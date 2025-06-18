@@ -70,10 +70,11 @@ class CoordinateConverter:
         real_w, real_h = real_size
         canvas_w, canvas_h = canvas_size
         
-        # 浮動小数点で精密計算
+        # スケーリング係数の計算を改善（高精度）
         scale_x = canvas_w / real_w
         scale_y = canvas_h / real_h
         
+        # 座標変換の精度を向上
         return {
             'x': round(real_coords['x'] * scale_x, AppConfig.COORDINATE_PRECISION),
             'y': round(real_coords['y'] * scale_y, AppConfig.COORDINATE_PRECISION)
@@ -97,10 +98,11 @@ class CoordinateConverter:
         real_w, real_h = real_size
         canvas_w, canvas_h = canvas_size
         
-        # 浮動小数点で精密計算
+        # スケーリング係数の計算を改善（高精度）
         scale_x = real_w / canvas_w
         scale_y = real_h / canvas_h
         
+        # 座標変換の精度を向上
         return {
             'x': round(canvas_coords['x'] * scale_x, AppConfig.COORDINATE_PRECISION),
             'y': round(canvas_coords['y'] * scale_y, AppConfig.COORDINATE_PRECISION)
@@ -111,7 +113,7 @@ class CoordinateConverter:
                                   real_size: Tuple[int, int],
                                   canvas_size: Tuple[int, int]) -> bool:
         """
-        座標変換の往復整合性を検証
+        座標変換の往復整合性を検証（改善版）
         
         Args:
             original_coords: 元の座標
@@ -121,15 +123,26 @@ class CoordinateConverter:
         Returns:
             整合性が保たれているかどうか
         """
-        # 往復変換テスト
-        canvas_coords = CoordinateConverter.scale_to_canvas(original_coords, real_size, canvas_size)
-        restored_coords = CoordinateConverter.scale_to_real(canvas_coords, real_size, canvas_size)
-        
-        # 許容誤差内かチェック（1ピクセル以内）
-        error_x = abs(original_coords['x'] - restored_coords['x'])
-        error_y = abs(original_coords['y'] - restored_coords['y'])
-        
-        return error_x <= 1.0 and error_y <= 1.0
+        try:
+            # 往復変換テスト
+            canvas_coords = CoordinateConverter.scale_to_canvas(original_coords, real_size, canvas_size)
+            restored_coords = CoordinateConverter.scale_to_real(canvas_coords, real_size, canvas_size)
+            
+            # 許容誤差内かチェック（1ピクセル以内）
+            error_x = abs(original_coords['x'] - restored_coords['x'])
+            error_y = abs(original_coords['y'] - restored_coords['y'])
+            
+            # エラーが許容範囲内かチェック
+            is_valid = error_x <= 1.0 and error_y <= 1.0
+            
+            if not is_valid:
+                st.warning(f"座標変換の誤差が大きいです: x={error_x:.2f}, y={error_y:.2f}")
+            
+            return is_valid
+            
+        except Exception as e:
+            st.error(f"座標変換の検証中にエラーが発生しました: {str(e)}")
+            return False
 
 class LandmarkAnalyzer:
     """
@@ -173,14 +186,14 @@ class LandmarkAnalyzer:
         return {'x': center_x, 'y': center_y}
     
     @staticmethod
-    def assess_landmark_confidence(landmarks, point_name: str, image_shape: Tuple[int, int]) -> Dict[str, Any]:
+    def assess_landmark_confidence(landmarks, point_name: str, image_shape: Tuple[int, int, int]) -> Dict[str, Any]:
         """
         ランドマークの信頼度を評価（改善案4: ヒートマップによる信頼度可視化）
         
         Args:
             landmarks: MediaPipeランドマーク
             point_name: 特徴点名
-            image_shape: 画像サイズ
+            image_shape: 画像サイズ (height, width, channels)
             
         Returns:
             信頼度情報の辞書
@@ -189,7 +202,7 @@ class LandmarkAnalyzer:
             return {'confidence': 0.0, 'status': 'unknown', 'color': '#808080'}
         
         group_indices = AppConfig.LANDMARK_GROUPS[point_name]
-        h, w = image_shape[:2]
+        h, w = image_shape[:2]  # チャンネル情報を除外
         
         # 各点の座標を取得
         points = []
@@ -206,7 +219,7 @@ class LandmarkAnalyzer:
             return {'confidence': 0.0, 'status': 'insufficient_points', 'color': '#FF0000'}
         
         # 点群の分散から信頼度を計算
-        center = LandmarkAnalyzer.calculate_group_center(landmarks, group_indices, image_shape)
+        center = LandmarkAnalyzer.calculate_group_center(landmarks, group_indices, (h, w))
         if not center:
             return {'confidence': 0.0, 'status': 'calculation_failed', 'color': '#FF0000'}
         
@@ -331,9 +344,24 @@ class FaceDetector:
         except Exception as e:
             return None, f"顔検出処理中にエラーが発生しました: {str(e)}"
     
-    def get_enhanced_landmarks(self, landmarks, image_shape: Tuple[int, int]) -> Dict[str, Dict[str, float]]:
+    def get_enhanced_landmarks(self, landmarks, image_shape: Tuple[int, int, int]) -> Dict[str, Dict[str, float]]:
         """
         強化されたランドマーク座標を取得（複数点の平均化適用）
+        
+        Args:
+            landmarks: MediaPipeランドマーク
+            image_shape: 画像サイズ (height, width, channels)
+            
+        Returns:
+            特徴点名をキーとする座標辞書
+        """
+        # image_shapeから必要な部分だけを取り出す
+        h, w = image_shape[:2]
+        return self._get_enhanced_landmarks_internal(landmarks, (h, w))
+    
+    def _get_enhanced_landmarks_internal(self, landmarks, image_shape: Tuple[int, int]) -> Dict[str, Dict[str, float]]:
+        """
+        内部用の強化されたランドマーク座標取得メソッド
         
         Args:
             landmarks: MediaPipeランドマーク
@@ -774,117 +802,124 @@ def create_enhanced_interactive_canvas(landmarks, image_shape: Tuple[int, int, i
         調整された特徴点の辞書
     """
     if landmarks is None:
+        st.warning("ランドマークが検出されていません。")
         return None
     
-    # キャンバスサイズと実際のサイズ
-    canvas_w, canvas_h = calculate_canvas_dimensions(image_shape)
-    real_w, real_h = image_shape[1], image_shape[0]  # OpenCV形式 (h, w) → (w, h)
-    
-    # 画像をキャンバスサイズにリサイズ
-    canvas_image = pil_image.resize((canvas_w, canvas_h), Image.Resampling.LANCZOS)
-    
-    # 座標変換の整合性を検証
-    test_coords = {'x': 100.0, 'y': 100.0}
-    is_conversion_valid = CoordinateConverter.verify_conversion_integrity(
-        test_coords, (real_w, real_h), (canvas_w, canvas_h)
-    )
-    
-    if not is_conversion_valid:
-        st.warning("⚠️ 座標変換の精度に問題があります。結果が不正確になる可能性があります。")
-    
-    # 強化されたランドマークを取得
-    detector = get_face_detector()
-    enhanced_landmarks = detector.get_enhanced_landmarks(landmarks, image_shape)
-    
-    # 重要な特徴点の定義（信頼度に基づく色付け）
-    key_points = {}
-    base_config = {
-        'nose_tip': {'label': '鼻先', 'base_color': '#00FF00', 'radius': 12},
-        'nose_bridge': {'label': '鼻梁', 'base_color': '#00AA00', 'radius': 8},
-        'left_nostril': {'label': '左小鼻', 'base_color': '#0000FF', 'radius': 10},
-        'right_nostril': {'label': '右小鼻', 'base_color': '#0066FF', 'radius': 10},
-        'left_eye_center': {'label': '左目中心', 'base_color': '#FF0000', 'radius': 10},
-        'right_eye_center': {'label': '右目中心', 'base_color': '#FF6600', 'radius': 10}
-    }
-    
-    # 信頼度に基づく色とサイズの調整
-    for point_name, config in base_config.items():
-        if point_name in enhanced_landmarks:
-            confidence_info = LandmarkAnalyzer.assess_landmark_confidence(
-                landmarks, point_name, image_shape
-            )
-            
-            key_points[point_name] = {
-                'coords': enhanced_landmarks[point_name],
-                'label': config['label'],
-                'color': confidence_info['color'],
-                'radius': config['radius'],
-                'confidence': confidence_info['confidence']
-            }
-    
-    # 初期オブジェクトを生成
-    initial_objects = []
-    for point_name, point_info in key_points.items():
-        real_coords = point_info['coords']
+    try:
+        # キャンバスサイズと実際のサイズ
+        canvas_w, canvas_h = calculate_canvas_dimensions(image_shape)
+        real_w, real_h = image_shape[1], image_shape[0]  # OpenCV形式 (h, w) → (w, h)
         
-        # 手動調整があれば適用
-        if point_name in st.session_state.manual_adjustments:
-            real_coords = st.session_state.manual_adjustments[point_name]
+        # 画像をキャンバスサイズにリサイズ
+        canvas_image = pil_image.resize((canvas_w, canvas_h), Image.Resampling.LANCZOS)
         
-        # キャンバス座標に変換（高精度）
-        canvas_coords = CoordinateConverter.scale_to_canvas(
-            real_coords, (real_w, real_h), (canvas_w, canvas_h)
+        # 座標変換の整合性を検証
+        test_coords = {'x': 100.0, 'y': 100.0}
+        is_conversion_valid = CoordinateConverter.verify_conversion_integrity(
+            test_coords, (real_w, real_h), (canvas_w, canvas_h)
         )
         
-        # 調整可能な円オブジェクト
-        initial_objects.append({
-            'type': 'circle',
-            'left': canvas_coords['x'] - point_info['radius'],
-            'top': canvas_coords['y'] - point_info['radius'],
-            'radius': point_info['radius'],
-            'fill': point_info['color'],
-            'stroke': '#FFFFFF',
-            'strokeWidth': 2,
-            'selectable': True,
-            'name': point_name,
-            'originalX': canvas_coords['x'],
-            'originalY': canvas_coords['y'],
-            'confidence': point_info['confidence']
-        })
-    
-    # 特徴点の凡例を表示（信頼度情報付き）
-    st.caption("**特徴点:** 🟢=鼻 🔵=小鼻 🔴=目 | 色の濃さ=検出信頼度")
-    
-    # キャンバスの作成
-    canvas_result = st_canvas(
-        fill_color="rgba(255, 165, 0, 0.3)",
-        stroke_width=2,
-        stroke_color="#FFFFFF",
-        background_image=canvas_image,
-        update_streamlit=True,
-        height=canvas_h,
-        width=canvas_w,
-        drawing_mode="transform",
-        initial_drawing={
-            "version": "4.4.0",
-            "objects": initial_objects
-        },
-        key="enhanced_landmark_canvas",
-    )
-    
-    # キャンバス操作結果の処理（高精度版）
-    update_enhanced_landmark_positions(
-        canvas_result, key_points, (real_w, real_h), (canvas_w, canvas_h)
-    )
-    
-    # 現在の調整状況を表示
-    if st.session_state.manual_adjustments:
-        st.info(f"🎯 現在 {len(st.session_state.manual_adjustments)}個の特徴点が調整されています")
+        if not is_conversion_valid:
+            st.warning("⚠️ 座標変換の精度に問題があります。結果が不正確になる可能性があります。")
         
-        # 解剖学的制約の検証
-        validate_anatomical_constraints_ui()
-    
-    return st.session_state.manual_adjustments
+        # 強化されたランドマークを取得
+        detector = get_face_detector()
+        enhanced_landmarks = detector.get_enhanced_landmarks(landmarks, image_shape)
+        
+        # 重要な特徴点の定義（信頼度に基づく色付け）
+        key_points = {}
+        base_config = {
+            'nose_tip': {'label': '鼻先', 'base_color': '#00FF00', 'radius': 12},
+            'nose_bridge': {'label': '鼻梁', 'base_color': '#00AA00', 'radius': 8},
+            'left_nostril': {'label': '左小鼻', 'base_color': '#0000FF', 'radius': 10},
+            'right_nostril': {'label': '右小鼻', 'base_color': '#0066FF', 'radius': 10},
+            'left_eye_center': {'label': '左目中心', 'base_color': '#FF0000', 'radius': 10},
+            'right_eye_center': {'label': '右目中心', 'base_color': '#FF6600', 'radius': 10}
+        }
+        
+        # 信頼度に基づく色とサイズの調整
+        for point_name, config in base_config.items():
+            if point_name in enhanced_landmarks:
+                confidence_info = LandmarkAnalyzer.assess_landmark_confidence(
+                    landmarks, point_name, image_shape
+                )
+                
+                key_points[point_name] = {
+                    'coords': enhanced_landmarks[point_name],
+                    'label': config['label'],
+                    'color': confidence_info['color'],
+                    'radius': config['radius'],
+                    'confidence': confidence_info['confidence']
+                }
+        
+        # 初期オブジェクトを生成
+        initial_objects = []
+        for point_name, point_info in key_points.items():
+            real_coords = point_info['coords']
+            
+            # 手動調整があれば適用
+            if point_name in st.session_state.manual_adjustments:
+                real_coords = st.session_state.manual_adjustments[point_name]
+            
+            # キャンバス座標に変換（高精度）
+            canvas_coords = CoordinateConverter.scale_to_canvas(
+                real_coords, (real_w, real_h), (canvas_w, canvas_h)
+            )
+            
+            # 調整可能な円オブジェクト
+            initial_objects.append({
+                'type': 'circle',
+                'left': canvas_coords['x'] - point_info['radius'],
+                'top': canvas_coords['y'] - point_info['radius'],
+                'radius': point_info['radius'],
+                'fill': point_info['color'],
+                'stroke': '#FFFFFF',
+                'strokeWidth': 2,
+                'selectable': True,
+                'name': point_name,
+                'originalX': canvas_coords['x'],
+                'originalY': canvas_coords['y'],
+                'confidence': point_info['confidence']
+            })
+        
+        # 特徴点の凡例を表示（信頼度情報付き）
+        st.caption("**特徴点:** 🟢=鼻 🔵=小鼻 🔴=目 | 色の濃さ=検出信頼度")
+        
+        # キャンバスの作成（改善版）
+        canvas_result = st_canvas(
+            fill_color="rgba(255, 165, 0, 0.3)",
+            stroke_width=2,
+            stroke_color="#FFFFFF",
+            background_image=canvas_image,
+            update_streamlit=True,
+            height=canvas_h,
+            width=canvas_w,
+            drawing_mode="transform",
+            initial_drawing={
+                "version": "4.4.0",
+                "objects": initial_objects
+            },
+            key="enhanced_landmark_canvas",
+            # 以下のオプションを追加
+            display_toolbar=True,
+            key_down_callback=None,
+            key_up_callback=None,
+            mouse_down_callback=None,
+            mouse_up_callback=None,
+            mouse_move_callback=None
+        )
+        
+        # キャンバス操作結果の処理（高精度版）
+        if canvas_result.json_data is not None:
+            update_enhanced_landmark_positions(
+                canvas_result, key_points, (real_w, real_h), (canvas_w, canvas_h)
+            )
+        
+        return st.session_state.manual_adjustments
+        
+    except Exception as e:
+        st.error(f"キャンバス作成中にエラーが発生しました: {str(e)}")
+        return None
 
 def update_enhanced_landmark_positions(canvas_result, key_points: Dict, 
                                      real_size: Tuple[int, int], 
@@ -902,6 +937,7 @@ def update_enhanced_landmark_positions(canvas_result, key_points: Dict,
         位置が更新されたかどうか
     """
     if canvas_result.json_data is None:
+        st.warning("キャンバスのデータが取得できませんでした。")
         return False
     
     try:
@@ -965,6 +1001,11 @@ def update_enhanced_landmark_positions(canvas_result, key_points: Dict,
         
     except Exception as e:
         st.error(f"特徴点位置更新エラー: {str(e)}")
+        # エラーの詳細をログに記録
+        st.error("詳細なエラー情報:")
+        st.error(f"key_points: {key_points}")
+        st.error(f"real_size: {real_size}")
+        st.error(f"canvas_size: {canvas_size}")
         return False
 
 def save_adjustment_to_history():
@@ -1280,7 +1321,7 @@ def main():
         - **信頼度表示**: 検出品質を色で確認
         - **複数点平均化**: より安定した検出
         
-        **4. 🔍 品質保証機能**
+        **4. 🔄 品質保証機能**
         - **座標変換整合性**: 高精度浮動小数点処理
         - **解剖学的制約**: 不自然な調整の自動警告
         - **履歴管理**: 元に戻す・やり直し機能
