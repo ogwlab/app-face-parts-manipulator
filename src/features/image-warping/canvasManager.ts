@@ -2,9 +2,10 @@ import * as fabric from 'fabric';
 
 export interface CanvasManager {
   canvas: fabric.Canvas | null;
-  initialize: (canvasElement: HTMLCanvasElement) => void;
+  initialize: (canvasElement: HTMLCanvasElement, width?: number, height?: number) => void;
   loadImage: (imageUrl: string) => Promise<fabric.Image>;
   updateImage: (image: fabric.Image) => void;
+  updateCanvasSize: (width: number, height: number) => void;
   dispose: () => void;
   getCanvasDataURL: () => string;
 }
@@ -13,14 +14,18 @@ export class FabricCanvasManager implements CanvasManager {
   public canvas: fabric.Canvas | null = null;
   private currentImage: fabric.Image | null = null;
 
-  initialize(canvasElement: HTMLCanvasElement): void {
+  initialize(canvasElement: HTMLCanvasElement, width?: number, height?: number): void {
     if (this.canvas) {
       this.dispose();
     }
 
+    // デフォルトサイズまたは指定されたサイズを使用
+    const canvasWidth = width || 800;
+    const canvasHeight = height || 600;
+
     this.canvas = new fabric.Canvas(canvasElement, {
-      width: 800,
-      height: 600,
+      width: canvasWidth,
+      height: canvasHeight,
       backgroundColor: '#f0f0f0',
       selection: false, // 選択を無効化
       preserveObjectStacking: true,
@@ -90,6 +95,30 @@ export class FabricCanvasManager implements CanvasManager {
     this.currentImage = image;
     this.canvas.add(image);
     this.canvas.bringObjectToFront(image);
+    this.canvas.renderAll();
+  }
+
+  updateCanvasSize(width: number, height: number): void {
+    if (!this.canvas) return;
+
+    // Canvasサイズを更新
+    this.canvas.setWidth(width);
+    this.canvas.setHeight(height);
+
+    // 既存の画像がある場合は、新しいサイズに合わせて調整
+    if (this.currentImage) {
+      const scaleX = width / (this.currentImage.width || 1);
+      const scaleY = height / (this.currentImage.height || 1);
+      const scale = Math.min(scaleX, scaleY) * 0.9; // 少し余白を残す
+
+      this.currentImage.set({
+        scaleX: scale,
+        scaleY: scale,
+        left: width / 2,
+        top: height / 2,
+      });
+    }
+
     this.canvas.renderAll();
   }
 

@@ -5,7 +5,7 @@ import { canvasManager } from '../features/image-warping/canvasManager';
 import { applyFaceWarping } from '../features/image-warping/warpingUtils';
 
 export interface UseImageWarpingReturn {
-  initializeCanvas: (canvasElement: HTMLCanvasElement) => void;
+  initializeCanvas: (canvasElement: HTMLCanvasElement, width?: number, height?: number) => void;
   processImage: () => Promise<void>;
   exportImage: () => string | null;
   isProcessing: boolean;
@@ -26,14 +26,28 @@ export const useImageWarping = (): UseImageWarpingReturn => {
   const originalFabricImage = useRef<fabric.Image | null>(null);
 
   // Canvas初期化
-  const initializeCanvas = useCallback((canvasElement: HTMLCanvasElement) => {
+  const initializeCanvas = useCallback((canvasElement: HTMLCanvasElement, width?: number, height?: number) => {
     try {
-      canvasManager.initialize(canvasElement);
-      console.log('✅ Canvas initialized successfully');
+      console.log('🎨 Canvas初期化開始:', { 
+        canvasElement: !!canvasElement, 
+        width, 
+        height,
+        elementWidth: canvasElement?.width,
+        elementHeight: canvasElement?.height
+      });
+      
+      canvasManager.initialize(canvasElement, width, height);
+      
+      console.log('✅ Canvas初期化成功:', {
+        canvas: !!canvasManager.canvas,
+        size: width ? `${width}x${height}` : 'デフォルト',
+        canvasWidth: canvasManager.canvas?.getWidth(),
+        canvasHeight: canvasManager.canvas?.getHeight()
+      });
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Canvas初期化エラー';
       setError(errorMessage);
-      console.error('❌ Canvas initialization failed:', error);
+      console.error('❌ Canvas初期化失敗:', error);
     }
   }, [setError]);
 
@@ -66,6 +80,7 @@ export const useImageWarping = (): UseImageWarpingReturn => {
       !faceDetection.landmarks ||
       isProcessingRef.current
     ) {
+      console.log('⚠️ ワーピング処理スキップ - 前提条件不足');
       return;
     }
 
@@ -73,6 +88,8 @@ export const useImageWarping = (): UseImageWarpingReturn => {
       isProcessingRef.current = true;
       setProcessing(true);
       setError(null);
+
+      console.log('🔄 ワーピング処理開始', faceParams);
 
       // ワーピング処理を適用
       const warpedImage = applyFaceWarping(
@@ -88,11 +105,11 @@ export const useImageWarping = (): UseImageWarpingReturn => {
       const processedDataURL = canvasManager.getCanvasDataURL();
       setProcessedImageUrl(processedDataURL);
 
-      console.log('✅ Image warping applied successfully');
+      console.log('✅ ワーピング処理完了');
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : '画像処理エラー';
       setError(errorMessage);
-      console.error('❌ Image processing failed:', error);
+      console.error('❌ ワーピング処理失敗:', error);
     } finally {
       isProcessingRef.current = false;
       setProcessing(false);
@@ -122,10 +139,31 @@ export const useImageWarping = (): UseImageWarpingReturn => {
     }
   }, [originalImage, loadOriginalImage, setProcessedImageUrl]);
 
-  // 顔パラメータが変更された時の処理
+  // 顔パラメータが変更された時の処理（デバウンス付き）
   useEffect(() => {
-    if (originalFabricImage.current && faceDetection) {
-      processImage();
+    console.log('🎛️ パラメータ変更検出 - 詳細ログ:', {
+      faceParams,
+      hasOriginalImage: !!originalFabricImage.current,
+      hasFaceDetection: !!faceDetection,
+      hasLandmarks: !!(faceDetection && faceDetection.landmarks),
+      canvasManager: !!canvasManager.canvas
+    });
+
+    if (originalFabricImage.current && faceDetection && faceDetection.landmarks) {
+      console.log('✅ 前提条件満たしている - ワーピング処理実行予定');
+      
+      // 少し遅延を入れてUIの応答性を保つ
+      const timeoutId = setTimeout(() => {
+        console.log('⏰ デバウンス完了 - ワーピング処理開始');
+        processImage();
+      }, 100);
+
+      return () => {
+        console.log('🚫 デバウンスキャンセル');
+        clearTimeout(timeoutId);
+      };
+    } else {
+      console.log('❌ 前提条件不足 - ワーピング処理スキップ');
     }
   }, [faceParams, processImage, faceDetection]);
 

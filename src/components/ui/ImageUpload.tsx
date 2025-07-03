@@ -36,65 +36,83 @@ const ImageUpload: React.FC = () => {
 
       // 画像の解像度チェック
       const img = new Image();
-      const url = URL.createObjectURL(file);
+      const tempUrl = URL.createObjectURL(file);
       
       img.onload = () => {
-        URL.revokeObjectURL(url);
-        
+        // 解像度チェック
         if (img.width > MAX_RESOLUTION || img.height > MAX_RESOLUTION) {
+          URL.revokeObjectURL(tempUrl);
           reject(new Error(`画像の解像度が大きすぎます。${MAX_RESOLUTION}px以下の画像を選択してください。`));
           return;
         }
 
+        // 新しいURLを作成して返す
+        const imageUrl = URL.createObjectURL(file);
         resolve({
           file,
-          url: URL.createObjectURL(file),
+          url: imageUrl,
           width: img.width,
           height: img.height,
         });
+        
+        // 一時URLをクリーンアップ
+        URL.revokeObjectURL(tempUrl);
       };
 
       img.onerror = () => {
-        URL.revokeObjectURL(url);
+        URL.revokeObjectURL(tempUrl);
         reject(new Error('画像ファイルの読み込みに失敗しました。'));
       };
 
-      img.src = url;
+      img.src = tempUrl;
     });
   }, [MAX_FILE_SIZE, MAX_RESOLUTION, SUPPORTED_FORMATS]);
 
   const handleFileSelect = useCallback(async (file: File) => {
+    console.log('📸 画像ファイル選択:', file.name, file.type, file.size);
     setLoading(true);
     setError(null);
 
     try {
       // 画像の検証とアップロード
       const imageData = await validateFile(file);
+      console.log('✅ 画像検証成功:', imageData.width, 'x', imageData.height);
+      
       setOriginalImage(imageData);
+      console.log('✅ 画像をストアに保存しました');
       
       // 画像が正常にアップロードされたら顔検出を実行
       const img = new Image();
       img.onload = async () => {
+        console.log('✅ 画像読み込み完了');
         try {
           // モデルの初期化（必要に応じて）
+          console.log('🔄 face-api.jsモデル初期化中...');
           await initializeModels();
+          console.log('✅ モデル初期化完了');
           
           // 顔検出の実行
+          console.log('🔄 顔検出実行中...');
           await detectFace(img);
+          console.log('✅ 顔検出完了');
         } catch (faceError) {
+          console.error('❌ 顔検出エラー:', faceError);
           const errorMessage = faceError instanceof Error ? faceError.message : '顔検出でエラーが発生しました。';
           setError(errorMessage);
-          setOriginalImage(null); // エラー時に画像をクリア
+          // エラー時も画像は保持する（削除しない）
+          console.log('⚠️ 顔検出に失敗しましたが、画像は表示されます');
         }
       };
       
       img.onerror = () => {
+        console.error('❌ 画像読み込みエラー');
         setError('画像の読み込みに失敗しました。');
       };
       
       img.src = imageData.url;
       
     } catch (error) {
+      console.error('❌ 画像処理エラー:', error);
       setError(error instanceof Error ? error.message : '画像の処理中にエラーが発生しました。');
     } finally {
       setLoading(false);
