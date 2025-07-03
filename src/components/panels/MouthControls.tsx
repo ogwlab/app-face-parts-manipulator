@@ -7,7 +7,7 @@ import {
   Button,
 } from '@mui/material';
 import { useFaceStore } from '../../stores/faceStore';
-import ParameterControl from '../common/ParameterControl';
+import ParameterControl from '../ui/ParameterControl';
 import { PARAM_LIMITS } from '../../types/face';
 
 const MouthControls: React.FC = () => {

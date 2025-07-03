@@ -7,10 +7,10 @@ import {
   Typography,
   Alert
 } from '@mui/material';
-import { useFaceStore } from '../stores/faceStore';
-import ImageUpload from './ImageUpload';
-import ImagePreview from './ImagePreview';
-import ControlPanel from './ControlPanel';
+import { useFaceStore } from '../../stores/faceStore';
+import ImageUpload from '../ui/ImageUpload';
+import ImagePreview from '../ui/ImagePreview';
+import ControlPanel from '../panels/ControlPanel';
 
 const MainLayout: React.FC = () => {
   const { error, originalImage } = useFaceStore();

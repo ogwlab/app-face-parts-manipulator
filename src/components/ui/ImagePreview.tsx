@@ -6,24 +6,34 @@ import {
   Paper,
   Divider,
 } from '@mui/material';
-import { useFaceStore } from '../stores/faceStore';
+import { useFaceStore } from '../../stores/faceStore';
+import { useImageWarping } from '../../hooks/useImageWarping';
+import type { FaceLandmarks } from '../../types/face';
 
 const ImagePreview: React.FC = () => {
   const { 
     originalImage, 
-    processedImageUrl, 
     isProcessing, 
     faceDetection 
   } = useFaceStore();
   
   const originalCanvasRef = useRef<HTMLCanvasElement>(null);
-  const processedCanvasRef = useRef<HTMLCanvasElement>(null);
+  const fabricCanvasRef = useRef<HTMLCanvasElement>(null);
   const [imageLoaded, setImageLoaded] = useState(false);
+  
+  const { initializeCanvas } = useImageWarping();
 
   // originalImageが変更された時にimageLoadedをリセット
   useEffect(() => {
     setImageLoaded(false);
   }, [originalImage]);
+
+  // Fabric.js Canvas の初期化
+  useEffect(() => {
+    if (fabricCanvasRef.current && originalImage) {
+      initializeCanvas(fabricCanvasRef.current);
+    }
+  }, [originalImage, initializeCanvas]);
 
   // 元画像を Canvas に描画
   useEffect(() => {
@@ -61,39 +71,19 @@ const ImagePreview: React.FC = () => {
     img.src = originalImage.url;
   }, [originalImage, faceDetection]);
 
-  // 編集後画像を Canvas に描画
+  // Fabric.js Canvas のサイズ調整
   useEffect(() => {
-    if (!processedImageUrl || !processedCanvasRef.current) return;
-
-    const canvas = processedCanvasRef.current;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-
-    const img = new Image();
-    img.onload = () => {
-      // Canvas サイズを設定
-      const maxWidth = 400;
-      const maxHeight = 400;
-      
-      const scale = Math.min(maxWidth / img.width, maxHeight / img.height);
-      const displayWidth = img.width * scale;
-      const displayHeight = img.height * scale;
-      
-      canvas.width = displayWidth;
-      canvas.height = displayHeight;
-      
-      // 画像を描画
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.drawImage(img, 0, 0, displayWidth, displayHeight);
-    };
-    
-    img.src = processedImageUrl;
-  }, [processedImageUrl]);
+    if (fabricCanvasRef.current) {
+      const canvas = fabricCanvasRef.current;
+      canvas.width = 400;
+      canvas.height = 400;
+    }
+  }, []);
 
   // 特徴点を描画する関数
   const drawLandmarks = (
     ctx: CanvasRenderingContext2D,
-    landmarks: any,
+    landmarks: FaceLandmarks,
     scale: number
   ) => {
     if (!landmarks) return;
@@ -223,9 +213,9 @@ const ImagePreview: React.FC = () => {
                     処理中...
                   </Typography>
                 </Box>
-              ) : processedImageUrl ? (
+              ) : originalImage ? (
                 <canvas
-                  ref={processedCanvasRef}
+                  ref={fabricCanvasRef}
                   style={{
                     maxWidth: '100%',
                     maxHeight: '100%',
@@ -249,8 +239,8 @@ const ImagePreview: React.FC = () => {
           画像サイズ: {originalImage.width} × {originalImage.height}
           {faceDetection && (
             <>
-              　|　顔検出: 成功
-              　|　信頼度: {(faceDetection.confidence * 100).toFixed(1)}%
+              {' | '}顔検出: 成功
+              {' | '}信頼度: {(faceDetection.confidence * 100).toFixed(1)}%
             </>
           )}
         </Typography>

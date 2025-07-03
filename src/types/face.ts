@@ -87,6 +87,7 @@ export interface FaceDetectionResult {
   isDetected: boolean;
   landmarks: FaceLandmarks;
   confidence: number;
+  warning?: string;
   centers?: {
     leftEye: Point;
     rightEye: Point;

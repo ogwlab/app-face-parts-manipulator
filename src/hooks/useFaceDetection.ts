@@ -8,32 +8,7 @@ import {
   calculatePartBounds 
 } from '../utils/faceDetection';
 import { useFaceStore } from '../stores/faceStore';
-
-export interface FaceDetectionResult {
-  landmarks: {
-    leftEye: { x: number; y: number }[];
-    rightEye: { x: number; y: number }[];
-    mouth: { x: number; y: number }[];
-    nose: { x: number; y: number }[];
-    jawline: { x: number; y: number }[];
-    leftEyebrow: { x: number; y: number }[];
-    rightEyebrow: { x: number; y: number }[];
-  };
-  centers: {
-    leftEye: { x: number; y: number };
-    rightEye: { x: number; y: number };
-    mouth: { x: number; y: number };
-    nose: { x: number; y: number };
-  };
-  bounds: {
-    leftEye: { left: number; top: number; right: number; bottom: number; width: number; height: number };
-    rightEye: { left: number; top: number; right: number; bottom: number; width: number; height: number };
-    mouth: { left: number; top: number; right: number; bottom: number; width: number; height: number };
-    nose: { left: number; top: number; right: number; bottom: number; width: number; height: number };
-  };
-  confidence: number;
-  warning?: string;
-}
+import type { FaceDetectionResult } from '../types/face';
 
 export interface UseFaceDetectionReturn {
   isLoading: boolean;
@@ -99,19 +74,7 @@ export const useFaceDetection = (): UseFaceDetectionReturn => {
 
       // 結果をまとめる
       const detectionResult: FaceDetectionResult = {
-        landmarks,
-        centers,
-        bounds,
-        confidence: detection.detection.score,
-        warning: warning || undefined
-      };
-
-      setResult(detectionResult);
-      
-      // グローバル状態に保存
-      setFaceDetection({
         isDetected: true,
-        confidence: detection.detection.score,
         landmarks: {
           leftEye: landmarks.leftEye,
           rightEye: landmarks.rightEye,
@@ -121,9 +84,16 @@ export const useFaceDetection = (): UseFaceDetectionReturn => {
           leftEyebrow: landmarks.leftEyebrow,
           rightEyebrow: landmarks.rightEyebrow
         },
+        confidence: detection.detection.score,
+        warning: warning || undefined,
         centers,
         bounds
-      });
+      };
+
+      setResult(detectionResult);
+      
+      // グローバル状態に保存
+      setFaceDetection(detectionResult);
 
       console.log('✅ 顔検出完了:', {
         confidence: detection.detection.score,

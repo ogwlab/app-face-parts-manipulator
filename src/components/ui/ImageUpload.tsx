@@ -6,9 +6,9 @@ import {
   CircularProgress,
   Alert,
 } from '@mui/material';
-import { useFaceStore } from '../stores/faceStore';
-import { useFaceDetection } from '../hooks/useFaceDetection';
-import type { ImageData } from '../types/face';
+import { useFaceStore } from '../../stores/faceStore';
+import { useFaceDetection } from '../../hooks/useFaceDetection';
+import type { ImageData } from '../../types/face';
 
 const ImageUpload: React.FC = () => {
   const { setOriginalImage, setError, isLoading, setLoading } = useFaceStore();
@@ -20,7 +20,7 @@ const ImageUpload: React.FC = () => {
   const MAX_RESOLUTION = 1920; // 1920px
   const SUPPORTED_FORMATS = ['image/jpeg', 'image/png', 'image/jpg'];
 
-  const validateFile = (file: File): Promise<ImageData> => {
+  const validateFile = useCallback((file: File): Promise<ImageData> => {
     return new Promise((resolve, reject) => {
       // ファイル形式チェック
       if (!SUPPORTED_FORMATS.includes(file.type)) {
@@ -61,7 +61,7 @@ const ImageUpload: React.FC = () => {
 
       img.src = url;
     });
-  };
+  }, [MAX_FILE_SIZE, MAX_RESOLUTION, SUPPORTED_FORMATS]);
 
   const handleFileSelect = useCallback(async (file: File) => {
     setLoading(true);
@@ -99,7 +99,7 @@ const ImageUpload: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }, [setOriginalImage, setError, setLoading, detectFace, initializeModels]);
+  }, [setOriginalImage, setError, setLoading, detectFace, initializeModels, validateFile]);
 
   const handleDrag = useCallback((e: React.DragEvent) => {
     e.preventDefault();

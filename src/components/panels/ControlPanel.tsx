@@ -6,10 +6,10 @@ import {
   Typography,
   Button,
 } from '@mui/material';
-import EyeControls from './controls/EyeControls';
-import MouthControls from './controls/MouthControls';
-import NoseControls from './controls/NoseControls';
-import { useFaceStore } from '../stores/faceStore';
+import EyeControls from './EyeControls';
+import MouthControls from './MouthControls';
+import NoseControls from './NoseControls';
+import { useFaceStore } from '../../stores/faceStore';
 
 interface TabPanelProps {
   children?: React.ReactNode;

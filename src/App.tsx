@@ -1,7 +1,7 @@
 import React from 'react';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
-import MainLayout from './components/MainLayout';
+import MainLayout from './components/layout/MainLayout';
 
 // Material-UIテーマの設定
 const theme = createTheme({
