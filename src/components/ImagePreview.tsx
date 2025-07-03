@@ -20,6 +20,11 @@ const ImagePreview: React.FC = () => {
   const processedCanvasRef = useRef<HTMLCanvasElement>(null);
   const [imageLoaded, setImageLoaded] = useState(false);
 
+  // originalImageが変更された時にimageLoadedをリセット
+  useEffect(() => {
+    setImageLoaded(false);
+  }, [originalImage]);
+
   // 元画像を Canvas に描画
   useEffect(() => {
     if (!originalImage || !originalCanvasRef.current) return;

@@ -84,6 +84,7 @@ const ImageUpload: React.FC = () => {
         } catch (faceError) {
           const errorMessage = faceError instanceof Error ? faceError.message : '顔検出でエラーが発生しました。';
           setError(errorMessage);
+          setOriginalImage(null); // エラー時に画像をクリア
         }
       };
       
