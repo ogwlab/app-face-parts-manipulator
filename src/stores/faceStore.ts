@@ -24,6 +24,9 @@ interface FaceStore {
   isProcessing: boolean;
   error: string | null;
   
+  // デバッグ設定
+  showDebugMesh: boolean;
+  
   // アクション
   setOriginalImage: (image: ImageData | null) => void;
   setProcessedImageUrl: (url: string | null) => void;
@@ -41,6 +44,7 @@ interface FaceStore {
   setLoading: (loading: boolean) => void;
   setProcessing: (processing: boolean) => void;
   setError: (error: string | null) => void;
+  toggleDebugMesh: () => void;
   clearAll: () => void;
 }
 
@@ -53,6 +57,7 @@ export const useFaceStore = create<FaceStore>((set) => ({
   isLoading: false,
   isProcessing: false,
   error: null,
+  showDebugMesh: false,
 
   // アクション
   setOriginalImage: (image) => set({ originalImage: image }),
@@ -129,6 +134,8 @@ export const useFaceStore = create<FaceStore>((set) => ({
   
   setError: (error) => set({ error }),
   
+  toggleDebugMesh: () => set((state) => ({ showDebugMesh: !state.showDebugMesh })),
+  
   clearAll: () => set({
     originalImage: null,
     processedImageUrl: null,
@@ -137,5 +144,6 @@ export const useFaceStore = create<FaceStore>((set) => ({
     isLoading: false,
     isProcessing: false,
     error: null,
+    showDebugMesh: false,
   }),
 })); 

@@ -20,7 +20,9 @@ const ImagePreview: React.FC = () => {
     originalImage, 
     processedImageUrl,
     isProcessing, 
-    faceDetection
+    faceDetection,
+    showDebugMesh,
+    toggleDebugMesh
   } = useFaceStore();
   
   const originalCanvasRef = useRef<HTMLCanvasElement>(null);
@@ -320,18 +322,42 @@ const ImagePreview: React.FC = () => {
               編集後
             </Typography>
             
-            <FormControl size="small" sx={{ minWidth: 100 }}>
-              <InputLabel>品質</InputLabel>
-              <Select
-                value={warpingQuality}
-                label="品質"
-                onChange={(e) => setWarpingQuality(e.target.value as 'fast' | 'medium' | 'high')}
+            <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+              <ToggleButton
+                value="mesh"
+                selected={showDebugMesh}
+                onChange={() => toggleDebugMesh()}
+                size="small"
+                sx={{ 
+                  py: 0.5, 
+                  px: 1, 
+                  fontSize: '0.75rem',
+                  minWidth: 'auto',
+                  '&.Mui-selected': {
+                    backgroundColor: 'error.main',
+                    color: 'error.contrastText',
+                    '&:hover': {
+                      backgroundColor: 'error.dark',
+                    },
+                  },
+                }}
               >
-                <MenuItem value="fast">高速</MenuItem>
-                <MenuItem value="medium">標準</MenuItem>
-                <MenuItem value="high">高品質</MenuItem>
-              </Select>
-            </FormControl>
+                🔺 メッシュ
+              </ToggleButton>
+              
+              <FormControl size="small" sx={{ minWidth: 100 }}>
+                <InputLabel>品質</InputLabel>
+                <Select
+                  value={warpingQuality}
+                  label="品質"
+                  onChange={(e) => setWarpingQuality(e.target.value as 'fast' | 'medium' | 'high')}
+                >
+                  <MenuItem value="fast">高速</MenuItem>
+                  <MenuItem value="medium">標準</MenuItem>
+                  <MenuItem value="high">高品質</MenuItem>
+                </Select>
+              </FormControl>
+            </Box>
           </Box>
           
           <Box
