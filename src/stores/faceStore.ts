@@ -8,6 +8,12 @@ import {
   defaultFaceParams 
 } from '../types/face';
 
+interface ExportSettings {
+  format: 'png' | 'jpg';
+  jpgQuality: number;
+  fileName?: string;
+}
+
 interface FaceStore {
   // 画像データ
   originalImage: ImageData | null;
@@ -23,6 +29,9 @@ interface FaceStore {
   isLoading: boolean;
   isProcessing: boolean;
   error: string | null;
+  
+  // エクスポート設定
+  exportSettings: ExportSettings;
   
   // アクション
   setOriginalImage: (image: ImageData | null) => void;
@@ -41,6 +50,7 @@ interface FaceStore {
   setLoading: (loading: boolean) => void;
   setProcessing: (processing: boolean) => void;
   setError: (error: string | null) => void;
+  setExportSettings: (settings: ExportSettings) => void;
   clearAll: () => void;
 }
 
@@ -53,6 +63,10 @@ export const useFaceStore = create<FaceStore>((set) => ({
   isLoading: false,
   isProcessing: false,
   error: null,
+  exportSettings: {
+    format: 'png',
+    jpgQuality: 0.9,
+  },
 
   // アクション
   setOriginalImage: (image) => set({ originalImage: image }),
@@ -129,6 +143,8 @@ export const useFaceStore = create<FaceStore>((set) => ({
   
   setError: (error) => set({ error }),
   
+  setExportSettings: (settings) => set({ exportSettings: settings }),
+  
   clearAll: () => set({
     originalImage: null,
     processedImageUrl: null,
@@ -137,5 +153,9 @@ export const useFaceStore = create<FaceStore>((set) => ({
     isLoading: false,
     isProcessing: false,
     error: null,
+    exportSettings: {
+      format: 'png',
+      jpgQuality: 0.9,
+    },
   }),
 })); 

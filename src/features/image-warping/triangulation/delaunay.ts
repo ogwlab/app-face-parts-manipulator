@@ -292,22 +292,22 @@ export function generateBoundaryPoints(width: number, height: number): Point[] {
   
   // 上辺
   for (let x = 0; x <= width; x += spacing) {
-    points.push({ x, y: 0 });
+    points.push({ x: Math.min(x, width - 1), y: 0 });
   }
   
   // 下辺
   for (let x = 0; x <= width; x += spacing) {
-    points.push({ x, y: height });
+    points.push({ x: Math.min(x, width - 1), y: height - 1 });
   }
   
   // 左辺（角を除く）
   for (let y = spacing; y < height; y += spacing) {
-    points.push({ x: 0, y });
+    points.push({ x: 0, y: Math.min(y, height - 1) });
   }
   
   // 右辺（角を除く）
   for (let y = spacing; y < height; y += spacing) {
-    points.push({ x: width, y });
+    points.push({ x: width - 1, y: Math.min(y, height - 1) });
   }
   
   return points;

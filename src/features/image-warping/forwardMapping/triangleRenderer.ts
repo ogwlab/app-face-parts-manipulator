@@ -278,20 +278,23 @@ function bilinearSample(
   const { width, height, data } = imageData;
   
   // 境界チェック
-  if (x < 0 || x >= width - 1 || y < 0 || y >= height - 1) {
+  if (x < 0 || x >= width || y < 0 || y >= height) {
     return { r: 0, g: 0, b: 0, a: 0 };
   }
   
   const x1 = Math.floor(x);
   const y1 = Math.floor(y);
-  const x2 = x1 + 1;
-  const y2 = y1 + 1;
+  const x2 = Math.min(x1 + 1, width - 1);
+  const y2 = Math.min(y1 + 1, height - 1);
   
   const fx = x - x1;
   const fy = y - y1;
   
   // 4つの隣接ピクセルを取得
   const getPixel = (px: number, py: number) => {
+    // 追加の境界チェック
+    px = Math.max(0, Math.min(px, width - 1));
+    py = Math.max(0, Math.min(py, height - 1));
     const idx = (py * width + px) * 4;
     return {
       r: data[idx],

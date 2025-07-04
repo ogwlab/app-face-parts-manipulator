@@ -13,6 +13,7 @@ import {
 } from '@mui/material';
 import { useFaceStore } from '../../stores/faceStore';
 import { useImageWarping } from '../../hooks/useImageWarping';
+import SaveButton from './SaveButton';
 import type { FaceLandmarks } from '../../types/face';
 
 const ImagePreview: React.FC = () => {
@@ -320,18 +321,25 @@ const ImagePreview: React.FC = () => {
               編集後
             </Typography>
             
-            <FormControl size="small" sx={{ minWidth: 100 }}>
-              <InputLabel>品質</InputLabel>
-              <Select
-                value={warpingQuality}
-                label="品質"
-                onChange={(e) => setWarpingQuality(e.target.value as 'fast' | 'medium' | 'high')}
-              >
-                <MenuItem value="fast">高速</MenuItem>
-                <MenuItem value="medium">標準</MenuItem>
-                <MenuItem value="high">高品質</MenuItem>
-              </Select>
-            </FormControl>
+            <Box sx={{ display: 'flex', gap: 1 }}>
+              <FormControl size="small" sx={{ minWidth: 100 }}>
+                <InputLabel>品質</InputLabel>
+                <Select
+                  value={warpingQuality}
+                  label="品質"
+                  onChange={(e) => setWarpingQuality(e.target.value as 'fast' | 'medium' | 'high')}
+                >
+                  <MenuItem value="fast">高速</MenuItem>
+                  <MenuItem value="medium">標準</MenuItem>
+                  <MenuItem value="high">高品質</MenuItem>
+                </Select>
+              </FormControl>
+              
+              {/* 保存ボタン */}
+              {processedImageUrl && (
+                <SaveButton canvasRef={fabricCanvasRef} />
+              )}
+            </Box>
           </Box>
           
           <Box
