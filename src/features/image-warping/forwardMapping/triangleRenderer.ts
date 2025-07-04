@@ -7,6 +7,19 @@ import type { Point } from '../../../types/face';
 import type { Triangle, AffineTransform } from '../triangulation/types';
 import { calculateBarycentricCoordinates } from './affineTransform';
 
+// デバッグ用のカウンター
+let renderedTriangleCount = 0;
+
+/**
+ * 三角形の面積を計算（デバッグ用）
+ */
+function calculateTriangleArea(triangle: Triangle): number {
+  const [p1, p2, p3] = triangle.vertices;
+  return Math.abs(
+    (p1.x * (p2.y - p3.y) + p2.x * (p3.y - p1.y) + p3.x * (p1.y - p2.y)) / 2
+  );
+}
+
 /**
  * 三角形をスキャンライン法でレンダリング
  */
@@ -28,40 +41,13 @@ export function renderTriangle(
   const sourceImageData = sourceCtx.getImageData(0, 0, sourceCanvas.width, sourceCanvas.height);
   const targetImageData = targetCtx.getImageData(0, 0, targetCanvas.width, targetCanvas.height);
   
-  // 三角形の境界ボックスを計算
-  const bounds = getTriangleBounds(targetTriangle, targetCanvas.width, targetCanvas.height);
-  
-  // スキャンライン法で三角形内をレンダリング
-  for (let y = bounds.minY; y <= bounds.maxY; y++) {
-    const scanline = getScanlineIntersections(targetTriangle, y);
-    if (scanline.length < 2) continue;
-    
-    const minX = Math.max(0, Math.floor(Math.min(scanline[0], scanline[1])));
-    const maxX = Math.min(targetCanvas.width - 1, Math.ceil(Math.max(scanline[0], scanline[1])));
-    
-    for (let x = minX; x <= maxX; x++) {
-      const targetPoint: Point = { x, y };
-      
-      // 重心座標を計算して、元画像の対応点を求める
-      const barycentric = calculateBarycentricCoordinates(targetPoint, targetTriangle);
-      
-      // 重心座標が有効な範囲内かチェック
-      if (barycentric.u >= 0 && barycentric.v >= 0 && barycentric.w >= 0) {
-        // 元画像での座標を計算
-        const sourcePoint = barycentricToSourcePoint(barycentric, sourceTriangle);
-        
-        // バイリニア補間でピクセル値を取得
-        const color = bilinearSample(sourceImageData, sourcePoint.x, sourcePoint.y);
-        
-        // ターゲットに描画
-        const targetIdx = (y * targetCanvas.width + x) * 4;
-        targetImageData.data[targetIdx] = color.r;
-        targetImageData.data[targetIdx + 1] = color.g;
-        targetImageData.data[targetIdx + 2] = color.b;
-        targetImageData.data[targetIdx + 3] = color.a;
-      }
-    }
-  }
+  renderTriangleToImageData(
+    sourceImageData,
+    targetImageData,
+    sourceTriangle,
+    targetTriangle,
+    _transform
+  );
   
   targetCtx.putImageData(targetImageData, 0, 0);
 }
@@ -81,6 +67,9 @@ export function renderTriangleMesh(
   console.log(`🎨 三角形メッシュレンダリング開始: ${trianglePairs.length}個の三角形`);
   const startTime = performance.now();
   
+  // デバッグ用カウンターをリセット
+  renderedTriangleCount = 0;
+  
   const sourceCtx = sourceCanvas.getContext('2d');
   const targetCtx = targetCanvas.getContext('2d');
   
@@ -93,10 +82,22 @@ export function renderTriangleMesh(
   const sourceImageData = sourceCtx.getImageData(0, 0, sourceCanvas.width, sourceCanvas.height);
   const targetImageData = targetCtx.createImageData(targetCanvas.width, targetCanvas.height);
   
+  // デバッグ: 最初の三角形の詳細を表示
+  if (trianglePairs.length > 0) {
+    const firstPair = trianglePairs[0];
+    console.log('🔍 最初の三角形ペア:', {
+      source: firstPair.source.vertices.map(v => `(${v.x.toFixed(1)}, ${v.y.toFixed(1)})`),
+      target: firstPair.target.vertices.map(v => `(${v.x.toFixed(1)}, ${v.y.toFixed(1)})`),
+      transform: firstPair.transform
+    });
+  }
+  
   // 各三角形をレンダリング
   let renderedTriangles = 0;
+  let pixelsRendered = 0;
+  
   for (const { source, target, transform } of trianglePairs) {
-    renderTriangleToImageData(
+    const pixelCount = renderTriangleToImageData(
       sourceImageData,
       targetImageData,
       source,
@@ -104,11 +105,12 @@ export function renderTriangleMesh(
       transform
     );
     renderedTriangles++;
+    pixelsRendered += pixelCount;
     
     // 進捗報告
-    if (renderedTriangles % 100 === 0) {
+    if (renderedTriangles % 50 === 0 || renderedTriangles <= 5) {
       const progress = Math.round((renderedTriangles / trianglePairs.length) * 100);
-      console.log(`📐 レンダリング進捗: ${progress}%`);
+      console.log(`📐 レンダリング進捗: ${progress}% (${renderedTriangles}/${trianglePairs.length}三角形, ${pixelsRendered}ピクセル)`);
     }
   }
   
@@ -116,7 +118,7 @@ export function renderTriangleMesh(
   targetCtx.putImageData(targetImageData, 0, 0);
   
   const endTime = performance.now();
-  console.log(`✅ 三角形メッシュレンダリング完了: ${(endTime - startTime).toFixed(1)}ms`);
+  console.log(`✅ 三角形メッシュレンダリング完了: ${(endTime - startTime).toFixed(1)}ms, 総ピクセル数: ${pixelsRendered}`);
 }
 
 /**
@@ -128,12 +130,47 @@ function renderTriangleToImageData(
   sourceTriangle: Triangle,
   targetTriangle: Triangle,
   _transform: AffineTransform
-): void {
+): number {
   const targetWidth = targetImageData.width;
   const targetHeight = targetImageData.height;
+  let pixelCount = 0;
   
   // 三角形の境界ボックスを計算
   const bounds = getTriangleBounds(targetTriangle, targetWidth, targetHeight);
+  
+  // デバッグ: 最初の数個の三角形の境界を表示
+  if (renderedTriangleCount < 5) {
+    console.log(`🔺 三角形 ${renderedTriangleCount} の詳細:`, {
+      境界: bounds,
+      頂点: {
+        v0: `(${targetTriangle.vertices[0].x.toFixed(1)}, ${targetTriangle.vertices[0].y.toFixed(1)})`,
+        v1: `(${targetTriangle.vertices[1].x.toFixed(1)}, ${targetTriangle.vertices[1].y.toFixed(1)})`,
+        v2: `(${targetTriangle.vertices[2].x.toFixed(1)}, ${targetTriangle.vertices[2].y.toFixed(1)})`
+      },
+      面積: calculateTriangleArea(targetTriangle),
+      画面内: bounds.minX >= 0 && bounds.minY >= 0 && bounds.maxX < targetWidth && bounds.maxY < targetHeight
+    });
+  }
+  
+  // カウンターを常にインクリメント（デバッグログの外で）
+  renderedTriangleCount++;
+  
+  // 境界チェック - 三角形が画面外の場合はスキップ
+  if (bounds.maxX < 0 || bounds.maxY < 0 || bounds.minX >= targetWidth || bounds.minY >= targetHeight) {
+    if (renderedTriangleCount <= 10) {
+      console.log(`⚠️ 三角形 ${renderedTriangleCount - 1} は画面外`);
+    }
+    return pixelCount;
+  }
+  
+  // 面積が極小の三角形はスキップ
+  const area = calculateTriangleArea(targetTriangle);
+  if (area < 0.5) {
+    if (renderedTriangleCount <= 10) {
+      console.log(`⚠️ 三角形 ${renderedTriangleCount - 1} は面積が極小: ${area.toFixed(2)}`);
+    }
+    return pixelCount;
+  }
   
   // スキャンライン法で三角形内をレンダリング
   for (let y = bounds.minY; y <= bounds.maxY; y++) {
@@ -164,9 +201,13 @@ function renderTriangleToImageData(
         targetImageData.data[targetIdx + 1] = color.g;
         targetImageData.data[targetIdx + 2] = color.b;
         targetImageData.data[targetIdx + 3] = color.a;
+        
+        pixelCount++;
       }
     }
   }
+  
+  return pixelCount;
 }
 
 /**

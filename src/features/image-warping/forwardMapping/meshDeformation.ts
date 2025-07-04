@@ -7,7 +7,7 @@ import type { Point, FaceParams, FaceLandmarks } from '../../../types/face';
 import type { Triangle, TriangleMesh, DeformedTrianglePair, MeshDeformationResult } from '../triangulation/types';
 import { createFaceOptimizedTriangulation, generateBoundaryPoints } from '../triangulation/delaunay';
 import { calculateAffineTransform } from './affineTransform';
-import { renderTriangleMesh } from './triangleRenderer';
+import { renderTriangleMesh, drawMeshEdges } from './triangleRenderer';
 
 /**
  * 顔パラメータに基づいてランドマークを変形
@@ -193,6 +193,31 @@ function calculatePartCenter(points: Point[]): Point {
 }
 
 /**
+ * ランドマークをCanvas座標にスケール
+ */
+function scaleLandmarksToCanvas(
+  landmarks: FaceLandmarks,
+  scale: { x: number; y: number }
+): FaceLandmarks {
+  const scalePoints = (points: Point[]): Point[] => {
+    return points.map(point => ({
+      x: point.x * scale.x,
+      y: point.y * scale.y
+    }));
+  };
+
+  return {
+    jawline: scalePoints(landmarks.jawline),
+    leftEyebrow: scalePoints(landmarks.leftEyebrow),
+    rightEyebrow: scalePoints(landmarks.rightEyebrow),
+    nose: scalePoints(landmarks.nose),
+    leftEye: scalePoints(landmarks.leftEye),
+    rightEye: scalePoints(landmarks.rightEye),
+    mouth: scalePoints(landmarks.mouth)
+  };
+}
+
+/**
  * メッシュ変形を実行
  */
 export function createMeshDeformation(
@@ -205,20 +230,29 @@ export function createMeshDeformation(
   
   // 1. 元の特徴点から三角形メッシュを作成
   const originalPoints = landmarksToPoints(originalLandmarks);
+  console.log(`📍 元のランドマーク点数: ${originalPoints.length}`);
+  
   const sourceMesh = createFaceOptimizedTriangulation(
     originalPoints,
     imageWidth,
     imageHeight
   );
+  console.log(`📐 ソースメッシュ: 頂点数=${sourceMesh.vertices.length}, 三角形数=${sourceMesh.triangles.length}`);
   
   // 2. 変形後の特徴点配列を作成（同じ順序を保つ）
   const deformedPoints = landmarksToPoints(deformedLandmarks);
+  console.log(`📍 変形後のランドマーク点数: ${deformedPoints.length}`);
   
   // 3. 境界点を追加（変形しない固定点として）
   const boundaryPoints = generateBoundaryPoints(imageWidth, imageHeight);
   const allDeformedPoints = [...deformedPoints, ...boundaryPoints];
   
   console.log(`🔧 ポイント数統一: landmarks=${deformedPoints.length}, boundary=${boundaryPoints.length}, total=${allDeformedPoints.length}`);
+  
+  // デバッグ: 最初の数点の座標を確認
+  console.log('🔍 最初の5つの変形点:', deformedPoints.slice(0, 5).map((p, i) => 
+    `Point ${i}: (${p.x.toFixed(2)}, ${p.y.toFixed(2)})`
+  ));
   
   // 4. 変形後のメッシュを作成（頂点数を統一）
   const targetMesh: TriangleMesh = {
@@ -249,6 +283,15 @@ export function createMeshDeformation(
         allDeformedPoints[idx1],
         allDeformedPoints[idx2]
       ];
+      
+      // デバッグ: 最初の三角形の頂点座標を表示
+      if (idx < 3) {
+        console.log(`🔺 三角形 ${idx} の頂点:`, {
+          v0: `(${deformedVertices[0].x.toFixed(2)}, ${deformedVertices[0].y.toFixed(2)})`,
+          v1: `(${deformedVertices[1].x.toFixed(2)}, ${deformedVertices[1].y.toFixed(2)})`,
+          v2: `(${deformedVertices[2].x.toFixed(2)}, ${deformedVertices[2].y.toFixed(2)})`
+        });
+      }
       
       return {
         vertices: deformedVertices,
@@ -359,6 +402,17 @@ export function applyMeshDeformation(
 }
 
 /**
+ * デバッグオプション
+ */
+export interface MeshDebugOptions {
+  enabled: boolean;
+  drawSourceMesh?: boolean;
+  drawTargetMesh?: boolean;
+  meshColor?: string;
+  meshLineWidth?: number;
+}
+
+/**
  * 統合された変形処理
  */
 export function performMeshBasedDeformation(
@@ -366,9 +420,15 @@ export function performMeshBasedDeformation(
   landmarks: FaceLandmarks,
   faceParams: FaceParams,
   canvasWidth: number,
-  canvasHeight: number
+  canvasHeight: number,
+  debugOptions: MeshDebugOptions = { enabled: false }
 ): HTMLCanvasElement {
   console.log('🚀 [Version 5.2.0] メッシュベース変形処理開始');
+  
+  // デバッグモードのログ
+  if (debugOptions.enabled) {
+    console.log('🐛 デバッグモード有効', debugOptions);
+  }
   
   // 1. ソースCanvasを作成
   const sourceCanvas = document.createElement('canvas');
@@ -389,12 +449,28 @@ export function performMeshBasedDeformation(
     y: canvasHeight / sourceImageElement.naturalHeight
   };
   
-  // 3. ランドマークを変形
-  const deformedLandmarks = deformLandmarks(landmarks, faceParams, imageScale);
+  // 3. ランドマークをCanvas座標にスケール
+  const scaledLandmarks = scaleLandmarksToCanvas(landmarks, imageScale);
+  console.log('📏 ランドマーク座標スケール:', {
+    originalScale: `${sourceImageElement.naturalWidth}x${sourceImageElement.naturalHeight}`,
+    canvasScale: `${canvasWidth}x${canvasHeight}`,
+    imageScale
+  });
   
-  // 4. メッシュ変形を作成
+  // 4. スケール済みランドマークを変形
+  const deformedLandmarks = deformLandmarks(scaledLandmarks, faceParams, { x: 1, y: 1 }); // スケール済みなので1.0を使用
+  
+  // デバッグ: パラメータと変形の確認
+  console.log('🔍 変形パラメータ:', {
+    leftEye: faceParams.leftEye,
+    rightEye: faceParams.rightEye,
+    mouth: faceParams.mouth,
+    nose: faceParams.nose
+  });
+  
+  // 5. メッシュ変形を作成
   const deformationResult = createMeshDeformation(
-    landmarks,
+    scaledLandmarks,
     deformedLandmarks,
     canvasWidth,
     canvasHeight
@@ -407,6 +483,41 @@ export function performMeshBasedDeformation(
   
   // 6. 変形を適用
   applyMeshDeformation(sourceCanvas, targetCanvas, deformationResult);
+  
+  // 7. デバッグ描画
+  if (debugOptions.enabled) {
+    const targetCtx = targetCanvas.getContext('2d');
+    if (targetCtx) {
+      // ソースメッシュの描画（別Canvasに）
+      if (debugOptions.drawSourceMesh) {
+        const debugCanvas = document.createElement('canvas');
+        debugCanvas.width = canvasWidth;
+        debugCanvas.height = canvasHeight;
+        const debugCtx = debugCanvas.getContext('2d');
+        if (debugCtx) {
+          debugCtx.drawImage(sourceCanvas, 0, 0);
+          drawMeshEdges(
+            debugCanvas,
+            deformationResult.sourceMesh.triangles,
+            debugOptions.meshColor || 'rgba(0, 255, 0, 0.5)',
+            debugOptions.meshLineWidth || 1
+          );
+          console.log('🐛 ソースメッシュ描画完了');
+        }
+      }
+      
+      // ターゲットメッシュの描画
+      if (debugOptions.drawTargetMesh) {
+        drawMeshEdges(
+          targetCanvas,
+          deformationResult.targetMesh.triangles,
+          debugOptions.meshColor || 'rgba(255, 0, 0, 0.5)',
+          debugOptions.meshLineWidth || 1
+        );
+        console.log('🐛 ターゲットメッシュ描画完了');
+      }
+    }
+  }
   
   console.log('✅ [Version 5.2.0] メッシュベース変形処理完了');
   return targetCanvas;

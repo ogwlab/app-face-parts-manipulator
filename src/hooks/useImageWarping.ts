@@ -1,8 +1,7 @@
 import { useEffect, useCallback, useRef } from 'react';
-import * as fabric from 'fabric';
 import { useFaceStore } from '../stores/faceStore';
 import { canvasManager } from '../features/image-warping/canvasManager';
-import { applyFaceWarping } from '../features/image-warping/warpingUtils';
+import { applyAdaptiveTPSWarping, getAdaptiveOptionsFromQuality } from '../features/image-warping/adaptiveWarping';
 
 export interface UseImageWarpingReturn {
   initializeCanvas: (canvasElement: HTMLCanvasElement, width?: number, height?: number) => void;
@@ -23,7 +22,6 @@ export const useImageWarping = (): UseImageWarpingReturn => {
   } = useFaceStore();
 
   const isProcessingRef = useRef(false);
-  const originalFabricImage = useRef<fabric.Image | null>(null);
 
   // Canvas初期化
   const initializeCanvas = useCallback((canvasElement: HTMLCanvasElement, width?: number, height?: number) => {
@@ -59,8 +57,8 @@ export const useImageWarping = (): UseImageWarpingReturn => {
       setProcessing(true);
       setError(null);
 
-      const fabricImage = await canvasManager.loadImage(originalImage.url);
-      originalFabricImage.current = fabricImage;
+      // Canvas managerに画像を読み込む
+      await canvasManager.loadImage(originalImage.url);
       
       console.log('✅ Original image loaded to canvas');
     } catch (error) {
@@ -75,7 +73,7 @@ export const useImageWarping = (): UseImageWarpingReturn => {
   // 画像処理（ワーピング適用）
   const processImage = useCallback(async () => {
     if (
-      !originalFabricImage.current ||
+      !originalImage ||
       !faceDetection ||
       !faceDetection.landmarks ||
       isProcessingRef.current
@@ -91,18 +89,38 @@ export const useImageWarping = (): UseImageWarpingReturn => {
 
       console.log('🔄 ワーピング処理開始', faceParams);
 
-      // ワーピング処理を適用
-      const warpedImage = applyFaceWarping(
-        originalFabricImage.current,
+      // 元画像を読み込む
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      
+      await new Promise<void>((resolve, reject) => {
+        img.onload = () => resolve();
+        img.onerror = () => reject(new Error('画像の読み込みに失敗'));
+        img.src = originalImage.url;
+      });
+
+      // Canvas サイズを取得
+      const canvas = canvasManager.getCanvas();
+      if (!canvas) {
+        throw new Error('Canvas が初期化されていません');
+      }
+
+      const canvasWidth = canvas.getWidth();
+      const canvasHeight = canvas.getHeight();
+
+      // 高品質ワーピング処理を適用
+      const options = getAdaptiveOptionsFromQuality('high');
+      const warpedCanvas = applyAdaptiveTPSWarping(
+        img,
         faceDetection.landmarks,
-        faceParams
+        faceParams,
+        canvasWidth,
+        canvasHeight,
+        options
       );
 
-      // Canvasを更新
-      canvasManager.updateImage(warpedImage);
-
       // 処理後の画像URLを生成
-      const processedDataURL = canvasManager.getCanvasDataURL();
+      const processedDataURL = warpedCanvas.toDataURL('image/png');
       setProcessedImageUrl(processedDataURL);
 
       console.log('✅ ワーピング処理完了');
@@ -114,7 +132,7 @@ export const useImageWarping = (): UseImageWarpingReturn => {
       isProcessingRef.current = false;
       setProcessing(false);
     }
-  }, [faceDetection, faceParams, setProcessedImageUrl, setProcessing, setError]);
+  }, [originalImage, faceDetection, faceParams, setProcessedImageUrl, setProcessing, setError]);
 
   // 画像エクスポート
   const exportImage = useCallback((): string | null => {
@@ -134,7 +152,6 @@ export const useImageWarping = (): UseImageWarpingReturn => {
       loadOriginalImage();
     } else {
       // 画像がクリアされた場合
-      originalFabricImage.current = null;
       setProcessedImageUrl(null);
     }
   }, [originalImage, loadOriginalImage, setProcessedImageUrl]);
@@ -143,13 +160,13 @@ export const useImageWarping = (): UseImageWarpingReturn => {
   useEffect(() => {
     console.log('🎛️ パラメータ変更検出 - 詳細ログ:', {
       faceParams,
-      hasOriginalImage: !!originalFabricImage.current,
+      hasOriginalImage: !!originalImage,
       hasFaceDetection: !!faceDetection,
       hasLandmarks: !!(faceDetection && faceDetection.landmarks),
       canvasManager: !!canvasManager.canvas
     });
 
-    if (originalFabricImage.current && faceDetection && faceDetection.landmarks) {
+    if (originalImage && faceDetection && faceDetection.landmarks) {
       console.log('✅ 前提条件満たしている - ワーピング処理実行予定');
       
       // 少し遅延を入れてUIの応答性を保つ
@@ -165,7 +182,7 @@ export const useImageWarping = (): UseImageWarpingReturn => {
     } else {
       console.log('❌ 前提条件不足 - ワーピング処理スキップ');
     }
-  }, [faceParams, processImage, faceDetection]);
+  }, [faceParams, processImage, faceDetection, originalImage]);
 
   // クリーンアップ
   useEffect(() => {

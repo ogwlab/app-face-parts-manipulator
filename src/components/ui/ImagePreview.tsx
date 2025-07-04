@@ -13,8 +13,6 @@ import {
 } from '@mui/material';
 import { useFaceStore } from '../../stores/faceStore';
 import { useImageWarping } from '../../hooks/useImageWarping';
-import { applySimpleFaceWarping } from '../../features/image-warping/simpleWarping';
-import { applyAdaptiveTPSWarping, getAdaptiveOptionsFromQuality } from '../../features/image-warping/adaptiveWarping';
 import type { FaceLandmarks } from '../../types/face';
 
 const ImagePreview: React.FC = () => {
@@ -22,9 +20,7 @@ const ImagePreview: React.FC = () => {
     originalImage, 
     processedImageUrl,
     isProcessing, 
-    faceDetection,
-    faceParams,
-    setProcessedImageUrl
+    faceDetection
   } = useFaceStore();
   
   const originalCanvasRef = useRef<HTMLCanvasElement>(null);
@@ -147,122 +143,14 @@ const ImagePreview: React.FC = () => {
     img.src = originalImage.url;
   }, [originalImage, faceDetection, showLandmarks, calculateCanvasSize]);
 
-  // 簡単なワーピング処理（パラメータ変更時・デバウンス付き）
-  useEffect(() => {
-    if (originalImage && faceDetection && faceDetection.landmarks && canvasSize) {
-      console.log('🎯 簡単ワーピング処理予約:', { faceParams, canvasSize });
-      
-      // デバウンス処理（150ms遅延）
-      const timeoutId = setTimeout(() => {
-        console.log('⏰ デバウンス完了 - 簡単ワーピング実行');
-        
-        const img = new Image();
-        img.onload = () => {
-          try {
-            let warpedCanvas: HTMLCanvasElement;
-            
-            // 品質設定に応じてワーピング手法を選択
-            switch (warpingQuality) {
-              case 'fast':
-                console.log('⚡ 高速適応的TPSワーピング実行');
-                const fastOptions = getAdaptiveOptionsFromQuality('fast');
-                warpedCanvas = applyAdaptiveTPSWarping(
-                  img,
-                  faceDetection.landmarks,
-                  faceParams,
-                  canvasSize.width,
-                  canvasSize.height,
-                  fastOptions
-                );
-                break;
-              
-              case 'high':
-                console.log('🎨 高品質適応的TPSワーピング実行');
-                const highOptions = getAdaptiveOptionsFromQuality('high');
-                warpedCanvas = applyAdaptiveTPSWarping(
-                  img,
-                  faceDetection.landmarks,
-                  faceParams,
-                  canvasSize.width,
-                  canvasSize.height,
-                  highOptions
-                );
-                break;
-              
-              case 'medium':
-              default:
-                console.log('🔄 標準適応的TPSワーピング実行');
-                const mediumOptions = getAdaptiveOptionsFromQuality('medium');
-                warpedCanvas = applyAdaptiveTPSWarping(
-                  img,
-                  faceDetection.landmarks,
-                  faceParams,
-                  canvasSize.width,
-                  canvasSize.height,
-                  mediumOptions
-                );
-                break;
-            }
-
-            // 結果をData URLに変換
-            const dataURL = warpedCanvas.toDataURL('image/png');
-            setProcessedImageUrl(dataURL);
-            
-            console.log(`✅ ${warpingQuality}品質ワーピング処理完了`);
-          } catch (error) {
-            console.error('❌ TPS変形処理失敗:', error);
-            console.log('🔄 段階的フォールバック開始');
-            
-            // 第1段階フォールバック: 簡単なワーピング
-            try {
-              console.log('🔄 フォールバック段階1: シンプルワーピング実行');
-              const fallbackCanvas = applySimpleFaceWarping(
-                img,
-                faceDetection.landmarks,
-                faceParams,
-                canvasSize.width,
-                canvasSize.height
-              );
-              const dataURL = fallbackCanvas.toDataURL('image/png');
-              setProcessedImageUrl(dataURL);
-              console.log('✅ シンプルワーピング フォールバック完了');
-            } catch (fallbackError) {
-              console.error('❌ シンプルワーピングも失敗:', fallbackError);
-              console.log('🔄 フォールバック段階2: 元画像表示');
-              
-              // 第2段階フォールバック: 元画像をそのまま表示
-              try {
-                const identityCanvas = document.createElement('canvas');
-                identityCanvas.width = canvasSize.width;
-                identityCanvas.height = canvasSize.height;
-                const identityCtx = identityCanvas.getContext('2d');
-                
-                if (identityCtx) {
-                  identityCtx.drawImage(img, 0, 0, canvasSize.width, canvasSize.height);
-                  const dataURL = identityCanvas.toDataURL('image/png');
-                  setProcessedImageUrl(dataURL);
-                  console.log('✅ 元画像表示 フォールバック完了');
-                } else {
-                  console.error('❌ Canvas context取得失敗');
-                  setProcessedImageUrl(null);
-                }
-              } catch (identityError) {
-                console.error('❌ 元画像表示も失敗:', identityError);
-                setProcessedImageUrl(null);
-              }
-            }
-          }
-        };
-        img.crossOrigin = 'anonymous';
-        img.src = originalImage.url;
-      }, 150);
-
-      return () => {
-        console.log('🚫 ワーピング処理キャンセル');
-        clearTimeout(timeoutId);
-      };
-    }
-  }, [faceParams, originalImage, faceDetection, canvasSize, setProcessedImageUrl]);
+  // 重複処理を削除 - useImageWarpingフックでワーピング処理を一本化
+  // このuseEffectは削除され、すべてのワーピング処理はuseImageWarpingフックで管理されます
+  
+  // コメントアウトした重複処理:
+  // - パラメータ変更時のワーピング処理
+  // - デバウンス処理
+  // - 品質別のワーピング処理
+  // これらはすべてuseImageWarping.tsで実行されるため、ここでは不要です
 
   // 編集後画像の表示（ワーピング結果または元画像）
   useEffect(() => {

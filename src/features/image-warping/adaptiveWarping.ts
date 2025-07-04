@@ -279,7 +279,13 @@ export function applyAdaptiveTPSWarping(
       landmarks,
       faceParams,
       canvasWidth,
-      canvasHeight
+      canvasHeight,
+      {
+        enabled: true,
+        drawTargetMesh: true,
+        meshColor: 'rgba(255, 0, 0, 0.3)',
+        meshLineWidth: 1
+      }
     );
   }
 
