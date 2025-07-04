@@ -5,7 +5,7 @@
 
 import type { Point, FaceParams, FaceLandmarks } from '../../../types/face';
 import type { Triangle, TriangleMesh, DeformedTrianglePair, MeshDeformationResult } from '../triangulation/types';
-import { createFaceOptimizedTriangulation } from '../triangulation/delaunay';
+import { createFaceOptimizedTriangulation, generateBoundaryPoints } from '../triangulation/delaunay';
 import { calculateAffineTransform } from './affineTransform';
 import { renderTriangleMesh } from './triangleRenderer';
 
@@ -214,9 +214,15 @@ export function createMeshDeformation(
   // 2. 変形後の特徴点配列を作成（同じ順序を保つ）
   const deformedPoints = landmarksToPoints(deformedLandmarks);
   
-  // 3. 変形後のメッシュを作成（三角形の接続関係は同じ）
+  // 3. 境界点を追加（変形しない固定点として）
+  const boundaryPoints = generateBoundaryPoints(imageWidth, imageHeight);
+  const allDeformedPoints = [...deformedPoints, ...boundaryPoints];
+  
+  console.log(`🔧 ポイント数統一: landmarks=${deformedPoints.length}, boundary=${boundaryPoints.length}, total=${allDeformedPoints.length}`);
+  
+  // 4. 変形後のメッシュを作成（頂点数を統一）
   const targetMesh: TriangleMesh = {
-    vertices: deformedPoints,
+    vertices: allDeformedPoints,
     triangles: sourceMesh.triangles.map((triangle, idx) => {
       // インデックスが有効かチェック
       if (!triangle.indices || triangle.indices.length !== 3) {
@@ -226,22 +232,22 @@ export function createMeshDeformation(
       
       const [idx0, idx1, idx2] = triangle.indices;
       
-      // インデックスが範囲内かチェック
-      if (idx0 < 0 || idx0 >= deformedPoints.length ||
-          idx1 < 0 || idx1 >= deformedPoints.length ||
-          idx2 < 0 || idx2 >= deformedPoints.length) {
+      // インデックスが範囲内かチェック（統一された配列サイズで）
+      if (idx0 < 0 || idx0 >= allDeformedPoints.length ||
+          idx1 < 0 || idx1 >= allDeformedPoints.length ||
+          idx2 < 0 || idx2 >= allDeformedPoints.length) {
         console.error(`❌ インデックスが範囲外: triangle ${idx}`, {
           indices: triangle.indices,
-          deformedPointsLength: deformedPoints.length
+          allDeformedPointsLength: allDeformedPoints.length
         });
         return null;
       }
       
       // 変形後の頂点を取得
       const deformedVertices: [Point, Point, Point] = [
-        deformedPoints[idx0],
-        deformedPoints[idx1],
-        deformedPoints[idx2]
+        allDeformedPoints[idx0],
+        allDeformedPoints[idx1],
+        allDeformedPoints[idx2]
       ];
       
       return {

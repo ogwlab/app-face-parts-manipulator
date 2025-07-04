@@ -243,6 +243,12 @@ export function calculateBarycentricCoordinates(
   const dot12 = v1x * v2x + v1y * v2y;
   
   const invDenom = 1 / (dot00 * dot11 - dot01 * dot01);
+  
+  if (!isFinite(invDenom)) {
+    // Triangle is degenerate (vertices are collinear)
+    return { u: 0, v: 0, w: 1 };
+  }
+  
   const u = (dot11 * dot02 - dot01 * dot12) * invDenom;
   const v = (dot00 * dot12 - dot01 * dot02) * invDenom;
   const w = 1 - u - v;

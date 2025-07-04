@@ -304,6 +304,97 @@ const newCenter = {
 - **Eye System**: 3-layer control with movement support
 - **Version Management**: HTML title and version display added
 
+### ⚠️ Current Issues (Version 5.2.0)
+
+#### 🔧 **ACTIVE: Triangle Mesh Forward Mapping System (Version 5.2.0)**
+**Implementation Date**: 2025-07-04
+**Branch**: `feature/v5.2-triangle-mesh-forward-mapping`
+**Problem**: 後方マッピングでは解決困難な残像問題に対する新アプローチ
+
+**Current Status**:
+- ✅ **Core Implementation Complete**: Type definitions, Delaunay triangulation, affine transform, triangle renderer
+- ✅ **Default Quality**: Set to 'high' for mesh-based system
+- ⚠️ **Boundary Point Index Error**: Landmarks 68点 vs Triangle mesh 96点の不整合
+
+**Root Cause**:
+- `createFaceOptimizedTriangulation` adds boundary points (28 points) for better triangulation
+- `deformedPoints` array contains only 68 landmark points
+- Triangles 108-162 reference boundary point indices causing "インデックスが範囲外" error
+
+**Technical Details**:
+- **Source Points**: 68 landmarks + 28 boundary points = 96 total
+- **Target Points**: 68 landmarks only
+- **Error Location**: `meshDeformation.ts:230-238` index validation
+- **Triangle Count**: 163 total, 108-162 fail due to boundary point indices
+
+#### ✅ **RESOLVED: Boundary Point Index Issue (Version 5.2.0)**
+**Implementation Date**: 2025-07-04
+**Problem**: Triangle indices 109-162 caused "インデックスが範囲外" errors
+**Root Cause**: Source mesh had 96 points (68 landmarks + 28 boundary) but target mesh only had 68 points
+
+**Solution**: Unified Point Array Approach
+1. **Export Boundary Generator** (`delaunay.ts:289`):
+   ```typescript
+   export function generateBoundaryPoints(width: number, height: number): Point[]
+   ```
+
+2. **Import in MeshDeformation** (`meshDeformation.ts:8`):
+   ```typescript
+   import { createFaceOptimizedTriangulation, generateBoundaryPoints } from '../triangulation/delaunay';
+   ```
+
+3. **Unified Point Array Creation** (`meshDeformation.ts:217-221`):
+   ```typescript
+   const boundaryPoints = generateBoundaryPoints(imageWidth, imageHeight);
+   const allDeformedPoints = [...deformedPoints, ...boundaryPoints];
+   // landmarks=68, boundary=28, total=96 points
+   ```
+
+4. **Index Consistency** (`meshDeformation.ts:236-251`):
+   ```typescript
+   // All triangles now reference valid indices 0-95
+   const deformedVertices = [
+     allDeformedPoints[idx0], allDeformedPoints[idx1], allDeformedPoints[idx2]
+   ];
+   ```
+
+**Results**:
+- ✅ **All 163 triangles processed**: No more index out of range errors
+- ✅ **Boundary stability**: Fixed boundary points ensure natural edge transitions
+- ✅ **Version 5.2.0 complete**: Triangle mesh forward mapping system fully functional
+
+**Technical Details**:
+- **Boundary behavior**: Fixed points (no deformation) for natural edge convergence
+- **Performance**: Minimal impact (28 additional points only)
+- **Triangle count**: Full 163 triangles now processed correctly
+
+#### 🔧 **RESOLVED: Security Permission Issue**
+**Implementation Date**: 2025-07-04  
+**Issue**: CodeRabbit flagged overly broad `"Bash(grep:*)"` permission
+**Solution**: Removed unused `grep` permission from `.claude/settings.local.json`
+**Result**: ✅ Security risk eliminated, no functional impact
+
+#### 🔧 **RESOLVED: CodeRabbit Robustness Improvements**
+**Implementation Date**: 2025-07-04
+**Issues**: CodeRabbit flagged 3 robustness issues in triangulation system
+**Solutions**:
+1. **Degenerate Triangle Handling** (`delaunay.ts:178-185`):
+   - Changed from `radius: Infinity` to `radius: Number.MAX_SAFE_INTEGER`
+   - Added warning logging for degenerate triangles
+   - Return triangle centroid instead of (0,0) for better stability
+
+2. **Super Triangle Indexing** (`delaunay.ts:241-253`):
+   - Changed from fixed `-999` to `-1` for super triangle vertices
+   - Added warning logging for unknown points
+   - Improved documentation for better maintenance
+
+3. **Barycentric Coordinate Safety** (`affineTransform.ts:245-250`):
+   - Added `isFinite(invDenom)` check before division
+   - Return safe fallback `{u:0, v:0, w:1}` for degenerate triangles
+   - Prevents division by zero in collinear vertex cases
+
+**Result**: ✅ Enhanced numerical stability and error handling in mesh system
+
 ## Code Organization Guidelines
 
 - Use absolute imports from `src/` root when referencing across different module categories

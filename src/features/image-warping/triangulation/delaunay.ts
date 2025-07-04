@@ -176,8 +176,12 @@ function getCircumcircle(triangle: Triangle): Circumcircle {
   const d = 2 * (ax * (by - cy) + bx * (cy - ay) + cx * (ay - by));
   
   if (Math.abs(d) < 1e-10) {
-    // 三角形が退化している場合
-    return { x: 0, y: 0, radius: Infinity };
+    // 三角形が退化している場合 - より適切な処理
+    console.warn('Degenerate triangle detected:', triangle.vertices);
+    // 三角形の重心を返し、半径は非常に大きな値にする
+    const centroidX = (ax + bx + cx) / 3;
+    const centroidY = (ay + by + cy) / 3;
+    return { x: centroidX, y: centroidY, radius: Number.MAX_SAFE_INTEGER };
   }
   
   const ux = ((ax * ax + ay * ay) * (by - cy) + 
@@ -242,8 +246,10 @@ function findOrAddPoint(points: Point[], point: Point): number {
     }
   }
   
-  // 見つからない場合は、スーパートライアングルの頂点として特別な負のインデックスを返す
-  return -999; // スーパートライアングルの頂点を示す特別な値
+  // スーパートライアングルの頂点に対して一意の負のインデックスを生成
+  // または、より良い解決策として、super triangle vertices を明示的に追跡する
+  console.warn('Unknown point found, treating as super-triangle vertex:', point);
+  return -1; // すべて同じ値にするのではなく、呼び出し側で適切に処理する
 }
 
 
@@ -280,7 +286,7 @@ export function createFaceOptimizedTriangulation(
 /**
  * 画像境界に点を生成
  */
-function generateBoundaryPoints(width: number, height: number): Point[] {
+export function generateBoundaryPoints(width: number, height: number): Point[] {
   const points: Point[] = [];
   const spacing = 50; // 境界点の間隔
   
