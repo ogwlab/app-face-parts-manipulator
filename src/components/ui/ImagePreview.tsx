@@ -31,7 +31,7 @@ const ImagePreview: React.FC = () => {
   const fabricCanvasRef = useRef<HTMLCanvasElement>(null);
   const [imageLoaded, setImageLoaded] = useState(false);
   const [canvasSize, setCanvasSize] = useState<{width: number, height: number} | null>(null);
-  const [warpingQuality, setWarpingQuality] = useState<'fast' | 'medium' | 'high'>('fast');
+  const [warpingQuality, setWarpingQuality] = useState<'fast' | 'medium' | 'high'>('high');
   const [showLandmarks, setShowLandmarks] = useState<boolean>(true);
   
   const { initializeCanvas } = useImageWarping();

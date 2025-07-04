@@ -2,6 +2,7 @@ import type { Point, FaceParams, FaceLandmarks } from '../../types/face';
 import { generateTPSControlPoints, type TPSControlPoint } from './tpsWarping';
 import { generateAnatomicalConstraints, applyAnatomicalConstraints } from './anatomicalConstraints';
 import { generateIndependentDeformation, applyIndependentDeformation } from './independentDeformation';
+import { performMeshBasedDeformation } from './forwardMapping/meshDeformation';
 
 /**
  * 適応的サンプリングによる高性能顔ワーピング
@@ -16,7 +17,7 @@ export interface AdaptiveWarpingOptions {
   quality: 'fast' | 'medium' | 'high';
   enableConstraints: boolean;
   maxControlPoints: number;
-  deformationMode: 'traditional' | 'independent'; // 新しいオプション
+  deformationMode: 'traditional' | 'independent' | 'mesh'; // メッシュモード追加
   samplingDensity: {
     foreground: number; // 顔領域のサンプリング密度 (1.0 = 全ピクセル)
     background: number; // 背景領域のサンプリング密度
@@ -25,10 +26,10 @@ export interface AdaptiveWarpingOptions {
 }
 
 export const DEFAULT_ADAPTIVE_OPTIONS: AdaptiveWarpingOptions = {
-  quality: 'medium',
+  quality: 'high', // デフォルトを高品質に変更（Version 5.2.0）
   enableConstraints: true,
   maxControlPoints: 100,
-  deformationMode: 'independent', // 特徴点ベースシステムに復元（首部対策は維持）
+  deformationMode: 'mesh', // メッシュベースをデフォルトに（Version 5.2.0）
   samplingDensity: {
     foreground: 0.5,
     background: 0.1,
@@ -46,7 +47,7 @@ export function getAdaptiveOptionsFromQuality(quality: 'fast' | 'medium' | 'high
         quality,
         enableConstraints: false,
         maxControlPoints: 30,
-        deformationMode: 'independent',
+        deformationMode: 'independent', // 高速処理のためindependentを使用
         samplingDensity: {
           foreground: 0.25,
           background: 0.05,
@@ -59,7 +60,7 @@ export function getAdaptiveOptionsFromQuality(quality: 'fast' | 'medium' | 'high
         quality,
         enableConstraints: true,
         maxControlPoints: 60,
-        deformationMode: 'independent',
+        deformationMode: 'mesh', // メッシュベース（Version 5.2.0）
         samplingDensity: {
           foreground: 0.5,
           background: 0.1,
@@ -72,7 +73,7 @@ export function getAdaptiveOptionsFromQuality(quality: 'fast' | 'medium' | 'high
         quality,
         enableConstraints: true,
         maxControlPoints: 120,
-        deformationMode: 'independent',
+        deformationMode: 'mesh', // メッシュベース（Version 5.2.0）
         samplingDensity: {
           foreground: 1.0,
           background: 0.2,
@@ -269,6 +270,18 @@ export function applyAdaptiveTPSWarping(
   });
   
   const startTime = performance.now();
+
+  // メッシュベース変形モードの処理（Version 5.2.0）
+  if (options.deformationMode === 'mesh') {
+    console.log('🔺 [Version 5.2.0] メッシュベース変形システムへ移行');
+    return performMeshBasedDeformation(
+      sourceImageElement,
+      landmarks,
+      faceParams,
+      canvasWidth,
+      canvasHeight
+    );
+  }
 
   // 独立変形モードの処理
   if (options.deformationMode === 'independent') {
