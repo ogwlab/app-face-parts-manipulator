@@ -8,6 +8,8 @@ import type { Triangle, TriangleMesh, DeformedTrianglePair, MeshDeformationResul
 import { createFaceOptimizedTriangulation, generateBoundaryPoints } from '../triangulation/delaunay';
 import { calculateAffineTransform } from './affineTransform';
 import { renderTriangleMesh, drawMeshEdges } from './triangleRenderer';
+import { renderTriangleMeshBackward } from './backwardRenderer';
+import { renderTriangleMeshHybrid } from './hybridRenderer';
 
 /**
  * 顔パラメータに基づいてランドマークを変形
@@ -372,13 +374,15 @@ function landmarksToPoints(landmarks: FaceLandmarks): Point[] {
 
 /**
  * メッシュ変形を適用
+ * @param renderMode - 'forward' | 'backward' | 'hybrid' レンダリングモード
  */
 export function applyMeshDeformation(
   sourceCanvas: HTMLCanvasElement,
   targetCanvas: HTMLCanvasElement,
-  deformationResult: MeshDeformationResult
+  deformationResult: MeshDeformationResult,
+  renderMode: 'forward' | 'backward' | 'hybrid' = 'hybrid'
 ): void {
-  console.log('🎨 メッシュ変形適用開始');
+  console.log(`🎨 メッシュ変形適用開始 (${renderMode}モード)`);
   const startTime = performance.now();
   
   // Canvasをクリア
@@ -390,12 +394,42 @@ export function applyMeshDeformation(
   
   targetCtx.clearRect(0, 0, targetCanvas.width, targetCanvas.height);
   
-  // 三角形メッシュをレンダリング
-  renderTriangleMesh(
-    sourceCanvas,
-    targetCanvas,
-    deformationResult.trianglePairs
-  );
+  // 三角形ペアを準備
+  const trianglePairs = deformationResult.trianglePairs.map(pair => ({
+    source: pair.source,
+    target: pair.target
+  }));
+  
+  // レンダリングモードに応じて処理を分岐
+  switch (renderMode) {
+    case 'backward':
+      console.log('🔄 バックワードマッピングモードで実行');
+      renderTriangleMeshBackward(
+        sourceCanvas,
+        targetCanvas,
+        trianglePairs
+      );
+      break;
+      
+    case 'hybrid':
+      console.log('🔀 ハイブリッドモードで実行');
+      renderTriangleMeshHybrid(
+        sourceCanvas,
+        targetCanvas,
+        deformationResult.trianglePairs
+      );
+      break;
+      
+    case 'forward':
+    default:
+      console.log('➡️ フォワードマッピングモードで実行');
+      renderTriangleMesh(
+        sourceCanvas,
+        targetCanvas,
+        deformationResult.trianglePairs
+      );
+      break;
+  }
   
   const endTime = performance.now();
   console.log(`✅ メッシュ変形適用完了: ${(endTime - startTime).toFixed(1)}ms`);
@@ -410,6 +444,7 @@ export interface MeshDebugOptions {
   drawTargetMesh?: boolean;
   meshColor?: string;
   meshLineWidth?: number;
+  renderMode?: 'forward' | 'backward' | 'hybrid';  // レンダリングモード追加
 }
 
 /**
@@ -423,7 +458,7 @@ export function performMeshBasedDeformation(
   canvasHeight: number,
   debugOptions: MeshDebugOptions = { enabled: false }
 ): HTMLCanvasElement {
-  console.log('🚀 [Version 5.2.0] メッシュベース変形処理開始');
+  console.log('🚀 [Version 5.2.2] メッシュベース変形処理開始 - ハイブリッドレンダリング');
   
   // デバッグモードのログ
   if (debugOptions.enabled) {
@@ -481,8 +516,9 @@ export function performMeshBasedDeformation(
   targetCanvas.width = canvasWidth;
   targetCanvas.height = canvasHeight;
   
-  // 6. 変形を適用
-  applyMeshDeformation(sourceCanvas, targetCanvas, deformationResult);
+  // 6. 変形を適用（ハイブリッドマッピングをデフォルトに）
+  const renderMode = debugOptions.renderMode || 'hybrid';
+  applyMeshDeformation(sourceCanvas, targetCanvas, deformationResult, renderMode);
   
   // 7. デバッグ描画
   if (debugOptions.enabled) {
@@ -519,6 +555,6 @@ export function performMeshBasedDeformation(
     }
   }
   
-  console.log('✅ [Version 5.2.0] メッシュベース変形処理完了');
+  console.log(`✅ [Version 5.2.2] メッシュベース変形処理完了 (${renderMode}モード)`);
   return targetCanvas;
 }

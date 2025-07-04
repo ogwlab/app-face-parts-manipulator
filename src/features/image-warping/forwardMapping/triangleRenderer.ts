@@ -78,9 +78,12 @@ export function renderTriangleMesh(
     return;
   }
   
-  // 画像データを一度だけ取得
+  // まず元画像をターゲットにコピー（背景として）
+  targetCtx.drawImage(sourceCanvas, 0, 0, targetCanvas.width, targetCanvas.height);
+  
+  // 画像データを取得
   const sourceImageData = sourceCtx.getImageData(0, 0, sourceCanvas.width, sourceCanvas.height);
-  const targetImageData = targetCtx.createImageData(targetCanvas.width, targetCanvas.height);
+  const targetImageData = targetCtx.getImageData(0, 0, targetCanvas.width, targetCanvas.height);
   
   // デバッグ: 最初の三角形の詳細を表示
   if (trianglePairs.length > 0) {

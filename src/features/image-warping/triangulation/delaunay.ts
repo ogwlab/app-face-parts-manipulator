@@ -84,8 +84,8 @@ export function createDelaunayTriangulation(points: Point[]): TriangleMesh {
       
       // 頂点のインデックスを見つける
       const indices: [number, number, number] = [
-        findOrAddPoint(points, edge[0]),
-        findOrAddPoint(points, edge[1]),
+        findOrAddPoint(points, edge[0], superTriangle),
+        findOrAddPoint(points, edge[1], superTriangle),
         i
       ];
       
@@ -238,7 +238,7 @@ function isSamePoint(p1: Point, p2: Point): boolean {
 /**
  * 点のインデックスを見つけるか、スーパートライアングルの頂点の場合は特別な値を返す
  */
-function findOrAddPoint(points: Point[], point: Point): number {
+function findOrAddPoint(points: Point[], point: Point, superTriangle?: Triangle): number {
   // まず既存の点から探す
   for (let i = 0; i < points.length; i++) {
     if (isSamePoint(points[i], point)) {
@@ -246,10 +246,17 @@ function findOrAddPoint(points: Point[], point: Point): number {
     }
   }
   
-  // スーパートライアングルの頂点に対して一意の負のインデックスを生成
-  // または、より良い解決策として、super triangle vertices を明示的に追跡する
-  console.warn('Unknown point found, treating as super-triangle vertex:', point);
-  return -1; // すべて同じ値にするのではなく、呼び出し側で適切に処理する
+  // スーパートライアングルの頂点を確認
+  if (superTriangle) {
+    for (let i = 0; i < 3; i++) {
+      if (isSamePoint(superTriangle.vertices[i], point)) {
+        return -(i + 1); // -1, -2, -3 を返す
+      }
+    }
+  }
+  
+  // 本当に未知の点の場合はエラー
+  throw new Error(`Unknown point found: (${point.x}, ${point.y})`);
 }
 
 
@@ -290,24 +297,30 @@ export function generateBoundaryPoints(width: number, height: number): Point[] {
   const points: Point[] = [];
   const spacing = 50; // 境界点の間隔
   
-  // 上辺
-  for (let x = 0; x <= width; x += spacing) {
-    points.push({ x: Math.min(x, width - 1), y: 0 });
+  // 四隅を明示的に追加
+  points.push({ x: 0, y: 0 });                    // 左上
+  points.push({ x: width - 1, y: 0 });             // 右上
+  points.push({ x: 0, y: height - 1 });            // 左下
+  points.push({ x: width - 1, y: height - 1 });    // 右下
+  
+  // 上辺（角を除く）
+  for (let x = spacing; x < width - 1; x += spacing) {
+    points.push({ x, y: 0 });
   }
   
-  // 下辺
-  for (let x = 0; x <= width; x += spacing) {
-    points.push({ x: Math.min(x, width - 1), y: height - 1 });
+  // 下辺（角を除く）
+  for (let x = spacing; x < width - 1; x += spacing) {
+    points.push({ x, y: height - 1 });
   }
   
   // 左辺（角を除く）
-  for (let y = spacing; y < height; y += spacing) {
-    points.push({ x: 0, y: Math.min(y, height - 1) });
+  for (let y = spacing; y < height - 1; y += spacing) {
+    points.push({ x: 0, y });
   }
   
   // 右辺（角を除く）
-  for (let y = spacing; y < height; y += spacing) {
-    points.push({ x: width - 1, y: Math.min(y, height - 1) });
+  for (let y = spacing; y < height - 1; y += spacing) {
+    points.push({ x: width - 1, y });
   }
   
   return points;
