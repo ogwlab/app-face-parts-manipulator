@@ -20,6 +20,13 @@ export interface IndependentDeformationResult {
   controlPoints: IndependentControlPoint[];
   segmentation: PartSegmentationResult;
   deformationMap: DeformationMap;
+  movementMask?: MovementMask;
+}
+
+export interface MovementMask {
+  width: number;
+  height: number;
+  data: Float32Array; // 0-1 values indicating movement intensity
 }
 
 export interface DeformationMap {
@@ -37,7 +44,7 @@ export function generateIndependentDeformation(
   imageScale: { x: number; y: number },
   canvasSize: { width: number; height: number }
 ): IndependentDeformationResult {
-  console.log('🔧 パーツ独立変形システム開始');
+  console.log('🔧 [Version 5.1.7] パーツ独立変形システム開始');
   
   // 🔍 仮説2検証: パラメータ詳細確認
   console.log('🔍 [仮説2検証] generateIndependentDeformation受信パラメータ:', {
@@ -64,12 +71,19 @@ export function generateIndependentDeformation(
     canvasSize
   );
 
+  // 4. 移動マスクを生成（Version 5.1.5）
+  const movementMask = generateMovementMask(
+    controlPoints,
+    canvasSize
+  );
+
   console.log(`✅ パーツ独立変形完了: ${controlPoints.length}制御点`);
 
   return {
     controlPoints,
     segmentation,
-    deformationMap
+    deformationMap,
+    movementMask
   };
 }
 
@@ -89,6 +103,16 @@ function generateIndependentControlPoints(
     y: p.y * imageScale.y
   });
 
+  // 特徴点データ検証（Version 5.1.4）
+  console.log('🔍 [Version 5.1.4] 特徴点データ検証:', {
+    leftEyePoints: landmarks.leftEye.length,
+    rightEyePoints: landmarks.rightEye.length,
+    mouthPoints: landmarks.mouth.length,
+    nosePoints: landmarks.nose.length,
+    imageScale,
+    faceParams
+  });
+
   // 左目の独立制御点
   const leftEyeShouldCreate = shouldCreateControlPoints(faceParams.leftEye);
   console.log('🔍 [仮説2検証] 左目制御点生成判定:', {
@@ -101,10 +125,17 @@ function generateIndependentControlPoints(
   
   if (leftEyeShouldCreate) {
     const region = segmentation.regions.get('leftEye')!;
+    // 目の影響半径も適切に制限
+    region.influenceRadius = Math.min(region.influenceRadius, 40);
     const eyePoints = landmarks.leftEye.map(scalePoint);
     const center = calculateCenter(eyePoints);
     
-    // 目の輪郭制御点
+    // 目の輪郭制御点（移動二重適用を修正）
+    const leftEyeNewCenter = {
+      x: center.x + faceParams.leftEye.positionX * 1.0,
+      y: center.y + faceParams.leftEye.positionY * 1.0
+    };
+    
     eyePoints.forEach(originalPoint => {
       const relative = {
         x: originalPoint.x - center.x,
@@ -112,8 +143,8 @@ function generateIndependentControlPoints(
       };
       
       const targetPoint = {
-        x: center.x + relative.x * faceParams.leftEye.size + faceParams.leftEye.positionX * 0.5,
-        y: center.y + relative.y * faceParams.leftEye.size + faceParams.leftEye.positionY * 0.5
+        x: leftEyeNewCenter.x + relative.x * faceParams.leftEye.size,
+        y: leftEyeNewCenter.y + relative.y * faceParams.leftEye.size
       };
       
       controlPoints.push({
@@ -129,16 +160,16 @@ function generateIndependentControlPoints(
       });
     });
 
-    // 瞳孔中心制御点を追加（完全固定）
+    // 瞳孔中心制御点を追加（移動許可、形状保持）
     const eyeCenterTarget = {
-      x: center.x, // 中心は移動しない（位置変更無効）
-      y: center.y  // 中心は移動しない（位置変更無効）
+      x: center.x + faceParams.leftEye.positionX * 1.0, // 移動許可
+      y: center.y + faceParams.leftEye.positionY * 1.0  // 移動許可
     };
     
     controlPoints.push({
       original: center,
       target: eyeCenterTarget,
-      weight: 2.0, // 最高重みで完全固定
+      weight: 1.5, // 形状保持のため適度に高い重み
       partType: 'eye',
       influenceRadius: 20, // 瞳孔中心領域
       partId: 'leftEye',
@@ -147,12 +178,12 @@ function generateIndependentControlPoints(
       barrierStrength: 1.0
     });
 
-    // 虹彩境界制御点を追加（正円形状維持）
+    // 虹彩境界制御点を追加（正円形状維持、移動対応）
     const irisRadius = calculateIrisRadius(eyePoints);
     const irisControlPoints = generateCircularControlPoints(center, irisRadius, 8); // 8方向
 
     irisControlPoints.forEach(irisPoint => {
-      const scaledIrisPoint = scalePointFromCenter(irisPoint, center, faceParams.leftEye.size);
+      const scaledIrisPoint = scalePointFromCenter(irisPoint, leftEyeNewCenter, faceParams.leftEye.size);
       
       controlPoints.push({
         original: irisPoint,
@@ -168,10 +199,17 @@ function generateIndependentControlPoints(
     });
     
     console.log('🔍 [仮説2検証] 左目制御点生成完了:', {
-      generatedPoints: eyePoints.length,
+      eyePointsCount: eyePoints.length,
+      eyePointsSample: eyePoints.slice(0, 2).map(p => ({ x: Math.round(p.x), y: Math.round(p.y) })),
+      controlPointsGenerated: {
+        contour: eyePoints.length,
+        pupilCenter: 1,
+        irisPoints: irisControlPoints.length,
+        total: eyePoints.length + 1 + irisControlPoints.length
+      },
       region: {
         partType: region.partType,
-        center: region.center,
+        center: { x: Math.round(region.center.x), y: Math.round(region.center.y) },
         influenceRadius: region.influenceRadius
       }
     });
@@ -180,10 +218,17 @@ function generateIndependentControlPoints(
   // 右目の独立制御点
   if (shouldCreateControlPoints(faceParams.rightEye)) {
     const region = segmentation.regions.get('rightEye')!;
+    // 目の影響半径も適切に制限
+    region.influenceRadius = Math.min(region.influenceRadius, 40);
     const eyePoints = landmarks.rightEye.map(scalePoint);
     const center = calculateCenter(eyePoints);
     
-    // 目の輪郭制御点
+    // 目の輪郭制御点（移動二重適用を修正）
+    const rightEyeNewCenter = {
+      x: center.x + faceParams.rightEye.positionX * 1.0,
+      y: center.y + faceParams.rightEye.positionY * 1.0
+    };
+    
     eyePoints.forEach(originalPoint => {
       const relative = {
         x: originalPoint.x - center.x,
@@ -191,8 +236,8 @@ function generateIndependentControlPoints(
       };
       
       const targetPoint = {
-        x: center.x + relative.x * faceParams.rightEye.size + faceParams.rightEye.positionX * 0.5,
-        y: center.y + relative.y * faceParams.rightEye.size + faceParams.rightEye.positionY * 0.5
+        x: rightEyeNewCenter.x + relative.x * faceParams.rightEye.size,
+        y: rightEyeNewCenter.y + relative.y * faceParams.rightEye.size
       };
       
       controlPoints.push({
@@ -208,16 +253,16 @@ function generateIndependentControlPoints(
       });
     });
 
-    // 瞳孔中心制御点を追加（完全固定）
+    // 瞳孔中心制御点を追加（移動許可、形状保持）
     const eyeCenterTarget = {
-      x: center.x, // 中心は移動しない（位置変更無効）
-      y: center.y  // 中心は移動しない（位置変更無効）
+      x: center.x + faceParams.rightEye.positionX * 1.0, // 移動許可
+      y: center.y + faceParams.rightEye.positionY * 1.0  // 移動許可
     };
     
     controlPoints.push({
       original: center,
       target: eyeCenterTarget,
-      weight: 2.0, // 最高重みで完全固定
+      weight: 1.5, // 形状保持のため適度に高い重み
       partType: 'eye',
       influenceRadius: 20, // 瞳孔中心領域
       partId: 'rightEye',
@@ -226,12 +271,12 @@ function generateIndependentControlPoints(
       barrierStrength: 1.0
     });
 
-    // 虹彩境界制御点を追加（正円形状維持）
+    // 虹彩境界制御点を追加（正円形状維持、移動対応）
     const irisRadius = calculateIrisRadius(eyePoints);
     const irisControlPoints = generateCircularControlPoints(center, irisRadius, 8); // 8方向
 
     irisControlPoints.forEach(irisPoint => {
-      const scaledIrisPoint = scalePointFromCenter(irisPoint, center, faceParams.rightEye.size);
+      const scaledIrisPoint = scalePointFromCenter(irisPoint, rightEyeNewCenter, faceParams.rightEye.size);
       
       controlPoints.push({
         original: irisPoint,
@@ -248,10 +293,28 @@ function generateIndependentControlPoints(
   }
 
   // 口の独立制御点
-  if (shouldCreateControlPoints(faceParams.mouth)) {
+  const mouthShouldCreate = shouldCreateControlPoints(faceParams.mouth);
+  console.log('🔍 [口移動デバッグ] 口制御点生成判定:', {
+    mouthParams: faceParams.mouth,
+    shouldCreate: mouthShouldCreate,
+    width: faceParams.mouth.width,
+    height: faceParams.mouth.height,
+    positionX: faceParams.mouth.positionX,
+    positionY: faceParams.mouth.positionY
+  });
+  
+  if (mouthShouldCreate) {
     const region = segmentation.regions.get('mouth')!;
+    // 影響半径を大幅に縮小してテスト
+    region.influenceRadius = Math.min(region.influenceRadius, 30);
     const mouthPoints = landmarks.mouth.map(scalePoint);
     const center = calculateCenter(mouthPoints);
+    
+    // 口の制御点（移動二重適用を修正）
+    const mouthNewCenter = {
+      x: center.x + faceParams.mouth.positionX * 1.0,
+      y: center.y + faceParams.mouth.positionY * 1.0
+    };
     
     mouthPoints.forEach(originalPoint => {
       const relative = {
@@ -260,14 +323,14 @@ function generateIndependentControlPoints(
       };
       
       const targetPoint = {
-        x: center.x + relative.x * faceParams.mouth.width + faceParams.mouth.positionX * 0.3,
-        y: center.y + relative.y * faceParams.mouth.height + faceParams.mouth.positionY * 0.3
+        x: mouthNewCenter.x + relative.x * faceParams.mouth.width,
+        y: mouthNewCenter.y + relative.y * faceParams.mouth.height
       };
       
       controlPoints.push({
         original: originalPoint,
         target: targetPoint,
-        weight: 0.8,
+        weight: 1.0,
         partType: 'mouth',
         influenceRadius: region.influenceRadius,
         partId: 'mouth',
@@ -276,13 +339,42 @@ function generateIndependentControlPoints(
         barrierStrength: 0.8
       });
     });
+    
+    console.log('🔍 [口移動デバッグ] 口制御点生成完了:', {
+      generatedPoints: mouthPoints.length,
+      center: center,
+      mouthNewCenter: mouthNewCenter,
+      region: {
+        partType: region.partType,
+        center: region.center,
+        influenceRadius: region.influenceRadius
+      }
+    });
   }
 
   // 鼻の独立制御点（最も厳密な分離）
-  if (shouldCreateControlPoints(faceParams.nose)) {
+  const noseShouldCreate = shouldCreateControlPoints(faceParams.nose);
+  console.log('🔍 [鼻移動デバッグ] 鼻制御点生成判定:', {
+    noseParams: faceParams.nose,
+    shouldCreate: noseShouldCreate,
+    width: faceParams.nose.width,
+    height: faceParams.nose.height,
+    positionX: faceParams.nose.positionX,
+    positionY: faceParams.nose.positionY
+  });
+  
+  if (noseShouldCreate) {
     const region = segmentation.regions.get('nose')!;
+    // 影響半径を大幅に縮小してテスト
+    region.influenceRadius = Math.min(region.influenceRadius, 25);
     const nosePoints = landmarks.nose.map(scalePoint);
     const center = calculateCenter(nosePoints);
+    
+    // 鼻の制御点（移動二重適用を修正）
+    const noseNewCenter = {
+      x: center.x + faceParams.nose.positionX * 1.0,
+      y: center.y + faceParams.nose.positionY * 1.0
+    };
     
     nosePoints.forEach(originalPoint => {
       const relative = {
@@ -291,14 +383,14 @@ function generateIndependentControlPoints(
       };
       
       const targetPoint = {
-        x: center.x + relative.x * faceParams.nose.width + faceParams.nose.positionX * 0.4,
-        y: center.y + relative.y * faceParams.nose.height + faceParams.nose.positionY * 0.4
+        x: noseNewCenter.x + relative.x * faceParams.nose.width,
+        y: noseNewCenter.y + relative.y * faceParams.nose.height
       };
       
       controlPoints.push({
         original: originalPoint,
         target: targetPoint,
-        weight: 0.9,
+        weight: 1.0,
         partType: 'nose',
         influenceRadius: region.influenceRadius,
         partId: 'nose',
@@ -306,6 +398,17 @@ function generateIndependentControlPoints(
         isolationLevel: 'complete',
         barrierStrength: 1.0 // 最強の分離
       });
+    });
+    
+    console.log('🔍 [鼻移動デバッグ] 鼻制御点生成完了:', {
+      generatedPoints: nosePoints.length,
+      center: center,
+      noseNewCenter: noseNewCenter,
+      region: {
+        partType: region.partType,
+        center: region.center,
+        influenceRadius: region.influenceRadius
+      }
     });
   }
 
@@ -325,15 +428,23 @@ function generateIndependentControlPoints(
 /**
  * 制御点が必要かどうかを判定
  */
-function shouldCreateControlPoints(params: EyeParams | MouthParams | NoseParams): boolean {
-  if ('size' in params) {
-    // 目のパラメータ
-    return params.size !== 1.0 || params.positionX !== 0 || params.positionY !== 0;
-  } else {
-    // 口・鼻のパラメータ
-    return params.width !== 1.0 || params.height !== 1.0 || 
-           params.positionX !== 0 || params.positionY !== 0;
-  }
+function shouldCreateControlPoints(
+  // @ts-ignore - Version 5.1.4では常にtrueを返すが、将来の参照のため引数を保持
+  params: EyeParams | MouthParams | NoseParams
+): boolean {
+  // Version 5.1.4: 常に制御点を生成して基準状態を確立
+  // これにより、変形なしでも正しい初期状態が保証される
+  return true;
+  
+  // 以下は元のロジック（参考のため残す）
+  // if ('size' in params) {
+  //   // 目のパラメータ
+  //   return params.size !== 1.0 || params.positionX !== 0 || params.positionY !== 0;
+  // } else {
+  //   // 口・鼻のパラメータ
+  //   return params.width !== 1.0 || params.height !== 1.0 || 
+  //          params.positionX !== 0 || params.positionY !== 0;
+  // }
 }
 
 /**
@@ -403,13 +514,21 @@ function generateIndependentDeformationMap(
       const partInfluences = calculatePartInfluences(pixel, controlPoints, segmentation);
       
       if (partInfluences.length > 0) {
-        // 最も影響力の強いパーツの変形を適用
-        const dominantInfluence = partInfluences.reduce((prev, current) => 
-          current.strength > prev.strength ? current : prev
-        );
+        // 全ての影響を重み付き平均でブレンド
+        let totalWeight = 0;
+        let weightedOffsetX = 0;
+        let weightedOffsetY = 0;
         
-        sourceX += dominantInfluence.offsetX;
-        sourceY += dominantInfluence.offsetY;
+        for (const influence of partInfluences) {
+          weightedOffsetX += influence.offsetX * influence.strength;
+          weightedOffsetY += influence.offsetY * influence.strength;
+          totalWeight += influence.strength;
+        }
+        
+        if (totalWeight > 0) {
+          sourceX += weightedOffsetX / totalWeight;
+          sourceY += weightedOffsetY / totalWeight;
+        }
       }
       
       data[pixelIndex] = sourceX;
@@ -486,6 +605,17 @@ function calculatePartInfluences(
       Math.pow(pixel.x - region.center.x, 2) +
       Math.pow(pixel.y - region.center.y, 2)
     );
+    
+    // デバッグ: 複数のパーツの影響を受けているピクセルを検出
+    if (distanceToCenter < region.influenceRadius && influences.length > 0 && Math.random() < 0.0001) {
+      console.log('⚠️ [影響重複デバッグ] 複数パーツの影響を受けるピクセル:', {
+        pixel: { x: Math.round(pixel.x), y: Math.round(pixel.y) },
+        currentPart: partId,
+        previousParts: influences.map(i => i.partId),
+        distance: distanceToCenter.toFixed(2),
+        radius: region.influenceRadius
+      });
+    }
 
     if (distanceToCenter < region.influenceRadius) {
       // バリア効果を考慮
@@ -531,8 +661,8 @@ function calculatePartDeformation(
   let weightedOffsetY = 0;
 
   for (const cp of partControlPoints) {
-    const dx = pixel.x - cp.target.x;
-    const dy = pixel.y - cp.target.y;
+    const dx = pixel.x - cp.original.x;
+    const dy = pixel.y - cp.original.y;
     const distance = Math.sqrt(dx * dx + dy * dy);
 
     if (distance < cp.influenceRadius!) {
@@ -556,9 +686,19 @@ function calculatePartDeformation(
     const normalizedOffsetX = weightedOffsetX / totalWeight;
     const normalizedOffsetY = weightedOffsetY / totalWeight;
     
+    // デバッグ: 大きな変形が発生している場合のみログ出力
+    const offsetMagnitude = Math.sqrt(normalizedOffsetX * normalizedOffsetX + normalizedOffsetY * normalizedOffsetY);
+    if (offsetMagnitude > 5 && Math.random() < 0.001) { // 0.1%の確率でサンプリング
+      console.log('🔍 [変形デバッグ] 大きな変形検出:', {
+        pixel: { x: Math.round(pixel.x), y: Math.round(pixel.y) },
+        partType: region.partType,
+        offsetMagnitude: offsetMagnitude.toFixed(2),
+        offset: { x: normalizedOffsetX.toFixed(2), y: normalizedOffsetY.toFixed(2) }
+      });
+    }
+    
     // 変形の強度制限
     const maxOffset = region.influenceRadius * 0.5;
-    const offsetMagnitude = Math.sqrt(normalizedOffsetX * normalizedOffsetX + normalizedOffsetY * normalizedOffsetY);
     
     if (offsetMagnitude > maxOffset) {
       const scale = maxOffset / offsetMagnitude;
@@ -646,20 +786,100 @@ function calculateDistanceToBarrierLine(point: Point, linePoints: Point[]): numb
 }
 
 /**
+ * 移動元領域のマスクを生成（Version 5.1.5）
+ */
+function generateMovementMask(
+  controlPoints: IndependentControlPoint[],
+  canvasSize: { width: number; height: number }
+): MovementMask {
+  console.log('🎭 [Version 5.1.7] フォワードマッピング付加版移動マスク生成開始');
+  
+  const data = new Float32Array(canvasSize.width * canvasSize.height);
+  
+  // パーツごとにグループ化して、より正確な移動元領域を特定
+  const partGroups = new Map<string, IndependentControlPoint[]>();
+  for (const cp of controlPoints) {
+    if (!partGroups.has(cp.partId)) {
+      partGroups.set(cp.partId, []);
+    }
+    partGroups.get(cp.partId)!.push(cp);
+  }
+  
+  // 各パーツの移動元領域を特定
+  for (const [, partCPs] of partGroups) {
+    // パーツ全体の移動量を計算
+    let totalMovementX = 0;
+    let totalMovementY = 0;
+    let movingPointCount = 0;
+    
+    for (const cp of partCPs) {
+      const moveX = cp.target.x - cp.original.x;
+      const moveY = cp.target.y - cp.original.y;
+      const moveDist = Math.sqrt(moveX * moveX + moveY * moveY);
+      
+      if (moveDist > 1.0) { // より大きな閾値
+        totalMovementX += moveX;
+        totalMovementY += moveY;
+        movingPointCount++;
+      }
+    }
+    
+    if (movingPointCount > 0) {
+      const avgMoveX = totalMovementX / movingPointCount;
+      const avgMoveY = totalMovementY / movingPointCount;
+      const avgMoveDist = Math.sqrt(avgMoveX * avgMoveX + avgMoveY * avgMoveY);
+      
+      // 移動が検出された場合、元の位置周辺をマーク
+      for (const cp of partCPs) {
+        // 元の位置の周辺ピクセルを高強度でマーク
+        const radius = cp.influenceRadius || 40;
+        const centerX = Math.round(cp.original.x);
+        const centerY = Math.round(cp.original.y);
+        
+        for (let dy = -radius; dy <= radius; dy++) {
+          for (let dx = -radius; dx <= radius; dx++) {
+            const px = centerX + dx;
+            const py = centerY + dy;
+            
+            if (px >= 0 && px < canvasSize.width && py >= 0 && py < canvasSize.height) {
+              const dist = Math.sqrt(dx * dx + dy * dy);
+              
+              if (dist <= radius) {
+                const pixelIndex = py * canvasSize.width + px;
+                // 距離に基づく強度（中心ほど強い）
+                const distanceIntensity = 1 - (dist / radius);
+                // 移動量に基づく強度（大きく動くほど強い）
+                const movementIntensity = Math.min(avgMoveDist / 20, 1);
+                // 最終的な強度
+                const intensity = distanceIntensity * movementIntensity;
+                
+                data[pixelIndex] = Math.max(data[pixelIndex], intensity);
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  
+  console.log('✅ [Version 5.1.7] フォワードマッピング付加版移動マスク生成完了');
+  
+  return {
+    width: canvasSize.width,
+    height: canvasSize.height,
+    data
+  };
+}
+
+/**
  * 独立変形マップを使用してCanvas変形を適用
  */
 export function applyIndependentDeformation(
   sourceCanvas: HTMLCanvasElement,
-  deformationMap: DeformationMap
+  deformationMap: DeformationMap,
+  movementMask?: MovementMask
 ): HTMLCanvasElement {
-  console.log('🎨 独立変形適用開始');
-  
-  // 🔍 仮説5検証: 画像適用の入力確認
-  console.log('🔍 [仮説5検証] 画像適用開始:', {
-    sourceCanvasSize: { width: sourceCanvas.width, height: sourceCanvas.height },
-    deformationMapSize: { width: deformationMap.width, height: deformationMap.height },
-    dataLength: deformationMap.data.length
-  });
+  console.log('🎨 [Version 5.1.7] フォワード補完付きハイブリッド変形適用開始');
   
   const targetCanvas = document.createElement('canvas');
   targetCanvas.width = sourceCanvas.width;
@@ -671,21 +891,92 @@ export function applyIndependentDeformation(
   const sourceImageData = sourceCtx.getImageData(0, 0, sourceCanvas.width, sourceCanvas.height);
   const targetImageData = targetCtx.createImageData(sourceCanvas.width, sourceCanvas.height);
   
+  // Phase 1: 移動元領域のクリア処理（Version 5.1.5）
+  if (movementMask) {
+    console.log('🧹 [Version 5.1.7] Phase 1: フォワードマッピング補完処理開始');
+    
+    // まず元画像をコピー
+    for (let i = 0; i < sourceImageData.data.length; i++) {
+      targetImageData.data[i] = sourceImageData.data[i];
+    }
+    
+    // Version 5.1.7: より積極的な移動元領域のクリア
+    // 第1段階: 高強度領域を完全にクリア
+    for (let y = 0; y < movementMask.height; y++) {
+      for (let x = 0; x < movementMask.width; x++) {
+        const maskIndex = y * movementMask.width + x;
+        const intensity = movementMask.data[maskIndex];
+        
+        if (intensity > 0.3) { // 高強度領域
+          const pixelIndex = (y * movementMask.width + x) * 4;
+          
+          // 周辺ピクセルで完全に置き換え
+          const [r, g, b, a] = getAverageOfSurroundingPixels(
+            sourceImageData, 
+            x, 
+            y, 
+            30 // 固定の大きなサンプリング半径
+          );
+          
+          targetImageData.data[pixelIndex] = r;
+          targetImageData.data[pixelIndex + 1] = g;
+          targetImageData.data[pixelIndex + 2] = b;
+          targetImageData.data[pixelIndex + 3] = a;
+        }
+      }
+    }
+    
+    // 第2段階: 低強度領域をブレンド
+    for (let y = 0; y < movementMask.height; y++) {
+      for (let x = 0; x < movementMask.width; x++) {
+        const maskIndex = y * movementMask.width + x;
+        const intensity = movementMask.data[maskIndex];
+        
+        if (intensity > 0.05 && intensity <= 0.3) { // 低強度領域
+          const pixelIndex = (y * movementMask.width + x) * 4;
+          
+          // 強化インペインティング
+          const [r, g, b, a] = getAverageOfSurroundingPixels(
+            targetImageData, // 既に処理済みの画像から取得
+            x, 
+            y, 
+            20
+          );
+          
+          // 強度に応じてブレンド
+          const blendFactor = intensity * 2.0; // より強い効果
+          targetImageData.data[pixelIndex] = Math.round(targetImageData.data[pixelIndex] * (1 - blendFactor) + r * blendFactor);
+          targetImageData.data[pixelIndex + 1] = Math.round(targetImageData.data[pixelIndex + 1] * (1 - blendFactor) + g * blendFactor);
+          targetImageData.data[pixelIndex + 2] = Math.round(targetImageData.data[pixelIndex + 2] * (1 - blendFactor) + b * blendFactor);
+          targetImageData.data[pixelIndex + 3] = a;
+        }
+      }
+    }
+    
+    console.log('✅ [Version 5.1.7] Phase 1完了');
+  }
+  
+  // Phase 2: 変形後の画像を上書き（Version 5.1.5）
+  console.log('🎨 [Version 5.1.7] Phase 2: 変形画像の適用開始');
+  
   for (let y = 0; y < deformationMap.height; y++) {
     for (let x = 0; x < deformationMap.width; x++) {
       const mapIndex = (y * deformationMap.width + x) * 2;
       const sourceX = deformationMap.data[mapIndex];
       const sourceY = deformationMap.data[mapIndex + 1];
       
-      // バイリニア補間でピクセル値を取得
-      const [r, g, b, a] = bilinearInterpolation(sourceImageData, sourceX, sourceY);
-      
-      // 結果画像に設定
-      const targetIndex = (y * deformationMap.width + x) * 4;
-      targetImageData.data[targetIndex] = r;
-      targetImageData.data[targetIndex + 1] = g;
-      targetImageData.data[targetIndex + 2] = b;
-      targetImageData.data[targetIndex + 3] = a;
+      // 変形がある場合のみ処理
+      if (Math.abs(sourceX - x) > 0.1 || Math.abs(sourceY - y) > 0.1) {
+        // バイリニア補間でピクセル値を取得
+        const [r, g, b, a] = bilinearInterpolation(sourceImageData, sourceX, sourceY);
+        
+        // 結果画像に設定
+        const targetIndex = (y * deformationMap.width + x) * 4;
+        targetImageData.data[targetIndex] = r;
+        targetImageData.data[targetIndex + 1] = g;
+        targetImageData.data[targetIndex + 2] = b;
+        targetImageData.data[targetIndex + 3] = a;
+      }
     }
   }
   
@@ -751,4 +1042,54 @@ function bilinearInterpolation(
   const a = a1 * (1 - fx) * (1 - fy) + a2 * fx * (1 - fy) + a3 * (1 - fx) * fy + a4 * fx * fy;
   
   return [Math.round(r), Math.round(g), Math.round(b), Math.round(a)];
+}
+
+/**
+ * 周辺ピクセルの平均を取得（Version 5.1.5）
+ */
+function getAverageOfSurroundingPixels(
+  imageData: ImageData,
+  centerX: number,
+  centerY: number,
+  radius: number
+): [number, number, number, number] {
+  const { width, height, data } = imageData;
+  let r = 0, g = 0, b = 0, a = 0;
+  let count = 0;
+  
+  // 周辺ピクセルをサンプリング
+  for (let dy = -radius; dy <= radius; dy++) {
+    for (let dx = -radius; dx <= radius; dx++) {
+      if (dx === 0 && dy === 0) continue; // 中心は除外
+      
+      const x = centerX + dx;
+      const y = centerY + dy;
+      
+      // 境界チェック
+      if (x >= 0 && x < width && y >= 0 && y < height) {
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist <= radius) {
+          const idx = (y * width + x) * 4;
+          r += data[idx];
+          g += data[idx + 1];
+          b += data[idx + 2];
+          a += data[idx + 3];
+          count++;
+        }
+      }
+    }
+  }
+  
+  if (count === 0) {
+    // 周辺ピクセルがない場合は元のピクセル値を返す
+    const idx = (centerY * width + centerX) * 4;
+    return [data[idx], data[idx + 1], data[idx + 2], data[idx + 3]];
+  }
+  
+  return [
+    Math.round(r / count),
+    Math.round(g / count),
+    Math.round(b / count),
+    Math.round(a / count)
+  ];
 }

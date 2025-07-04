@@ -562,10 +562,11 @@ function applyIndependentTPSWarping(
     { width: canvasWidth, height: canvasHeight }
   );
 
-  // 独立変形を適用
+  // 独立変形を適用（Version 5.1.5: movementMaskも渡す）
   const resultCanvas = applyIndependentDeformation(
     sourceCanvas,
-    deformationResult.deformationMap
+    deformationResult.deformationMap,
+    deformationResult.movementMask
   );
 
   const endTime = performance.now();

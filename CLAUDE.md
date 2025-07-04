@@ -82,7 +82,7 @@ src/
 
 ## Development Status
 
-### ✅ Completed Features (Phase 1-4.8)
+### ✅ Completed Features (Phase 1-5.0)
 - Project foundation (React + TypeScript + Vite setup)
 - Face detection using face-api.js (68-point landmark extraction)
 - UI component structure with Material-UI
@@ -102,12 +102,18 @@ src/
     - Pupil center fixing (no movement during scaling)
     - Iris shape preservation (perfect circle maintenance)
     - 3-layer eye control (contour, center, iris boundary)
+- **Complete parts movement functionality** (Phase 5.0)
+  - Unified movement multipliers (1.0x for all parts)
+  - Consistent control point weights
+  - Eye movement with iris shape preservation
+  - UI-accurate movement values
 
 ### ✅ All Major Issues Resolved
 - ~~Horizontal noise/striping~~ → **SOLVED** (Phase 4.1)
 - ~~Neck area deformation~~ → **SOLVED** (Phase 4.6)
 - ~~Eye pupil distortion~~ → **SOLVED** (Phase 4.7-4.8)
 - ~~Feature point visualization~~ → **SOLVED** (Phase 4.2)
+- ~~Parts movement functionality~~ → **SOLVED** (Phase 5.0)
 
 ### ⏳ Future Enhancement Opportunities (Phase 5+)
 - Image export functionality
@@ -250,6 +256,53 @@ src/
 - **Iris Control**: 8 circular control points at 35% eye width radius
 - **Center Constraint**: Weight 2.0 with 20px influence radius
 - **Build Status**: ✅ Successfully compiles and functions
+
+#### ✅ **SOLVED: Parts Movement Functionality (Phase 5.0)**
+**Implementation Date**: 2025-07-04
+**Version**: 5.0.0 - パーツ移動機能完全修正版
+**Problem**: パーツ移動がUI設定値通りに動作しない（大幅減衰）
+
+**Root Cause Analysis**:
+1. **Movement Multiplier Inconsistency**:
+   - Eyes: `positionX * 0.5` (50% attenuation)
+   - Nose: `positionX * 0.4` (60% attenuation)  
+   - Mouth: `positionX * 0.3` (70% attenuation)
+2. **Control Point Weight Inconsistency**:
+   - Eyes: weight 1.0, Nose: weight 0.9, Mouth: weight 0.8
+3. **Eye Movement Contradiction**:
+   - Pupil center completely fixed with weight 2.0
+   - Contour control points had movement calculation but were overridden
+
+**Solution: Unified Movement System**:
+```typescript
+// 1. Unified Movement Multipliers (1.0x for all parts)
+目/鼻/口: positionX * 1.0  // 100% UI value application
+
+// 2. Unified Control Point Weights
+目輪郭/鼻/口: weight: 1.0  // Standard weight
+瞳孔中心: weight: 1.5      // Slightly higher for shape preservation
+虹彩境界: weight: 1.2      // Higher for circular preservation
+
+// 3. Eye Movement with Iris Preservation
+const newCenter = {
+  x: center.x + faceParams.leftEye.positionX * 1.0,
+  y: center.y + faceParams.leftEye.positionY * 1.0
+};
+// All control points use newCenter for consistent movement
+```
+
+**Results**:
+- ✅ **UI-accurate movement**: 25px setting → 25px actual movement
+- ✅ **Consistent behavior**: All parts move with same precision
+- ✅ **Eye movement restoration**: Movement works with iris shape preservation
+- ✅ **Improved UX**: Intuitive control response
+
+**Technical Details**:
+- **Modified Files**: `independentDeformation.ts`
+- **Movement Multipliers**: Unified to 1.0x across all parts
+- **Control Weights**: Balanced for functionality and shape preservation
+- **Eye System**: 3-layer control with movement support
+- **Version Management**: HTML title and version display added
 
 ## Code Organization Guidelines
 
