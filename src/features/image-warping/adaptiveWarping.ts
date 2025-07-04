@@ -253,8 +253,7 @@ export function applyAdaptiveTPSWarping(
   faceParams: FaceParams,
   canvasWidth: number,
   canvasHeight: number,
-  options: AdaptiveWarpingOptions = DEFAULT_ADAPTIVE_OPTIONS,
-  showDebugMesh: boolean = false
+  options: AdaptiveWarpingOptions = DEFAULT_ADAPTIVE_OPTIONS
 ): HTMLCanvasElement {
   console.log('🎨 適応的TPS変形開始:', { 
     quality: options.quality, 
@@ -282,8 +281,8 @@ export function applyAdaptiveTPSWarping(
       canvasWidth,
       canvasHeight,
       {
-        enabled: showDebugMesh,
-        drawTargetMesh: showDebugMesh,
+        enabled: false,
+        drawTargetMesh: false,
         meshColor: 'rgba(255, 0, 0, 0.3)',
         meshLineWidth: 1
       }

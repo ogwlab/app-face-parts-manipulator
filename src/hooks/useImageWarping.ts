@@ -16,7 +16,6 @@ export const useImageWarping = (): UseImageWarpingReturn => {
     originalImage,
     faceDetection,
     faceParams,
-    showDebugMesh,
     setProcessedImageUrl,
     setProcessing,
     setError,
@@ -117,8 +116,7 @@ export const useImageWarping = (): UseImageWarpingReturn => {
         faceParams,
         canvasWidth,
         canvasHeight,
-        options,
-        showDebugMesh
+        options
       );
 
       // 処理後の画像URLを生成
@@ -184,7 +182,7 @@ export const useImageWarping = (): UseImageWarpingReturn => {
     } else {
       console.log('❌ 前提条件不足 - ワーピング処理スキップ');
     }
-  }, [faceParams, processImage, faceDetection, originalImage, showDebugMesh]);
+  }, [faceParams, processImage, faceDetection, originalImage]);
 
   // クリーンアップ
   useEffect(() => {
