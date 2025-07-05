@@ -16,6 +16,7 @@ export const useImageWarping = (): UseImageWarpingReturn => {
     originalImage,
     faceDetection,
     faceParams,
+    renderMode,
     setProcessedImageUrl,
     setProcessing,
     setError,
@@ -108,8 +109,15 @@ export const useImageWarping = (): UseImageWarpingReturn => {
       const canvasWidth = canvas.getWidth();
       const canvasHeight = canvas.getHeight();
 
-      // 高品質ワーピング処理を適用
+      // レンダリングモードに応じたオプションを設定
       const options = getAdaptiveOptionsFromQuality('high');
+      // renderModeをオプションに反映
+      options.deformationMode = 'mesh'; // メッシュベースを使用
+      if (options.deformationMode === 'mesh') {
+        // メッシュベースの場合、debugOptionsにrenderModeを設定
+        (options as any).meshRenderMode = renderMode;
+      }
+      
       const warpedCanvas = applyAdaptiveTPSWarping(
         img,
         faceDetection.landmarks,
@@ -132,7 +140,7 @@ export const useImageWarping = (): UseImageWarpingReturn => {
       isProcessingRef.current = false;
       setProcessing(false);
     }
-  }, [originalImage, faceDetection, faceParams, setProcessedImageUrl, setProcessing, setError]);
+  }, [originalImage, faceDetection, faceParams, renderMode, setProcessedImageUrl, setProcessing, setError]);
 
   // 画像エクスポート
   const exportImage = useCallback((): string | null => {
@@ -182,7 +190,7 @@ export const useImageWarping = (): UseImageWarpingReturn => {
     } else {
       console.log('❌ 前提条件不足 - ワーピング処理スキップ');
     }
-  }, [faceParams, processImage, faceDetection, originalImage]);
+  }, [faceParams, renderMode, processImage, faceDetection, originalImage]);
 
   // クリーンアップ
   useEffect(() => {

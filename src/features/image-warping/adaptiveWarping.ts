@@ -274,6 +274,8 @@ export function applyAdaptiveTPSWarping(
   // メッシュベース変形モードの処理（Version 5.2.0）
   if (options.deformationMode === 'mesh') {
     console.log('🔺 [Version 5.2.0] メッシュベース変形システムへ移行');
+    // renderModeをdebugOptionsに渡す
+    const meshRenderMode = (options as any).meshRenderMode || 'hybrid';
     return performMeshBasedDeformation(
       sourceImageElement,
       landmarks,
@@ -284,7 +286,8 @@ export function applyAdaptiveTPSWarping(
         enabled: false,
         drawTargetMesh: false,
         meshColor: 'rgba(255, 0, 0, 0.3)',
-        meshLineWidth: 1
+        meshLineWidth: 1,
+        renderMode: meshRenderMode
       }
     );
   }

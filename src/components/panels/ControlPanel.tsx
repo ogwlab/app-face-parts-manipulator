@@ -5,10 +5,12 @@ import {
   Tab,
   Typography,
   Button,
+  Divider,
 } from '@mui/material';
 import EyeControls from './EyeControls';
 import MouthControls from './MouthControls';
 import NoseControls from './NoseControls';
+import { RenderModeSelector } from './RenderModeSelector';
 import { useFaceStore } from '../../stores/faceStore';
 
 interface TabPanelProps {
@@ -113,16 +115,26 @@ const ControlPanel: React.FC = () => {
         </TabPanel>
       </Box>
 
-      {/* 全体リセットボタン */}
-      <Box sx={{ p: 2, borderTop: 1, borderColor: 'divider' }}>
-        <Button 
-          variant="outlined" 
-          color="secondary"
-          fullWidth
-          onClick={handleResetAll}
-        >
-          すべてリセット
-        </Button>
+      {/* レンダリングモードとリセットボタン */}
+      <Box sx={{ borderTop: 1, borderColor: 'divider' }}>
+        {/* レンダリングモード選択 */}
+        <Box sx={{ p: 2 }}>
+          <RenderModeSelector />
+        </Box>
+        
+        <Divider />
+        
+        {/* 全体リセットボタン */}
+        <Box sx={{ p: 2 }}>
+          <Button 
+            variant="outlined" 
+            color="secondary"
+            fullWidth
+            onClick={handleResetAll}
+          >
+            すべてリセット
+          </Button>
+        </Box>
       </Box>
     </Box>
   );

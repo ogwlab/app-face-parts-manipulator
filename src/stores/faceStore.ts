@@ -33,6 +33,9 @@ interface FaceStore {
   // エクスポート設定
   exportSettings: ExportSettings;
   
+  // レンダリング設定
+  renderMode: 'forward' | 'backward' | 'hybrid';
+  
   // アクション
   setOriginalImage: (image: ImageData | null) => void;
   setProcessedImageUrl: (url: string | null) => void;
@@ -51,6 +54,7 @@ interface FaceStore {
   setProcessing: (processing: boolean) => void;
   setError: (error: string | null) => void;
   setExportSettings: (settings: ExportSettings) => void;
+  setRenderMode: (mode: 'forward' | 'backward' | 'hybrid') => void;
   clearAll: () => void;
 }
 
@@ -67,6 +71,7 @@ export const useFaceStore = create<FaceStore>((set) => ({
     format: 'png',
     jpgQuality: 0.9,
   },
+  renderMode: 'hybrid',
 
   // アクション
   setOriginalImage: (image) => set({ originalImage: image }),
@@ -144,6 +149,8 @@ export const useFaceStore = create<FaceStore>((set) => ({
   setError: (error) => set({ error }),
   
   setExportSettings: (settings) => set({ exportSettings: settings }),
+  
+  setRenderMode: (mode) => set({ renderMode: mode }),
   
   clearAll: () => set({
     originalImage: null,
