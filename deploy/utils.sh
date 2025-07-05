@@ -75,9 +75,9 @@ validate_ssh_config() {
         ssh_opts="${ssh_opts} -p ${port}"
     fi
     
-    # オプションが存在する場合のみ追加（空白を正しく処理）
+    # オプションが存在する場合のみ追加（明示的空白挿入）
     if [ -n "${ssh_opts}" ]; then
-        ssh_cmd="${ssh_cmd}${ssh_opts}"
+        ssh_cmd="${ssh_cmd} ${ssh_opts}"
     fi
     
     # 接続テスト実行
@@ -208,9 +208,9 @@ create_backup() {
         ssh_opts="${ssh_opts} -p ${port}"
     fi
     
-    # オプションが存在する場合のみ追加（空白を正しく処理）
+    # オプションが存在する場合のみ追加（明示的空白挿入）
     if [ -n "${ssh_opts}" ]; then
-        ssh_cmd="${ssh_cmd}${ssh_opts}"
+        ssh_cmd="${ssh_cmd} ${ssh_opts}"
     fi
     
     # バックアップ実行
@@ -245,9 +245,9 @@ set_permissions() {
         ssh_opts="${ssh_opts} -p ${port}"
     fi
     
-    # オプションが存在する場合のみ追加（空白を正しく処理）
+    # オプションが存在する場合のみ追加（明示的空白挿入）
     if [ -n "${ssh_opts}" ]; then
-        ssh_cmd="${ssh_cmd}${ssh_opts}"
+        ssh_cmd="${ssh_cmd} ${ssh_opts}"
     fi
     
     # 権限設定実行
