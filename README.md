@@ -1,69 +1,81 @@
-# React + TypeScript + Vite
+# Face Parts Manipulator
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+顔パーツを個別に操作できるWebアプリケーション
 
-Currently, two official plugins are available:
+## 概要
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+Face Parts Manipulatorは、アップロードした顔画像の各パーツ（目・口・鼻）を個別に拡大・縮小・移動できるWebアプリケーションです。face-api.jsによる高精度な顔検出と、Triangle Mesh Forward Mappingによる自然な画像変形を実現しています。
 
-## Expanding the ESLint configuration
+## 主な機能
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- 🎯 **高精度な顔検出** - face-api.jsによる68点顔特徴点検出
+- 👁️ **目の操作** - 左右の目を個別に拡大・縮小・移動（虹彩形状保持）
+- 👄 **口の操作** - 幅・高さの調整と位置移動
+- 👃 **鼻の操作** - 幅・高さの調整と位置移動
+- 🖼️ **リアルタイムプレビュー** - 編集結果を即座に確認
+- 💾 **画像保存** - PNG/JPG形式で編集後の画像をダウンロード
+- 🎨 **レンダリングモード選択** - Forward/Hybrid/Backward の3つのモードから選択可能
 
-```js
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## 技術スタック
 
-      // Remove tseslint.configs.recommended and replace with this
-      ...tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      ...tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      ...tseslint.configs.stylisticTypeChecked,
+- **Frontend**: React 19 + TypeScript + Vite
+- **UI**: Material-UI (MUI)
+- **顔検出**: face-api.js
+- **画像処理**: Canvas API + 独自のTriangle Mesh変形アルゴリズム
+- **状態管理**: Zustand
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+## インストール方法
+
+```bash
+# リポジトリのクローン
+git clone https://github.com/ogwlab/app-face-parts-manipulator.git
+cd app-face-parts-manipulator
+
+# 依存関係のインストール
+npm install
+
+# 開発サーバーの起動
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## 使用方法
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+1. **画像のアップロード**
+   - ドラッグ&ドロップまたはクリックで顔画像をアップロード
+   - 対応形式: JPG, PNG
+   - 推奨サイズ: 1920px以下
 
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+2. **顔パーツの編集**
+   - 右側のコントロールパネルで各パーツを調整
+   - スライダーまたは数値入力で細かく調整可能
+
+3. **画像の保存**
+   - 編集後の画像右上の「保存」ボタンをクリック
+   - PNG（高品質）またはJPG（軽量）形式を選択
+
+## ビルド方法
+
+```bash
+# プロダクションビルド
+npm run build
+
+# ビルドのプレビュー
+npm run preview
 ```
+
+## 開発者向け情報
+
+詳細な開発情報は [CLAUDE.md](./CLAUDE.md) を参照してください。
+
+## ライセンス
+
+MIT License
+
+## 作者
+
+ogwlab
+
+## 謝辞
+
+- [face-api.js](https://github.com/justadudewhohacks/face-api.js) - 顔検出ライブラリ
+- [Material-UI](https://mui.com/) - UIコンポーネント

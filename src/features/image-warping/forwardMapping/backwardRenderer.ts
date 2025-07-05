@@ -11,25 +11,25 @@ import { calculateBarycentricCoordinates } from './affineTransform';
  * Version 5.2.2: バウンディングボックス最適化対応
  */
 
-/**
- * 点が三角形に含まれるかを判定し、含まれる場合はその三角形を返す
- */
-function findContainingTriangle(
-  point: Point,
-  triangles: Triangle[]
-): Triangle | null {
-  for (const triangle of triangles) {
-    const barycentric = calculateBarycentricCoordinates(point, triangle);
-    
-    // 重心座標が全て0以上1以下なら、点は三角形内にある
-    if (barycentric.u >= 0 && barycentric.v >= 0 && barycentric.w >= 0 &&
-        barycentric.u <= 1 && barycentric.v <= 1 && barycentric.w <= 1) {
-      return triangle;
-    }
-  }
-  
-  return null;
-}
+// /**
+//  * 点が三角形に含まれるかを判定し、含まれる場合はその三角形を返す
+//  */
+// function findContainingTriangle(
+//   point: Point,
+//   triangles: Triangle[]
+// ): Triangle | null {
+//   for (const triangle of triangles) {
+//     const barycentric = calculateBarycentricCoordinates(point, triangle);
+//     
+//     // 重心座標が全て0以上1以下なら、点は三角形内にある
+//     if (barycentric.u >= 0 && barycentric.v >= 0 && barycentric.w >= 0 &&
+//         barycentric.u <= 1 && barycentric.v <= 1 && barycentric.w <= 1) {
+//       return triangle;
+//     }
+//   }
+//   
+//   return null;
+// }
 
 /**
  * 重心座標から元画像の座標に変換
