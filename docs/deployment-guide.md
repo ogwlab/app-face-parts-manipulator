@@ -239,11 +239,64 @@ server {
 
 ## 5. 自動デプロイスクリプト
 
-### 5.1 基本デプロイスクリプト
+### 5.1 改善されたデプロイスクリプト（推奨）
+
+**注意**: CodeRabbitの指摘を反映し、.htaccessテンプレートの重複を解消した改善版です。
+
+#### テンプレートベースのアプローチ
 
 ```bash
 # deploy.sh を作成
 cat > deploy.sh << 'EOF'
+#!/bin/bash
+
+# 共通ユーティリティの読み込み
+source deploy/utils.sh
+
+# 設定変数
+SERVER="your-server.com"
+USERNAME="your-username"
+REMOTE_PATH="/var/www/html/face-manipulator"
+BASE_PATH="/face-manipulator/"
+
+echo "🚀 Face Parts Manipulator Deployment Script"
+echo "=================================================="
+
+# プロジェクトのビルド
+if ! build_project; then
+    exit 1
+fi
+
+# .htaccessファイルの生成（テンプレートから）
+if ! generate_htaccess "${BASE_PATH}"; then
+    exit 1
+fi
+
+# rsyncでデプロイ
+log_info "Deploying to server..."
+if rsync -avz --progress --delete dist/ ${USERNAME}@${SERVER}:${REMOTE_PATH}/; then
+    log_success "Deployment successful!"
+    log_success "🌐 Your app is now live at: https://${SERVER}${BASE_PATH}"
+else
+    log_error "Deployment failed"
+    exit 1
+fi
+
+echo "=================================================="
+log_success "🎉 Deployment completed successfully!"
+EOF
+
+# スクリプトに実行権限を付与
+chmod +x deploy.sh
+```
+
+#### 従来の方式（インライン .htaccess）
+
+レガシー環境や簡単な用途向け：
+
+```bash
+# simple-deploy.sh を作成
+cat > simple-deploy.sh << 'EOF'
 #!/bin/bash
 
 # 設定変数
@@ -259,7 +312,7 @@ YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
-echo -e "${BLUE}🚀 Face Parts Manipulator Deployment Script${NC}"
+echo -e "${BLUE}🚀 Face Parts Manipulator Simple Deployment${NC}"
 echo "=================================================="
 
 # ビルドの実行
@@ -271,7 +324,7 @@ else
     exit 1
 fi
 
-# .htaccessファイルの追加
+# .htaccessファイルの追加（シンプル版）
 echo -e "${YELLOW}📝 Adding .htaccess file...${NC}"
 cat > ${LOCAL_PATH}/.htaccess << 'HTACCESS'
 <IfModule mod_rewrite.c>
@@ -287,11 +340,6 @@ AddType application/json .json
 AddType application/javascript .js
 HTACCESS
 
-# ファイルサイズの確認
-echo -e "${YELLOW}📊 Checking file sizes...${NC}"
-TOTAL_SIZE=$(du -sh ${LOCAL_PATH} | cut -f1)
-echo "Total size: ${TOTAL_SIZE}"
-
 # rsyncでデプロイ
 echo -e "${YELLOW}🚀 Deploying to server...${NC}"
 if rsync -avz --progress --delete ${LOCAL_PATH}/ ${USERNAME}@${SERVER}:${REMOTE_PATH}/; then
@@ -306,8 +354,7 @@ echo "=================================================="
 echo -e "${BLUE}🎉 Deployment completed successfully!${NC}"
 EOF
 
-# スクリプトに実行権限を付与
-chmod +x deploy.sh
+chmod +x simple-deploy.sh
 ```
 
 ### 5.2 環境設定ファイル
@@ -320,22 +367,110 @@ DEPLOY_SERVER=your-server.com
 DEPLOY_USERNAME=your-username
 DEPLOY_PATH=/var/www/html/face-manipulator
 DEPLOY_PORT=22
-DEPLOY_KEY_PATH=~/.ssh/id_rsa
+DEPLOY_KEY_PATH=  # 空の場合はSSHエージェントまたはデフォルトキーを使用
 
 # アプリケーション設定
 APP_URL=https://your-server.com/face-manipulator
 APP_NAME="Face Parts Manipulator"
+BASE_PATH=/face-manipulator/
 EOF
 
 # .gitignoreに追加（秘密情報を保護）
 echo ".env.deploy" >> .gitignore
 ```
 
-### 5.3 高度なデプロイスクリプト
+### 5.3 高度なデプロイスクリプト（SSH鍵対応・テンプレート使用）
+
+**注意**: CodeRabbitの指摘を反映し、SSH鍵設定を修正し、テンプレートを使用する改善版です。
 
 ```bash
 # advanced-deploy.sh を作成
 cat > advanced-deploy.sh << 'EOF'
+#!/bin/bash
+
+# 共通ユーティリティの読み込み
+source deploy/utils.sh
+
+# 環境設定の読み込み
+if ! validate_env_config ".env.deploy"; then
+    exit 1
+fi
+
+source .env.deploy
+
+# メイン関数
+main() {
+    echo "=========================================="
+    echo "  ${APP_NAME} Advanced Deployment Script"
+    echo "=========================================="
+    
+    # SSH設定の検証
+    if ! validate_ssh_config "${DEPLOY_SERVER}" "${DEPLOY_USERNAME}" "${DEPLOY_KEY_PATH}" "${DEPLOY_PORT}"; then
+        exit 1
+    fi
+    
+    # バックアップ作成
+    create_backup "${DEPLOY_USERNAME}" "${DEPLOY_SERVER}" "${DEPLOY_PATH}" "${DEPLOY_KEY_PATH}" "${DEPLOY_PORT}"
+    
+    # プロジェクトビルド
+    if ! build_project; then
+        exit 1
+    fi
+    
+    # .htaccessファイルの生成（テンプレートから）
+    if ! generate_htaccess "${BASE_PATH:-/}"; then
+        exit 1
+    fi
+    
+    # rsyncコマンドの構築と実行
+    log_info "Deploying files to server..."
+    local rsync_cmd=""
+    
+    # SSH鍵が指定されている場合の処理
+    if [ -n "${DEPLOY_KEY_PATH}" ] && [ "${DEPLOY_KEY_PATH}" != "~/.ssh/id_rsa" ]; then
+        if [ ! -f "${DEPLOY_KEY_PATH}" ]; then
+            log_error "SSH key file not found: ${DEPLOY_KEY_PATH}"
+            exit 1
+        fi
+        rsync_cmd="rsync -avz --progress --delete -e \"ssh -i ${DEPLOY_KEY_PATH} -p ${DEPLOY_PORT:-22}\" dist/ ${DEPLOY_USERNAME}@${DEPLOY_SERVER}:${DEPLOY_PATH}/"
+    else
+        rsync_cmd="rsync -avz --progress --delete -e \"ssh -p ${DEPLOY_PORT:-22}\" dist/ ${DEPLOY_USERNAME}@${DEPLOY_SERVER}:${DEPLOY_PATH}/"
+    fi
+    
+    # rsync実行
+    if eval "${rsync_cmd}"; then
+        log_success "Files deployed successfully"
+    else
+        log_error "Deployment failed"
+        exit 1
+    fi
+    
+    # 権限設定
+    set_permissions "${DEPLOY_USERNAME}" "${DEPLOY_SERVER}" "${DEPLOY_PATH}" "${DEPLOY_KEY_PATH}" "${DEPLOY_PORT}"
+    
+    # ヘルスチェック
+    if [ -n "${APP_URL}" ]; then
+        health_check "${APP_URL}"
+    fi
+    
+    echo "=========================================="
+    log_success "🎉 Deployment completed successfully!"
+    echo "=========================================="
+}
+
+# スクリプト実行
+main "$@"
+EOF
+
+# 実行権限を付与
+chmod +x advanced-deploy.sh
+```
+
+#### 従来の高度なデプロイスクリプト（参考・レガシー）
+
+```bash
+# legacy-advanced-deploy.sh を作成
+cat > legacy-advanced-deploy.sh << 'EOF'
 #!/bin/bash
 
 # 環境設定の読み込み
@@ -367,20 +502,22 @@ log_error() {
 pre_deploy_check() {
     log_info "Pre-deployment checks..."
     
-    # Node.jsの確認
-    if ! command -v node &> /dev/null; then
-        log_error "Node.js is not installed"
-        exit 1
+    # SSH接続テスト（修正版：SSH鍵を実際に使用）
+    local ssh_cmd="ssh -o ConnectTimeout=10"
+    
+    if [ -n "${DEPLOY_KEY_PATH}" ] && [ "${DEPLOY_KEY_PATH}" != "~/.ssh/id_rsa" ]; then
+        if [ ! -f "${DEPLOY_KEY_PATH}" ]; then
+            log_error "SSH key file not found: ${DEPLOY_KEY_PATH}"
+            exit 1
+        fi
+        ssh_cmd="${ssh_cmd} -i ${DEPLOY_KEY_PATH}"
     fi
     
-    # package.jsonの確認
-    if [ ! -f package.json ]; then
-        log_error "package.json not found"
-        exit 1
+    if [ -n "${DEPLOY_PORT}" ] && [ "${DEPLOY_PORT}" != "22" ]; then
+        ssh_cmd="${ssh_cmd} -p ${DEPLOY_PORT}"
     fi
     
-    # サーバー接続テスト
-    if ! ssh -o ConnectTimeout=10 ${DEPLOY_USERNAME}@${DEPLOY_SERVER} exit 2>/dev/null; then
+    if ! ${ssh_cmd} ${DEPLOY_USERNAME}@${DEPLOY_SERVER} exit 2>/dev/null; then
         log_error "Cannot connect to server"
         exit 1
     fi
@@ -388,30 +525,11 @@ pre_deploy_check() {
     log_success "Pre-deployment checks passed"
 }
 
-# バックアップ作成
-create_backup() {
-    log_info "Creating backup..."
-    BACKUP_NAME="backup-$(date +%Y%m%d-%H%M%S)"
-    ssh ${DEPLOY_USERNAME}@${DEPLOY_SERVER} "cd $(dirname ${DEPLOY_PATH}) && cp -r $(basename ${DEPLOY_PATH}) ${BACKUP_NAME}"
-    log_success "Backup created: ${BACKUP_NAME}"
-}
-
-# ビルド実行
-build_project() {
-    log_info "Building project..."
-    if npm run build; then
-        log_success "Build completed"
-    else
-        log_error "Build failed"
-        exit 1
-    fi
-}
-
-# デプロイ実行
+# デプロイ実行（修正版：SSH鍵を実際に使用）
 deploy_files() {
     log_info "Deploying files..."
     
-    # .htaccessファイルの追加
+    # .htaccessファイルの追加（インライン版）
     cat > dist/.htaccess << 'HTACCESS'
 <IfModule mod_rewrite.c>
     RewriteEngine On
@@ -426,10 +544,25 @@ AddType application/json .json
 AddType application/javascript .js
 HTACCESS
     
-    # rsync実行
-    if rsync -avz --progress --delete \
-        -e "ssh -p ${DEPLOY_PORT:-22}" \
-        dist/ ${DEPLOY_USERNAME}@${DEPLOY_SERVER}:${DEPLOY_PATH}/; then
+    # rsync実行（修正版：SSH鍵を実際に使用）
+    local rsync_opts="-avz --progress --delete"
+    local ssh_opts=""
+    
+    if [ -n "${DEPLOY_KEY_PATH}" ] && [ "${DEPLOY_KEY_PATH}" != "~/.ssh/id_rsa" ]; then
+        ssh_opts="-i ${DEPLOY_KEY_PATH}"
+    fi
+    
+    if [ -n "${DEPLOY_PORT}" ] && [ "${DEPLOY_PORT}" != "22" ]; then
+        ssh_opts="${ssh_opts} -p ${DEPLOY_PORT}"
+    fi
+    
+    if [ -n "${ssh_opts}" ]; then
+        rsync_opts="${rsync_opts} -e \"ssh ${ssh_opts}\""
+    fi
+    
+    local rsync_cmd="rsync ${rsync_opts} dist/ ${DEPLOY_USERNAME}@${DEPLOY_SERVER}:${DEPLOY_PATH}/"
+    
+    if eval "${rsync_cmd}"; then
         log_success "Files deployed successfully"
     else
         log_error "Deployment failed"
@@ -437,42 +570,19 @@ HTACCESS
     fi
 }
 
-# 権限設定
-set_permissions() {
-    log_info "Setting file permissions..."
-    ssh ${DEPLOY_USERNAME}@${DEPLOY_SERVER} "
-        find ${DEPLOY_PATH} -type f -exec chmod 644 {} \;
-        find ${DEPLOY_PATH} -type d -exec chmod 755 {} \;
-        chmod 644 ${DEPLOY_PATH}/.htaccess
-    "
-    log_success "Permissions set"
-}
-
-# ヘルスチェック
-health_check() {
-    log_info "Performing health check..."
-    HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "${APP_URL}")
-    
-    if [ "${HTTP_STATUS}" = "200" ]; then
-        log_success "Health check passed (HTTP ${HTTP_STATUS})"
-        log_success "🌐 Application is live at: ${APP_URL}"
-    else
-        log_warning "Health check returned HTTP ${HTTP_STATUS}"
-    fi
-}
+# 他の関数は省略...
 
 # メイン実行
 main() {
     echo "=========================================="
-    echo "  ${APP_NAME} Deployment Script"
+    echo "  ${APP_NAME} Legacy Deployment Script"
     echo "=========================================="
     
     pre_deploy_check
-    create_backup
-    build_project
+    # build_project
     deploy_files
-    set_permissions
-    health_check
+    # set_permissions
+    # health_check
     
     echo "=========================================="
     echo "🎉 Deployment completed successfully!"
@@ -483,8 +593,7 @@ main() {
 main "$@"
 EOF
 
-# 実行権限を付与
-chmod +x advanced-deploy.sh
+chmod +x legacy-advanced-deploy.sh
 ```
 
 ---
@@ -596,7 +705,7 @@ git push production main
 
 ## 8. 継続的インテグレーション
 
-### 8.1 GitHub Actionsでの自動デプロイ
+### 8.1 GitHub Actionsでの自動デプロイ（改善版）
 
 ```yaml
 # .github/workflows/deploy.yml
@@ -605,16 +714,17 @@ name: Deploy to Server
 on:
   push:
     branches: [ main ]
+  workflow_dispatch:  # 手動実行を許可
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
     
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     
     - name: Setup Node.js
-      uses: actions/setup-node@v3
+      uses: actions/setup-node@v4
       with:
         node-version: '18'
         cache: 'npm'
@@ -622,11 +732,17 @@ jobs:
     - name: Install dependencies
       run: npm ci
     
-    - name: Build
+    - name: Build project
       run: npm run build
     
+    - name: Generate .htaccess from template
+      run: |
+        mkdir -p dist
+        sed "s|{{BASE_PATH}}|${{ secrets.BASE_PATH || '/face-manipulator/' }}|g" \
+          deploy/templates/.htaccess.template > dist/.htaccess
+    
     - name: Deploy to server
-      uses: burnett01/rsync-deployments@5.2
+      uses: burnett01/rsync-deployments@6.0.0
       with:
         switches: -avzr --delete
         path: dist/
@@ -634,29 +750,118 @@ jobs:
         remote_host: ${{ secrets.DEPLOY_HOST }}
         remote_user: ${{ secrets.DEPLOY_USER }}
         remote_key: ${{ secrets.DEPLOY_KEY }}
+        remote_port: ${{ secrets.DEPLOY_PORT || '22' }}
+    
+    - name: Health check
+      run: |
+        if [ -n "${{ secrets.APP_URL }}" ]; then
+          sleep 10  # サーバーが更新されるまで待機
+          HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "${{ secrets.APP_URL }}" --max-time 30)
+          if [ "${HTTP_STATUS}" = "200" ]; then
+            echo "✅ Health check passed (HTTP ${HTTP_STATUS})"
+            echo "🌐 Application is live at: ${{ secrets.APP_URL }}"
+          else
+            echo "⚠️ Health check returned HTTP ${HTTP_STATUS}"
+            exit 1
+          fi
+        fi
+```
+
+### 8.2 必要なGitHub Secrets
+
+GitHub リポジトリの Settings > Secrets and variables > Actions で以下を設定：
+
+| Secret名 | 説明 | 例 |
+|---------|------|-----|
+| `DEPLOY_HOST` | サーバーのホスト名 | `ogwlab.org` |
+| `DEPLOY_USER` | SSHユーザー名 | `username` |
+| `DEPLOY_KEY` | SSH秘密鍵（内容全体） | `-----BEGIN OPENSSH PRIVATE KEY-----...` |
+| `DEPLOY_PATH` | リモートの配置パス | `/var/www/html/face-manipulator` |
+| `DEPLOY_PORT` | SSHポート（オプション） | `22` |
+| `BASE_PATH` | アプリのベースパス | `/face-manipulator/` |
+| `APP_URL` | ヘルスチェック用URL | `https://ogwlab.org/face-manipulator/` |
+
+---
+
+## 9. ベストプラクティス
+
+### 9.1 保守性向上のための設計原則
+
+#### テンプレートの分離
+- `.htaccess`設定は`deploy/templates/.htaccess.template`に集約
+- スクリプトでの重複コードを排除
+- 変更時は1箇所の修正で全体に反映
+
+#### SSH設定の明確化
+- `DEPLOY_KEY_PATH`が空の場合はSSHエージェントを使用
+- 秘密鍵ファイルが指定されている場合は存在確認を実行
+- ポート設定のデフォルト値（22）を明示
+
+#### エラーハンドリング
+- 各処理ステップでの適切な終了処理
+- ログ出力による問題の特定支援
+- 復旧可能なバックアップの自動作成
+
+### 9.2 セキュリティ設定
+
+#### 機密情報の管理
+```bash
+# .gitignoreに追加
+echo ".env.deploy" >> .gitignore
+echo "deploy/config/*.env" >> .gitignore
+
+# ファイル権限の設定
+chmod 600 .env.deploy
+chmod 600 ~/.ssh/your-key.pem
+```
+
+#### SSH設定の強化
+```bash
+# ~/.ssh/config の例
+Host production-server
+    HostName ogwlab.org
+    User your-username
+    IdentityFile ~/.ssh/production-key.pem
+    Port 22
+    ServerAliveInterval 60
+    ServerAliveCountMax 3
 ```
 
 ---
 
-## 9. チェックリスト
+## 10. チェックリスト
 
 ### デプロイ前チェックリスト
 
 - [ ] プロダクションビルドが成功する
-- [ ] モデルファイルが含まれている
-- [ ] サーバー接続情報が正しい
-- [ ] 公開ディレクトリのパスが正しい
-- [ ] .htaccessファイルが設定されている
+- [ ] モデルファイルが含まれている（`dist/models/`）
+- [ ] テンプレートファイルが存在する（`deploy/templates/.htaccess.template`）
+- [ ] 環境設定ファイルが正しく設定されている（`.env.deploy`）
+- [ ] SSH接続が可能である
+- [ ] デプロイ先ディレクトリが存在する
+- [ ] 必要な権限がある
 
 ### デプロイ後チェックリスト
 
 - [ ] Webサイトが正常に表示される
+- [ ] ファイルサイズが適切である（CSS/JSが圧縮されている）
+- [ ] モデルファイルにアクセスできる
 - [ ] 顔検出が動作する
 - [ ] 画像アップロードが動作する
 - [ ] パラメータ調整が動作する
 - [ ] 画像保存が動作する
+- [ ] レンダリングモード切り替えが動作する
 - [ ] モバイルデバイスで動作する
+- [ ] HTTPS接続が可能である（SSL証明書）
+
+### CodeRabbit指摘事項のチェック
+
+- [ ] .htaccessテンプレートの重複が解消されている
+- [ ] SSH鍵設定が実際に使用されている
+- [ ] 環境変数の定義と使用が一致している
+- [ ] エラーハンドリングが適切に実装されている
 
 ---
 
 最終更新日: 2025年1月5日
+CodeRabbit対応バージョン: 1.1
