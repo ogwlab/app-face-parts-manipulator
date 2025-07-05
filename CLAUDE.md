@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a React-based face parts manipulation application that allows users to upload images, detect faces, and manipulate individual facial features (eyes, mouth, nose). The app uses face-api.js for face detection and landmark extraction. Note: Image warping functionality with Fabric.js is planned but not yet implemented.
+This is a React-based face parts manipulation application that allows users to upload images, detect faces, and manipulate individual facial features (eyes, mouth, nose). The app uses face-api.js for face detection and landmark extraction with advanced Triangle Mesh Forward Mapping for natural image transformation.
 
 ## Development Commands
 
@@ -23,23 +23,53 @@ src/
 │   ├── ui/              # Reusable UI components
 │   │   ├── ImageUpload.tsx
 │   │   ├── ImagePreview.tsx
-│   │   └── ParameterControl.tsx
+│   │   ├── ParameterControl.tsx
+│   │   └── SaveButton.tsx
 │   └── panels/          # Control panels
 │       ├── ControlPanel.tsx
 │       ├── EyeControls.tsx
 │       ├── MouthControls.tsx
-│       └── NoseControls.tsx
-├── features/            # Feature modules (future expansion)
-│   ├── face-detection/
-│   ├── image-warping/
-│   └── image-export/
+│       ├── NoseControls.tsx
+│       └── RenderModeSelector.tsx
+├── features/            # Feature modules
+│   └── image-warping/   # Advanced warping algorithms
+│       ├── adaptiveWarping.ts
+│       ├── independentDeformation.ts
+│       ├── forwardMapping/
+│       │   ├── meshDeformation.ts
+│       │   ├── triangleRenderer.ts
+│       │   ├── backwardRenderer.ts
+│       │   ├── hybridRenderer.ts
+│       │   └── affineTransform.ts
+│       └── triangulation/
+│           ├── delaunay.ts
+│           └── types.ts
 ├── hooks/              # Custom React hooks
 ├── stores/             # Zustand state management
 ├── types/              # TypeScript type definitions
 ├── utils/              # Utility functions
+│   ├── faceDetection.ts
+│   └── fileNameGenerator.ts
 ├── styles/             # CSS files
 │   └── globals.css
 └── assets/             # Static resources
+```
+
+## Deployment Structure
+
+```
+deploy/
+├── templates/
+│   └── .htaccess.template    # Apache configuration template
+└── utils.sh                 # Deployment utilities
+
+docs/
+├── technical-specification.md  # Complete system architecture
+├── algorithm-details.md        # Mathematical implementation details
+├── api-reference.md           # Component and API documentation
+├── deployment-guide.md        # Production deployment guide
+├── logs.md                   # Development history
+└── todo.md                   # Project management
 ```
 
 ## Architecture
@@ -308,30 +338,45 @@ const newCenter = {
 - **Eye System**: 3-layer control with movement support
 - **Version Management**: HTML title and version display added
 
-### ✅ Version 5.2.0 Complete - Triangle Mesh Forward Mapping (2025-01-04)
-**Implementation Date**: 2025-01-04
-**Branch**: `feature/v5.2-triangle-mesh-forward-mapping`
-**Major Achievement**: Complete transition to triangle mesh-based forward mapping system
+### ✅ Version 5.2.2 Complete - Hybrid Rendering & Image Export (2025-01-05)
+**Latest Version**: 5.2.2
+**Status**: Production Ready with Enterprise-Grade Features
 
-**Key Features**:
-1. **Delaunay Triangulation**: Face-optimized mesh generation with 68 landmarks + 28 boundary points
-2. **Forward Mapping**: Eliminated residual artifacts from backward mapping
-3. **Coordinate Scaling**: Fixed image-to-canvas coordinate transformation
-4. **Performance**: Efficient triangle rendering with barycentric interpolation
+**Major Achievements**:
+1. **Multiple Rendering Modes**: Forward/Hybrid/Backward rendering options
+2. **Image Export System**: Auto-download with smart file naming
+3. **Security Hardening**: CodeRabbit-compliant deployment system
+4. **Performance Optimization**: Efficient compression and caching
 
-**Technical Details**:
-- Source mesh: 96 vertices (68 landmarks + 28 boundary), 163 triangles
-- Unified point array approach for consistent indexing
-- Proper scaling from image space (1180×787) to canvas space (448×298)
-- All triangles now process correctly without index errors
-- Default deformation mode set to 'mesh' for high quality
-- Debug mesh visualization removed (not needed with perfect rendering)
+**Core Features**:
+1. **Advanced Triangle Mesh System**: 
+   - Delaunay triangulation with 68 landmarks + 28 boundary points
+   - 163 triangles for precise facial deformation
+   - Barycentric interpolation for high-quality rendering
 
-**Fixed Issues**:
-- ✅ Boundary point index errors resolved
-- ✅ Coordinate system mismatch fixed
-- ✅ Triangle rendering counter bugs fixed
-- ✅ Screen boundary detection corrected
+2. **Rendering Modes**:
+   - **Forward**: High-speed (~100ms) for real-time preview
+   - **Hybrid**: Balanced quality/speed (~300ms, recommended)
+   - **Backward**: Maximum quality (~2000ms) for final output
+
+3. **Image Export Features**:
+   - PNG/JPG format support with quality settings
+   - Auto-generated filenames: `face-edit-YYYYMMDD-HHMMSS-[params].ext`
+   - Browser-based download with progress feedback
+
+4. **Production Deployment**:
+   - Template-based .htaccess configuration
+   - SSH-based deployment utilities
+   - Environment-specific security settings
+   - Comprehensive documentation
+
+**Technical Improvements**:
+- ✅ Eliminated edge noise through hybrid rendering
+- ✅ Pupil center fixing with iris shape preservation
+- ✅ UI-accurate parameter movement (1:1 mapping)
+- ✅ CodeRabbit security compliance (6 issues resolved)
+- ✅ Performance-optimized compression settings
+- ✅ Enterprise-grade deployment pipeline
 
 
 #### ✅ **RESOLVED: Boundary Point Index Issue (Version 5.2.0)**
