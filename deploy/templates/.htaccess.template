@@ -27,10 +27,18 @@ AddType application/wasm .wasm
 # セキュリティヘッダー
 <IfModule mod_headers.c>
     # CORS設定（モデルファイル用）
+    # 注意: 本番環境では具体的なドメインに制限することを推奨
+    # 例: Header set Access-Control-Allow-Origin "https://yourdomain.com"
     <FilesMatch "\.(json|wasm)$">
+        # 開発環境用: すべてのオリジンを許可
         Header set Access-Control-Allow-Origin "*"
-        Header set Access-Control-Allow-Methods "GET, POST, OPTIONS"
+        Header set Access-Control-Allow-Methods "GET, OPTIONS"
         Header set Access-Control-Allow-Headers "Content-Type"
+        
+        # 本番環境用（コメントアウト解除して使用）:
+        # Header unset Access-Control-Allow-Origin
+        # Header set Access-Control-Allow-Origin "https://yourdomain.com"
+        # Header set Access-Control-Allow-Origin "https://cdn.yourdomain.com"
     </FilesMatch>
     
     # セキュリティヘッダー
@@ -38,6 +46,7 @@ AddType application/wasm .wasm
     Header always set X-Frame-Options "SAMEORIGIN"
     Header always set X-XSS-Protection "1; mode=block"
     Header always set Referrer-Policy "strict-origin-when-cross-origin"
+    Header always set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self'"
 </IfModule>
 
 # キャッシュ設定
@@ -58,12 +67,41 @@ AddType application/wasm .wasm
     ExpiresByType application/json "access plus 1 month"
 </IfModule>
 
-# 圧縮設定
+# 圧縮設定（パフォーマンス最適化）
 <IfModule mod_deflate.c>
+    # テキストベースファイル
     AddOutputFilterByType DEFLATE text/html
     AddOutputFilterByType DEFLATE text/css
+    AddOutputFilterByType DEFLATE text/plain
+    AddOutputFilterByType DEFLATE text/xml
+    
+    # JavaScript とスクリプト
     AddOutputFilterByType DEFLATE application/javascript
+    AddOutputFilterByType DEFLATE application/x-javascript
+    AddOutputFilterByType DEFLATE text/javascript
+    
+    # データファイル
     AddOutputFilterByType DEFLATE application/json
+    AddOutputFilterByType DEFLATE application/xml
+    AddOutputFilterByType DEFLATE application/rss+xml
+    AddOutputFilterByType DEFLATE application/atom+xml
+    
+    # WebAssembly と SVG（CodeRabbit推奨）
+    AddOutputFilterByType DEFLATE application/wasm
+    AddOutputFilterByType DEFLATE image/svg+xml
+    
+    # フォントファイル（現代的なフォーマット）
+    AddOutputFilterByType DEFLATE font/woff2
+    AddOutputFilterByType DEFLATE font/woff
+    AddOutputFilterByType DEFLATE font/ttf
+    AddOutputFilterByType DEFLATE font/otf
+    
+    # 圧縮レベルの最適化
+    DeflateCompressionLevel 6
+    
+    # 圧縮除外設定（既に圧縮済みファイル）
+    SetEnvIfNoCase Request_URI \
+        \.(?:gif|jpe?g|png|webp|mp4|webm|mp3|ogg|zip|gz|bz2|rar|7z)$ no-gzip dont-vary
 </IfModule>
 
 # ファイル保護

@@ -33,8 +33,11 @@ generate_htaccess() {
     
     log_info "Generating .htaccess from template..."
     
-    # テンプレート変数を置換
-    sed "s|{{BASE_PATH}}|${base_path}|g" "${template_file}" > "${output_file}"
+    # sedで安全にパスを置換（&文字をエスケープ）
+    local safe_base_path
+    safe_base_path=$(printf '%s' "${base_path}" | sed 's|&|\\&|g')
+    
+    sed "s|{{BASE_PATH}}|${safe_base_path}|g" "${template_file}" > "${output_file}"
     
     if [ $? -eq 0 ]; then
         log_success ".htaccess generated successfully"
@@ -56,6 +59,7 @@ validate_ssh_config() {
     
     # SSH接続テスト用のコマンド構築
     local ssh_cmd="ssh"
+    local ssh_opts=""
     
     # 秘密鍵が指定されている場合
     if [ -n "${key_path}" ] && [ "${key_path}" != "~/.ssh/id_rsa" ]; then
@@ -63,12 +67,17 @@ validate_ssh_config() {
             log_error "SSH key file not found: ${key_path}"
             return 1
         fi
-        ssh_cmd="${ssh_cmd} -i ${key_path}"
+        ssh_opts="${ssh_opts} -i ${key_path}"
     fi
     
     # ポートの指定
     if [ "${port}" != "22" ]; then
-        ssh_cmd="${ssh_cmd} -p ${port}"
+        ssh_opts="${ssh_opts} -p ${port}"
+    fi
+    
+    # オプションが存在する場合のみ追加（空白を正しく処理）
+    if [ -n "${ssh_opts}" ]; then
+        ssh_cmd="${ssh_cmd}${ssh_opts}"
     fi
     
     # 接続テスト実行
@@ -103,9 +112,9 @@ build_rsync_command() {
         ssh_opts="${ssh_opts} -p ${port}"
     fi
     
-    # SSH オプションが存在する場合は -e オプションを追加
+    # SSH オプションが存在する場合は -e オプションを追加（空白を正しく処理）
     if [ -n "${ssh_opts}" ]; then
-        rsync_cmd="${rsync_cmd} -e \"ssh${ssh_opts}\""
+        rsync_cmd="${rsync_cmd} -e \"ssh ${ssh_opts}\""
     fi
     
     rsync_cmd="${rsync_cmd} ${source} ${username}@${server}:${remote_path}"
@@ -189,13 +198,19 @@ create_backup() {
     
     # SSH コマンドの構築
     local ssh_cmd="ssh"
+    local ssh_opts=""
     
     if [ -n "${key_path}" ] && [ "${key_path}" != "~/.ssh/id_rsa" ]; then
-        ssh_cmd="${ssh_cmd} -i ${key_path}"
+        ssh_opts="${ssh_opts} -i ${key_path}"
     fi
     
     if [ "${port}" != "22" ]; then
-        ssh_cmd="${ssh_cmd} -p ${port}"
+        ssh_opts="${ssh_opts} -p ${port}"
+    fi
+    
+    # オプションが存在する場合のみ追加（空白を正しく処理）
+    if [ -n "${ssh_opts}" ]; then
+        ssh_cmd="${ssh_cmd}${ssh_opts}"
     fi
     
     # バックアップ実行
@@ -220,13 +235,19 @@ set_permissions() {
     
     # SSH コマンドの構築
     local ssh_cmd="ssh"
+    local ssh_opts=""
     
     if [ -n "${key_path}" ] && [ "${key_path}" != "~/.ssh/id_rsa" ]; then
-        ssh_cmd="${ssh_cmd} -i ${key_path}"
+        ssh_opts="${ssh_opts} -i ${key_path}"
     fi
     
     if [ "${port}" != "22" ]; then
-        ssh_cmd="${ssh_cmd} -p ${port}"
+        ssh_opts="${ssh_opts} -p ${port}"
+    fi
+    
+    # オプションが存在する場合のみ追加（空白を正しく処理）
+    if [ -n "${ssh_opts}" ]; then
+        ssh_cmd="${ssh_cmd}${ssh_opts}"
     fi
     
     # 権限設定実行

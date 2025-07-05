@@ -827,6 +827,46 @@ Host production-server
     ServerAliveCountMax 3
 ```
 
+#### CORS設定のセキュリティ強化
+```apache
+# 本番環境での推奨CORS設定例
+
+# 方法1: 特定ドメインのみ許可
+<FilesMatch "\.(json|wasm)$">
+    Header unset Access-Control-Allow-Origin
+    Header set Access-Control-Allow-Origin "https://yourdomain.com"
+</FilesMatch>
+
+# 方法2: 複数ドメインの条件付き許可
+<FilesMatch "\.(json|wasm)$">
+    SetEnvIf Origin "^https://(yourdomain\.com|cdn\.yourdomain\.com)$" CORS_ORIGIN=$0
+    Header set Access-Control-Allow-Origin "%{CORS_ORIGIN}e" env=CORS_ORIGIN
+</FilesMatch>
+
+# 方法3: CDN + 署名URL使用（最高セキュリティ）
+# モデルファイルをCDNに配置し、署名付きURLでアクセス制限
+```
+
+#### パフォーマンス最適化設定
+```apache
+# .htaccess での圧縮最適化例
+<IfModule mod_deflate.c>
+    # CodeRabbit推奨: WASM、SVG、フォントも圧縮
+    AddOutputFilterByType DEFLATE application/wasm
+    AddOutputFilterByType DEFLATE image/svg+xml
+    AddOutputFilterByType DEFLATE font/woff2
+    
+    # 圧縮レベル調整（1-9、6が推奨）
+    DeflateCompressionLevel 6
+    
+    # 小さなファイルの圧縮除外（オーバーヘッド回避）
+    DeflateFilterNote Input instream
+    DeflateFilterNote Output outstream
+    DeflateFilterNote Ratio ratio
+    LogFormat '"%r" %{outstream}n/%{instream}n (%{ratio}n%%)' deflate
+</IfModule>
+```
+
 ---
 
 ## 10. チェックリスト
@@ -860,8 +900,27 @@ Host production-server
 - [ ] SSH鍵設定が実際に使用されている
 - [ ] 環境変数の定義と使用が一致している
 - [ ] エラーハンドリングが適切に実装されている
+- [ ] sed置換で`&`文字が適切にエスケープされている
+- [ ] SSH コマンド構築で空白が正しく処理されている  
+- [ ] CORS設定がセキュリティを考慮している
+- [ ] 圧縮設定にWASM、SVG、フォントが含まれている
 
 ---
 
-最終更新日: 2025年1月5日
-CodeRabbit対応バージョン: 1.1
+最終更新日: 2025年1月5日  
+CodeRabbit対応バージョン: 1.2
+
+## 変更履歴
+
+### v1.2 (2025-01-05)
+**CodeRabbit指摘事項への包括的対応**
+- sed置換での`&`文字エスケープ処理追加
+- SSH コマンド構築での空白処理修正
+- CORS設定セキュリティ強化（本番環境向け設定追加）
+- 圧縮設定拡張（WASM、SVG、フォント対応）
+
+### v1.1 (2025-01-05)
+**初期CodeRabbit対応**
+- .htaccessテンプレート重複解消
+- SSH鍵設定の実装修正
+- 保守性向上のための設計改善
