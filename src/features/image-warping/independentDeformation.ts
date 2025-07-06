@@ -9,6 +9,12 @@ import { segmentFaceParts, type PartSegmentationResult, type PartRegion } from '
  * 例：鼻を下げても口の位置は変わらず、結果的に鼻と口の距離が変化
  */
 
+// 虹彩オフセット制限値（CodeRabbit修正）
+const IRIS_OFFSET_LIMITS = {
+  maxX: 0.3,  // 目の幅の30%
+  maxY: 0.2   // 目の高さの20%
+} as const;
+
 export interface IndependentControlPoint extends TPSControlPoint {
   partId: string;
   region: PartRegion;
@@ -160,15 +166,35 @@ function generateIndependentControlPoints(
       });
     });
 
-    // 瞳孔中心制御点を追加（移動許可、形状保持）
-    const eyeCenterTarget = {
-      x: center.x + faceParams.leftEye.positionX * 1.0, // 移動許可
-      y: center.y + faceParams.leftEye.positionY * 1.0  // 移動許可
+    // 虹彩中心制御点を追加（視線方向制御対応）
+    const eyeBounds = {
+      width: Math.max(...eyePoints.map(p => p.x)) - Math.min(...eyePoints.map(p => p.x)),
+      height: Math.max(...eyePoints.map(p => p.y)) - Math.min(...eyePoints.map(p => p.y))
     };
+    
+    // 虹彩オフセットの制約適用（CodeRabbit修正: 型安全性と統一化）
+    const irisOffset = getIrisOffset(faceParams.leftEye);
+    const constrainedOffset = constrainIrisOffset(irisOffset);
+    
+    // 虹彩の新しい中心位置を計算（目全体の移動 + 制約済み虹彩オフセット）
+    const irisCenter = {
+      x: center.x + faceParams.leftEye.positionX + (eyeBounds.width * constrainedOffset.x),
+      y: center.y + faceParams.leftEye.positionY + (eyeBounds.height * constrainedOffset.y)
+    };
+    
+    // デバッグログ: 虹彩オフセット適用時
+    if (irisOffset.x !== 0 || irisOffset.y !== 0) {
+      console.log('👁️ 左目虹彩オフセット適用:', {
+        originalOffset: irisOffset,
+        constrainedOffset,
+        irisCenter,
+        eyeBounds
+      });
+    }
     
     controlPoints.push({
       original: center,
-      target: eyeCenterTarget,
+      target: irisCenter,
       weight: 1.5, // 形状保持のため適度に高い重み
       partType: 'eye',
       influenceRadius: 20, // 瞳孔中心領域
@@ -178,12 +204,21 @@ function generateIndependentControlPoints(
       barrierStrength: 1.0
     });
 
-    // 虹彩境界制御点を追加（正円形状維持、移動対応）
+    // 虹彩境界制御点を追加（正円形状維持、虹彩オフセット対応）
     const irisRadius = calculateIrisRadius(eyePoints);
     const irisControlPoints = generateCircularControlPoints(center, irisRadius, 8); // 8方向
 
     irisControlPoints.forEach(irisPoint => {
-      const scaledIrisPoint = scalePointFromCenter(irisPoint, leftEyeNewCenter, faceParams.leftEye.size);
+      // 虹彩境界点も新しい虹彩中心に合わせて移動
+      const offset = {
+        x: irisPoint.x - center.x,
+        y: irisPoint.y - center.y
+      };
+      
+      const scaledIrisPoint = {
+        x: irisCenter.x + offset.x * faceParams.leftEye.size,
+        y: irisCenter.y + offset.y * faceParams.leftEye.size
+      };
       
       controlPoints.push({
         original: irisPoint,
@@ -253,15 +288,35 @@ function generateIndependentControlPoints(
       });
     });
 
-    // 瞳孔中心制御点を追加（移動許可、形状保持）
-    const eyeCenterTarget = {
-      x: center.x + faceParams.rightEye.positionX * 1.0, // 移動許可
-      y: center.y + faceParams.rightEye.positionY * 1.0  // 移動許可
+    // 虹彩中心制御点を追加（視線方向制御対応）
+    const eyeBounds = {
+      width: Math.max(...eyePoints.map(p => p.x)) - Math.min(...eyePoints.map(p => p.x)),
+      height: Math.max(...eyePoints.map(p => p.y)) - Math.min(...eyePoints.map(p => p.y))
     };
+    
+    // 虹彩オフセットの制約適用（CodeRabbit修正: 型安全性と統一化）
+    const irisOffset = getIrisOffset(faceParams.rightEye);
+    const constrainedOffset = constrainIrisOffset(irisOffset);
+    
+    // 虹彩の新しい中心位置を計算（目全体の移動 + 制約済み虹彩オフセット）
+    const irisCenter = {
+      x: center.x + faceParams.rightEye.positionX + (eyeBounds.width * constrainedOffset.x),
+      y: center.y + faceParams.rightEye.positionY + (eyeBounds.height * constrainedOffset.y)
+    };
+    
+    // デバッグログ: 虹彩オフセット適用時
+    if (irisOffset.x !== 0 || irisOffset.y !== 0) {
+      console.log('👁️ 右目虹彩オフセット適用:', {
+        originalOffset: irisOffset,
+        constrainedOffset,
+        irisCenter,
+        eyeBounds
+      });
+    }
     
     controlPoints.push({
       original: center,
-      target: eyeCenterTarget,
+      target: irisCenter,
       weight: 1.5, // 形状保持のため適度に高い重み
       partType: 'eye',
       influenceRadius: 20, // 瞳孔中心領域
@@ -271,12 +326,21 @@ function generateIndependentControlPoints(
       barrierStrength: 1.0
     });
 
-    // 虹彩境界制御点を追加（正円形状維持、移動対応）
+    // 虹彩境界制御点を追加（正円形状維持、虹彩オフセット対応）
     const irisRadius = calculateIrisRadius(eyePoints);
     const irisControlPoints = generateCircularControlPoints(center, irisRadius, 8); // 8方向
 
     irisControlPoints.forEach(irisPoint => {
-      const scaledIrisPoint = scalePointFromCenter(irisPoint, rightEyeNewCenter, faceParams.rightEye.size);
+      // 虹彩境界点も新しい虹彩中心に合わせて移動
+      const offset = {
+        x: irisPoint.x - center.x,
+        y: irisPoint.y - center.y
+      };
+      
+      const scaledIrisPoint = {
+        x: irisCenter.x + offset.x * faceParams.rightEye.size,
+        y: irisCenter.y + offset.y * faceParams.rightEye.size
+      };
       
       controlPoints.push({
         original: irisPoint,
@@ -426,6 +490,41 @@ function generateIndependentControlPoints(
 }
 
 /**
+ * 虹彩オフセットを安全に取得（CodeRabbit修正: 型安全性向上）
+ * 注意: レイヤーベース虹彩制御が有効な場合は、変形システムでの虹彩処理を無効化
+ */
+function getIrisOffset(eyeParams: EyeParams): { x: number; y: number } {
+  // レイヤーベース虹彩制御システムが有効な場合は、
+  // 変形システムでの虹彩オフセットを無効化して目の形状変形を防ぐ
+  const USE_LAYER_BASED_IRIS_CONTROL = false; // メッシュ変形システムの虹彩制御を使用
+  
+  const originalOffset = {
+    x: eyeParams.irisOffsetX ?? 0,
+    y: eyeParams.irisOffsetY ?? 0
+  };
+  
+  if (USE_LAYER_BASED_IRIS_CONTROL) {
+    console.log('🔍 [Independent] 虹彩オフセット無効化:', {
+      originalOffset,
+      returnValue: { x: 0, y: 0 }
+    });
+    return { x: 0, y: 0 }; // 変形システムでは虹彩を動かさない
+  }
+  
+  return originalOffset;
+}
+
+/**
+ * 虹彩オフセットの制約を適用（CodeRabbit修正: 重複コード統一）
+ */
+function constrainIrisOffset(offset: { x: number; y: number }): { x: number; y: number } {
+  return {
+    x: Math.max(-IRIS_OFFSET_LIMITS.maxX, Math.min(IRIS_OFFSET_LIMITS.maxX, offset.x)),
+    y: Math.max(-IRIS_OFFSET_LIMITS.maxY, Math.min(IRIS_OFFSET_LIMITS.maxY, offset.y))
+  };
+}
+
+/**
  * 制御点が必要かどうかを判定
  */
 function shouldCreateControlPoints(
@@ -478,15 +577,6 @@ function generateCircularControlPoints(center: Point, radius: number, count: num
   return points;
 }
 
-/**
- * 中心からのスケール変換
- */
-function scalePointFromCenter(point: Point, center: Point, scale: number): Point {
-  return {
-    x: center.x + (point.x - center.x) * scale,
-    y: center.y + (point.y - center.y) * scale
-  };
-}
 
 /**
  * 独立変形マップを生成

@@ -20,6 +20,8 @@ export interface EyeParams {
   size: number;      // 大きさ: 0.5-2.0
   positionX: number; // X位置: -20 to +20
   positionY: number; // Y位置: -20 to +20
+  irisOffsetX: number; // 虹彩X方向オフセット: -0.3 to +0.3
+  irisOffsetY: number; // 虹彩Y方向オフセット: -0.2 to +0.2
 }
 
 // 口のパラメータ
@@ -51,6 +53,8 @@ export const defaultEyeParams: EyeParams = {
   size: 1.0,
   positionX: 0,
   positionY: 0,
+  irisOffsetX: 0,
+  irisOffsetY: 0,
 };
 
 export const defaultMouthParams: MouthParams = {
@@ -114,6 +118,8 @@ export const PARAM_LIMITS = {
     size: { min: 0.2, max: 4.0, step: 0.01 },        // 20倍の範囲（1/5縮小〜5倍拡大）
     positionX: { min: -50, max: 50, step: 0.5 },      // 2.5倍拡張（±50px）
     positionY: { min: -50, max: 50, step: 0.5 },      // 2.5倍拡張（±50px）
+    irisOffsetX: { min: -0.3, max: 0.3, step: 0.01 }, // 虹彩X方向（目の幅の30%）
+    irisOffsetY: { min: -0.2, max: 0.2, step: 0.01 }, // 虹彩Y方向（目の高さの20%、まぶた考慮）
   },
   mouth: {
     width: { min: 0.2, max: 4.0, step: 0.01 },       // 20倍の範囲（1/5縮小〜5倍拡大）

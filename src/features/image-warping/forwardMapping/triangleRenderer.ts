@@ -78,12 +78,21 @@ export function renderTriangleMesh(
     return;
   }
   
-  // まず元画像をターゲットにコピー（背景として）
-  targetCtx.drawImage(sourceCanvas, 0, 0, targetCanvas.width, targetCanvas.height);
-  
   // 画像データを取得
   const sourceImageData = sourceCtx.getImageData(0, 0, sourceCanvas.width, sourceCanvas.height);
-  const targetImageData = targetCtx.getImageData(0, 0, targetCanvas.width, targetCanvas.height);
+  const targetImageData = targetCtx.createImageData(targetCanvas.width, targetCanvas.height);
+  
+  // デバッグ: ソース画像の確認
+  console.log('🎨 [TriangleRenderer] ソース画像確認:', {
+    size: `${sourceCanvas.width}x${sourceCanvas.height}`,
+    firstPixel: `rgba(${sourceImageData.data[0]}, ${sourceImageData.data[1]}, ${sourceImageData.data[2]}, ${sourceImageData.data[3]})`,
+    centerPixel: (() => {
+      const cx = Math.floor(sourceCanvas.width / 2);
+      const cy = Math.floor(sourceCanvas.height / 2);
+      const idx = (cy * sourceCanvas.width + cx) * 4;
+      return `rgba(${sourceImageData.data[idx]}, ${sourceImageData.data[idx+1]}, ${sourceImageData.data[idx+2]}, ${sourceImageData.data[idx+3]})`;
+    })()
+  });
   
   // デバッグ: 最初の三角形の詳細を表示
   if (trianglePairs.length > 0) {

@@ -43,6 +43,8 @@ interface FaceStore {
   updateFaceParams: (params: Partial<FaceParams>) => void;
   updateLeftEye: (params: Partial<FaceParams['leftEye']>) => void;
   updateRightEye: (params: Partial<FaceParams['rightEye']>) => void;
+  updateLeftEyeIrisOffset: (offsetX: number, offsetY: number) => void;
+  updateRightEyeIrisOffset: (offsetX: number, offsetY: number) => void;
   updateMouth: (params: Partial<FaceParams['mouth']>) => void;
   updateNose: (params: Partial<FaceParams['nose']>) => void;
   resetLeftEye: () => void;
@@ -95,6 +97,28 @@ export const useFaceStore = create<FaceStore>((set) => ({
     faceParams: {
       ...state.faceParams,
       rightEye: { ...state.faceParams.rightEye, ...params }
+    }
+  })),
+  
+  updateLeftEyeIrisOffset: (offsetX: number, offsetY: number) => set((state) => ({
+    faceParams: {
+      ...state.faceParams,
+      leftEye: { 
+        ...state.faceParams.leftEye, 
+        irisOffsetX: offsetX,
+        irisOffsetY: offsetY
+      }
+    }
+  })),
+  
+  updateRightEyeIrisOffset: (offsetX: number, offsetY: number) => set((state) => ({
+    faceParams: {
+      ...state.faceParams,
+      rightEye: { 
+        ...state.faceParams.rightEye, 
+        irisOffsetX: offsetX,
+        irisOffsetY: offsetY
+      }
     }
   })),
   

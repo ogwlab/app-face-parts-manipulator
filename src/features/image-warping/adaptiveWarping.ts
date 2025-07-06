@@ -29,7 +29,7 @@ export const DEFAULT_ADAPTIVE_OPTIONS: AdaptiveWarpingOptions = {
   quality: 'high', // デフォルトを高品質に変更（Version 5.2.0）
   enableConstraints: true,
   maxControlPoints: 100,
-  deformationMode: 'mesh', // メッシュベースをデフォルトに（Version 5.2.0）
+  deformationMode: 'mesh', // 虹彩制御システム完成につきmeshモードに復帰
   samplingDensity: {
     foreground: 0.5,
     background: 0.1,
@@ -47,7 +47,7 @@ export function getAdaptiveOptionsFromQuality(quality: 'fast' | 'medium' | 'high
         quality,
         enableConstraints: false,
         maxControlPoints: 30,
-        deformationMode: 'independent', // 高速処理のためindependentを使用
+        deformationMode: 'mesh', // 虹彩制御統一のためmeshモードを使用
         samplingDensity: {
           foreground: 0.25,
           background: 0.05,
@@ -261,6 +261,20 @@ export function applyAdaptiveTPSWarping(
     canvasWidth, 
     canvasHeight 
   });
+  
+  // デバッグ: 虹彩オフセットが設定されている場合はログ出力
+  const hasIrisOffset = 
+    faceParams.leftEye.irisOffsetX !== 0 || 
+    faceParams.leftEye.irisOffsetY !== 0 ||
+    faceParams.rightEye.irisOffsetX !== 0 || 
+    faceParams.rightEye.irisOffsetY !== 0;
+    
+  if (hasIrisOffset) {
+    console.log('👁️ [Adaptive] 虹彩オフセット検出:');
+    console.log('  モード:', options.deformationMode);
+    console.log('  左目:', `X=${faceParams.leftEye.irisOffsetX.toFixed(2)}, Y=${faceParams.leftEye.irisOffsetY.toFixed(2)}`);
+    console.log('  右目:', `X=${faceParams.rightEye.irisOffsetX.toFixed(2)}, Y=${faceParams.rightEye.irisOffsetY.toFixed(2)}`);
+  }
   
   // 🔍 仮説1検証: どのモードが選択されているかを明示
   console.log('🔍 [仮説1検証] 変形モード判定:', {

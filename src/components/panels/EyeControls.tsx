@@ -15,6 +15,8 @@ const EyeControls: React.FC = () => {
     faceParams, 
     updateLeftEye, 
     updateRightEye, 
+    updateLeftEyeIrisOffset,
+    updateRightEyeIrisOffset,
     resetLeftEye, 
     resetRightEye 
   } = useFaceStore();
@@ -60,6 +62,35 @@ const EyeControls: React.FC = () => {
               step={PARAM_LIMITS.eye.positionY.step}
               unit="px"
               onReset={() => updateLeftEye({ positionY: 0 })}
+            />
+            
+            {/* 視線方向制御 */}
+            <Box sx={{ mt: 2, mb: 1 }}>
+              <Typography variant="subtitle2" color="text.secondary" gutterBottom>
+                🎯 視線方向
+              </Typography>
+            </Box>
+            
+            <ParameterControl
+              label="虹彩X方向"
+              value={faceParams.leftEye.irisOffsetX}
+              onChange={(value: number) => updateLeftEyeIrisOffset(value, faceParams.leftEye.irisOffsetY)}
+              min={PARAM_LIMITS.eye.irisOffsetX.min}
+              max={PARAM_LIMITS.eye.irisOffsetX.max}
+              step={PARAM_LIMITS.eye.irisOffsetX.step}
+              unit=""
+              onReset={() => updateLeftEyeIrisOffset(0, faceParams.leftEye.irisOffsetY)}
+            />
+            
+            <ParameterControl
+              label="虹彩Y方向"
+              value={faceParams.leftEye.irisOffsetY}
+              onChange={(value: number) => updateLeftEyeIrisOffset(faceParams.leftEye.irisOffsetX, value)}
+              min={PARAM_LIMITS.eye.irisOffsetY.min}
+              max={PARAM_LIMITS.eye.irisOffsetY.max}
+              step={PARAM_LIMITS.eye.irisOffsetY.step}
+              unit=""
+              onReset={() => updateLeftEyeIrisOffset(faceParams.leftEye.irisOffsetX, 0)}
             />
           </Box>
           
@@ -121,6 +152,35 @@ const EyeControls: React.FC = () => {
               step={PARAM_LIMITS.eye.positionY.step}
               unit="px"
               onReset={() => updateRightEye({ positionY: 0 })}
+            />
+            
+            {/* 視線方向制御 */}
+            <Box sx={{ mt: 2, mb: 1 }}>
+              <Typography variant="subtitle2" color="text.secondary" gutterBottom>
+                🎯 視線方向
+              </Typography>
+            </Box>
+            
+            <ParameterControl
+              label="虹彩X方向"
+              value={faceParams.rightEye.irisOffsetX}
+              onChange={(value: number) => updateRightEyeIrisOffset(value, faceParams.rightEye.irisOffsetY)}
+              min={PARAM_LIMITS.eye.irisOffsetX.min}
+              max={PARAM_LIMITS.eye.irisOffsetX.max}
+              step={PARAM_LIMITS.eye.irisOffsetX.step}
+              unit=""
+              onReset={() => updateRightEyeIrisOffset(0, faceParams.rightEye.irisOffsetY)}
+            />
+            
+            <ParameterControl
+              label="虹彩Y方向"
+              value={faceParams.rightEye.irisOffsetY}
+              onChange={(value: number) => updateRightEyeIrisOffset(faceParams.rightEye.irisOffsetX, value)}
+              min={PARAM_LIMITS.eye.irisOffsetY.min}
+              max={PARAM_LIMITS.eye.irisOffsetY.max}
+              step={PARAM_LIMITS.eye.irisOffsetY.step}
+              unit=""
+              onReset={() => updateRightEyeIrisOffset(faceParams.rightEye.irisOffsetX, 0)}
             />
           </Box>
           
