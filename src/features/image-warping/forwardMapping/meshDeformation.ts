@@ -16,13 +16,16 @@ import { renderTriangleMeshHybrid } from './hybridRenderer';
  */
 export function deformLandmarks(
   landmarks: FaceLandmarks,
-  faceParams: FaceParams,
-  imageScale: { x: number; y: number }
+  faceParams: FaceParams
 ): FaceLandmarks {
   console.log('🔄 ランドマーク変形開始');
   
   // ディープコピー
   const deformed: FaceLandmarks = JSON.parse(JSON.stringify(landmarks));
+  
+  // 顔全体の境界を計算
+  const faceBounds = calculateFaceBounds(landmarks);
+  console.log('📏 顔領域サイズ:', faceBounds);
   
   // 左目の変形
   if (faceParams.leftEye) {
@@ -31,7 +34,7 @@ export function deformLandmarks(
       deformed.leftEye,
       leftEyeCenter,
       faceParams.leftEye,
-      imageScale
+      faceBounds
     );
   }
   
@@ -42,7 +45,7 @@ export function deformLandmarks(
       deformed.rightEye,
       rightEyeCenter,
       faceParams.rightEye,
-      imageScale
+      faceBounds
     );
   }
   
@@ -53,7 +56,7 @@ export function deformLandmarks(
       deformed.mouth,
       mouthCenter,
       faceParams.mouth,
-      imageScale
+      faceBounds
     );
   }
   
@@ -64,7 +67,7 @@ export function deformLandmarks(
       deformed.nose,
       noseCenter,
       faceParams.nose,
-      imageScale
+      faceBounds
     );
   }
   
@@ -79,11 +82,12 @@ function deformEye(
   eyePoints: Point[],
   center: Point,
   params: { size: number; positionX: number; positionY: number },
-  imageScale: { x: number; y: number }
+  faceBounds: { width: number; height: number }
 ): void {
   const scale = params.size;
-  const dx = params.positionX * imageScale.x;
-  const dy = params.positionY * imageScale.y;
+  // 位置パラメータを顔領域サイズ比%として計算
+  const dx = (params.positionX / 100) * faceBounds.width;
+  const dy = (params.positionY / 100) * faceBounds.height;
   
   // 新しい中心位置
   const newCenter = {
@@ -114,12 +118,13 @@ function deformMouth(
   mouthPoints: Point[],
   center: Point,
   params: { width: number; height: number; positionX: number; positionY: number },
-  imageScale: { x: number; y: number }
+  faceBounds: { width: number; height: number }
 ): void {
   const scaleX = params.width;
   const scaleY = params.height;
-  const dx = params.positionX * imageScale.x;
-  const dy = params.positionY * imageScale.y;
+  // 位置パラメータを顔領域サイズ比%として計算
+  const dx = (params.positionX / 100) * faceBounds.width;
+  const dy = (params.positionY / 100) * faceBounds.height;
   
   // 新しい中心位置
   const newCenter = {
@@ -150,12 +155,13 @@ function deformNose(
   nosePoints: Point[],
   center: Point,
   params: { width: number; height: number; positionX: number; positionY: number },
-  imageScale: { x: number; y: number }
+  faceBounds: { width: number; height: number }
 ): void {
   const scaleX = params.width;
   const scaleY = params.height;
-  const dx = params.positionX * imageScale.x;
-  const dy = params.positionY * imageScale.y;
+  // 位置パラメータを顔領域サイズ比%として計算
+  const dx = (params.positionX / 100) * faceBounds.width;
+  const dy = (params.positionY / 100) * faceBounds.height;
   
   // 新しい中心位置
   const newCenter = {
@@ -191,6 +197,31 @@ function calculatePartCenter(points: Point[]): Point {
   return {
     x: sum.x / points.length,
     y: sum.y / points.length
+  };
+}
+
+/**
+ * 顔全体の境界を計算
+ */
+function calculateFaceBounds(landmarks: FaceLandmarks): { width: number; height: number } {
+  // 顔の輪郭と眉毛から顔領域を計算
+  const boundaryPoints = [
+    ...landmarks.jawline,
+    ...landmarks.leftEyebrow,
+    ...landmarks.rightEyebrow
+  ];
+  
+  const xs = boundaryPoints.map(p => p.x);
+  const ys = boundaryPoints.map(p => p.y);
+  
+  const minX = Math.min(...xs);
+  const maxX = Math.max(...xs);
+  const minY = Math.min(...ys);
+  const maxY = Math.max(...ys);
+  
+  return {
+    width: maxX - minX,
+    height: maxY - minY
   };
 }
 
@@ -493,7 +524,7 @@ export function performMeshBasedDeformation(
   });
   
   // 4. スケール済みランドマークを変形
-  const deformedLandmarks = deformLandmarks(scaledLandmarks, faceParams, { x: 1, y: 1 }); // スケール済みなので1.0を使用
+  const deformedLandmarks = deformLandmarks(scaledLandmarks, faceParams);
   
   // デバッグ: パラメータと変形の確認
   console.log('🔍 変形パラメータ:', {

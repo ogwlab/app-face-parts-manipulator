@@ -5,33 +5,116 @@ import {
   CircularProgress,
   Paper,
   Divider,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
   ToggleButton,
+  Button,
 } from '@mui/material';
 import { useFaceStore } from '../../stores/faceStore';
 import { useImageWarping } from '../../hooks/useImageWarping';
+import { useFaceDetection } from '../../hooks/useFaceDetection';
 import SaveButton from './SaveButton';
-import type { FaceLandmarks } from '../../types/face';
+import { UnifiedQualitySelector, type UnifiedQualityMode } from './UnifiedQualitySelector';
+import type { FaceLandmarks, ImageData } from '../../types/face';
 
 const ImagePreview: React.FC = () => {
   const { 
     originalImage, 
     processedImageUrl,
     isProcessing, 
-    faceDetection
+    faceDetection,
+    setRenderMode,
+    setOriginalImage,
+    setError,
+    setLoading
   } = useFaceStore();
   
   const originalCanvasRef = useRef<HTMLCanvasElement>(null);
   const fabricCanvasRef = useRef<HTMLCanvasElement>(null);
   const [imageLoaded, setImageLoaded] = useState(false);
   const [canvasSize, setCanvasSize] = useState<{width: number, height: number} | null>(null);
-  const [warpingQuality, setWarpingQuality] = useState<'fast' | 'medium' | 'high'>('high');
+  const [warpingQuality, setWarpingQuality] = useState<'fast' | 'medium' | 'high'>('medium');
   const [showLandmarks, setShowLandmarks] = useState<boolean>(true);
+  const [qualityMode, setQualityMode] = useState<UnifiedQualityMode>('balanced');
   
-  const { initializeCanvas } = useImageWarping();
+  const { initializeCanvas } = useImageWarping(warpingQuality);
+  const { detectFace, initializeModels } = useFaceDetection();
+
+  // 統合品質設定の変更ハンドラー
+  const handleQualityModeChange = (mode: UnifiedQualityMode) => {
+    setQualityMode(mode);
+  };
+
+  const handleWarpingQualityChange = (quality: 'fast' | 'medium' | 'high') => {
+    setWarpingQuality(quality);
+  };
+
+  const handleRenderModeChange = (mode: 'forward' | 'hybrid' | 'backward') => {
+    setRenderMode(mode);
+  };
+
+  // 新しい画像を開くハンドラー
+  const handleOpenNewImage = () => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/jpeg,image/png,image/jpg';
+    input.onchange = async (event) => {
+      const file = (event.target as HTMLInputElement).files?.[0];
+      if (!file) return;
+
+      try {
+        setLoading(true);
+        setError(null);
+
+        // ファイル検証
+        const MAX_FILE_SIZE = 8 * 1024 * 1024; // 8MB
+        const SUPPORTED_FORMATS = ['image/jpeg', 'image/png', 'image/jpg'];
+        
+        if (!SUPPORTED_FORMATS.includes(file.type)) {
+          throw new Error('サポートされていないファイル形式です。JPEGまたはPNGファイルを選択してください。');
+        }
+        
+        if (file.size > MAX_FILE_SIZE) {
+          throw new Error('ファイルサイズが大きすぎます。8MB以下のファイルを選択してください。');
+        }
+
+        // 画像データを作成
+        const imageData: ImageData = await new Promise((resolve, reject) => {
+          const img = new Image();
+          img.onload = () => {
+            resolve({
+              file,
+              url: URL.createObjectURL(file),
+              width: img.naturalWidth,
+              height: img.naturalHeight
+            });
+          };
+          img.onerror = () => reject(new Error('画像の読み込みに失敗しました。'));
+          img.src = URL.createObjectURL(file);
+        });
+
+        setOriginalImage(imageData);
+
+        // 顔検出を実行
+        const img = new Image();
+        img.onload = async () => {
+          try {
+            await initializeModels();
+            await detectFace(img);
+          } catch (faceError) {
+            const errorMessage = faceError instanceof Error ? faceError.message : '顔検出でエラーが発生しました。';
+            setError(errorMessage);
+          }
+        };
+        img.src = imageData.url;
+
+      } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : '画像の処理中にエラーが発生しました。';
+        setError(errorMessage);
+      } finally {
+        setLoading(false);
+      }
+    };
+    input.click();
+  };
 
   // originalImageが変更された時にimageLoadedをリセット
   useEffect(() => {
@@ -256,27 +339,43 @@ const ImagePreview: React.FC = () => {
               元画像
             </Typography>
             
-            <ToggleButton
-              value="landmarks"
-              selected={showLandmarks}
-              onChange={() => setShowLandmarks(!showLandmarks)}
-              size="small"
-              sx={{ 
-                py: 0.5, 
-                px: 1, 
-                fontSize: '0.75rem',
-                minWidth: 'auto',
-                '&.Mui-selected': {
-                  backgroundColor: 'primary.main',
-                  color: 'primary.contrastText',
-                  '&:hover': {
-                    backgroundColor: 'primary.dark',
+            <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+              <Button
+                variant="outlined"
+                size="small"
+                onClick={handleOpenNewImage}
+                sx={{ 
+                  py: 0.5, 
+                  px: 1, 
+                  fontSize: '0.75rem',
+                  minWidth: 'auto',
+                }}
+              >
+                📁 新しい画像
+              </Button>
+              
+              <ToggleButton
+                value="landmarks"
+                selected={showLandmarks}
+                onChange={() => setShowLandmarks(!showLandmarks)}
+                size="small"
+                sx={{ 
+                  py: 0.5, 
+                  px: 1, 
+                  fontSize: '0.75rem',
+                  minWidth: 'auto',
+                  '&.Mui-selected': {
+                    backgroundColor: 'primary.main',
+                    color: 'primary.contrastText',
+                    '&:hover': {
+                      backgroundColor: 'primary.dark',
+                    },
                   },
-                },
-              }}
-            >
-              👁️ 特徴点
-            </ToggleButton>
+                }}
+              >
+                👁️ 特徴点
+              </ToggleButton>
+            </Box>
           </Box>
           
           <Box
@@ -321,19 +420,14 @@ const ImagePreview: React.FC = () => {
               編集後
             </Typography>
             
-            <Box sx={{ display: 'flex', gap: 1 }}>
-              <FormControl size="small" sx={{ minWidth: 100 }}>
-                <InputLabel>品質</InputLabel>
-                <Select
-                  value={warpingQuality}
-                  label="品質"
-                  onChange={(e) => setWarpingQuality(e.target.value as 'fast' | 'medium' | 'high')}
-                >
-                  <MenuItem value="fast">高速</MenuItem>
-                  <MenuItem value="medium">標準</MenuItem>
-                  <MenuItem value="high">高品質</MenuItem>
-                </Select>
-              </FormControl>
+            <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+              {/* 統合品質設定 */}
+              <UnifiedQualitySelector
+                value={qualityMode}
+                onChange={handleQualityModeChange}
+                onWarpingQualityChange={handleWarpingQualityChange}
+                onRenderModeChange={handleRenderModeChange}
+              />
               
               {/* 保存ボタン */}
               {processedImageUrl && (

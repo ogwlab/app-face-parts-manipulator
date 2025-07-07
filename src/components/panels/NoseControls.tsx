@@ -35,6 +35,7 @@ const NoseControls: React.FC = () => {
               step={PARAM_LIMITS.nose.width.step}
               unit=""
               onReset={() => updateNose({ width: 1.0 })}
+              parameterType="size"
             />
             
             <ParameterControl
@@ -46,6 +47,7 @@ const NoseControls: React.FC = () => {
               step={PARAM_LIMITS.nose.height.step}
               unit=""
               onReset={() => updateNose({ height: 1.0 })}
+              parameterType="size"
             />
             
             <ParameterControl
@@ -55,8 +57,9 @@ const NoseControls: React.FC = () => {
               min={PARAM_LIMITS.nose.positionX.min}
               max={PARAM_LIMITS.nose.positionX.max}
               step={PARAM_LIMITS.nose.positionX.step}
-              unit="px"
+              unit="%"
               onReset={() => updateNose({ positionX: 0 })}
+              parameterType="position"
             />
             
             <ParameterControl
@@ -66,8 +69,9 @@ const NoseControls: React.FC = () => {
               min={PARAM_LIMITS.nose.positionY.min}
               max={PARAM_LIMITS.nose.positionY.max}
               step={PARAM_LIMITS.nose.positionY.step}
-              unit="px"
+              unit="%"
               onReset={() => updateNose({ positionY: 0 })}
+              parameterType="position"
             />
           </Box>
           

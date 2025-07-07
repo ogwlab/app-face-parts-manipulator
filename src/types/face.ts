@@ -112,19 +112,19 @@ export interface FaceDetectionResult {
 export const PARAM_LIMITS = {
   eye: {
     size: { min: 0.2, max: 4.0, step: 0.01 },        // 20倍の範囲（1/5縮小〜5倍拡大）
-    positionX: { min: -50, max: 50, step: 0.5 },      // 2.5倍拡張（±50px）
-    positionY: { min: -50, max: 50, step: 0.5 },      // 2.5倍拡張（±50px）
+    positionX: { min: -25, max: 25, step: 0.1 },      // ±25%（顔領域横幅に対する比率）
+    positionY: { min: -25, max: 25, step: 0.1 },      // ±25%（顔領域縦幅に対する比率）
   },
   mouth: {
     width: { min: 0.2, max: 4.0, step: 0.01 },       // 20倍の範囲（1/5縮小〜5倍拡大）
     height: { min: 0.2, max: 4.0, step: 0.01 },      // 20倍の範囲（1/5縮小〜5倍拡大）
-    positionX: { min: -80, max: 80, step: 0.5 },      // 2.7倍拡張（±80px）
-    positionY: { min: -80, max: 80, step: 0.5 },      // 2.7倍拡張（±80px）
+    positionX: { min: -30, max: 30, step: 0.1 },      // ±30%（顔領域横幅に対する比率）
+    positionY: { min: -30, max: 30, step: 0.1 },      // ±30%（顔領域縦幅に対する比率）
   },
   nose: {
     width: { min: 0.3, max: 3.0, step: 0.01 },       // 10倍の範囲（1/3縮小〜3倍拡大）
     height: { min: 0.3, max: 3.0, step: 0.01 },      // 10倍の範囲（1/3縮小〜3倍拡大）
-    positionX: { min: -40, max: 40, step: 0.5 },      // 2.7倍拡張（±40px）
-    positionY: { min: -40, max: 40, step: 0.5 },      // 2.7倍拡張（±40px）
+    positionX: { min: -25, max: 25, step: 0.1 },      // ±25%（顔領域横幅に対する比率）
+    positionY: { min: -25, max: 25, step: 0.1 },      // ±25%（顔領域縦幅に対する比率）
   },
 } as const; 

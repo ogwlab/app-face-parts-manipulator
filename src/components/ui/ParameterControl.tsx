@@ -19,6 +19,7 @@ interface ParameterControlProps {
   onReset: () => void;
   resetOnly?: boolean;
   resetLabel?: string;
+  parameterType?: 'size' | 'position';
 }
 
 const ParameterControl: React.FC<ParameterControlProps> = ({
@@ -32,6 +33,7 @@ const ParameterControl: React.FC<ParameterControlProps> = ({
   onReset,
   resetOnly = false,
   resetLabel = "🔄",
+  parameterType = 'position',
 }) => {
   const handleSliderChange = (_event: Event, newValue: number | number[]) => {
     if (typeof newValue === 'number') {
@@ -40,11 +42,49 @@ const ParameterControl: React.FC<ParameterControlProps> = ({
   };
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const newValue = parseFloat(event.target.value);
-    if (!isNaN(newValue) && newValue >= min && newValue <= max) {
-      onChange(newValue);
+    const inputValue = parseFloat(event.target.value);
+    if (isNaN(inputValue)) return;
+    
+    let actualValue: number;
+    let minCheck: number;
+    let maxCheck: number;
+    
+    if (parameterType === 'size') {
+      // %表示から倍率に変換 (100% → 1.0)
+      actualValue = inputValue / 100;
+      minCheck = getDisplayValue(min);
+      maxCheck = getDisplayValue(max);
+    } else {
+      actualValue = inputValue;
+      minCheck = min;
+      maxCheck = max;
+    }
+    
+    if (inputValue >= minCheck && inputValue <= maxCheck) {
+      onChange(actualValue);
     }
   };
+
+  // 表示用の値とラベルを計算
+  const getDisplayValue = (val: number) => {
+    if (parameterType === 'size') {
+      return Math.round(val * 100); // 1.0 → 100%
+    }
+    if (parameterType === 'position') {
+      return val; // 位置は既に%値
+    }
+    return val;
+  };
+
+  const getDisplayUnit = () => {
+    if (parameterType === 'size' || parameterType === 'position') {
+      return '%';
+    }
+    return unit;
+  };
+
+  const displayValue = getDisplayValue(value);
+  const displayUnit = getDisplayUnit();
 
   // リセット専用の場合
   if (resetOnly) {
@@ -91,7 +131,7 @@ const ParameterControl: React.FC<ParameterControlProps> = ({
             step={step}
             size="small"
             valueLabelDisplay="auto"
-            valueLabelFormat={(val) => `${val}${unit}`}
+            valueLabelFormat={(val) => `${getDisplayValue(val)}${getDisplayUnit()}`}
           />
         </Box>
         
@@ -99,12 +139,12 @@ const ParameterControl: React.FC<ParameterControlProps> = ({
         <TextField
           size="small"
           type="number"
-          value={value.toFixed(2)}
+          value={parameterType === 'size' ? displayValue.toString() : value.toFixed(2)}
           onChange={handleInputChange}
           inputProps={{
-            min,
-            max,
-            step,
+            min: parameterType === 'size' ? getDisplayValue(min) : min,
+            max: parameterType === 'size' ? getDisplayValue(max) : max,
+            step: parameterType === 'size' ? 1 : step,
             style: { textAlign: 'right' }
           }}
           sx={{ 
@@ -117,9 +157,9 @@ const ParameterControl: React.FC<ParameterControlProps> = ({
         />
         
         {/* 単位 */}
-        {unit && (
+        {displayUnit && (
           <Typography variant="caption" color="text.secondary" sx={{ minWidth: 20 }}>
-            {unit}
+            {displayUnit}
           </Typography>
         )}
       </Box>
@@ -127,10 +167,10 @@ const ParameterControl: React.FC<ParameterControlProps> = ({
       {/* 値の範囲表示 */}
       <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 0.5 }}>
         <Typography variant="caption" color="text.secondary">
-          {min}{unit}
+          {getDisplayValue(min)}{getDisplayUnit()}
         </Typography>
         <Typography variant="caption" color="text.secondary">
-          {max}{unit}
+          {getDisplayValue(max)}{getDisplayUnit()}
         </Typography>
       </Box>
     </Box>

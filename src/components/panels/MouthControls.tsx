@@ -35,6 +35,7 @@ const MouthControls: React.FC = () => {
               step={PARAM_LIMITS.mouth.width.step}
               unit=""
               onReset={() => updateMouth({ width: 1.0 })}
+              parameterType="size"
             />
             
             <ParameterControl
@@ -46,6 +47,7 @@ const MouthControls: React.FC = () => {
               step={PARAM_LIMITS.mouth.height.step}
               unit=""
               onReset={() => updateMouth({ height: 1.0 })}
+              parameterType="size"
             />
             
             <ParameterControl
@@ -55,8 +57,9 @@ const MouthControls: React.FC = () => {
               min={PARAM_LIMITS.mouth.positionX.min}
               max={PARAM_LIMITS.mouth.positionX.max}
               step={PARAM_LIMITS.mouth.positionX.step}
-              unit="px"
+              unit="%"
               onReset={() => updateMouth({ positionX: 0 })}
+              parameterType="position"
             />
             
             <ParameterControl
@@ -66,8 +69,9 @@ const MouthControls: React.FC = () => {
               min={PARAM_LIMITS.mouth.positionY.min}
               max={PARAM_LIMITS.mouth.positionY.max}
               step={PARAM_LIMITS.mouth.positionY.step}
-              unit="px"
+              unit="%"
               onReset={() => updateMouth({ positionY: 0 })}
+              parameterType="position"
             />
           </Box>
           

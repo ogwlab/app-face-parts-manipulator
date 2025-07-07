@@ -5,13 +5,13 @@ import { applyAdaptiveTPSWarping, getAdaptiveOptionsFromQuality } from '../featu
 
 export interface UseImageWarpingReturn {
   initializeCanvas: (canvasElement: HTMLCanvasElement, width?: number, height?: number) => void;
-  processImage: () => Promise<void>;
+  processImage: (quality?: 'fast' | 'medium' | 'high') => Promise<void>;
   exportImage: () => string | null;
   isProcessing: boolean;
   error: string | null;
 }
 
-export const useImageWarping = (): UseImageWarpingReturn => {
+export const useImageWarping = (quality: 'fast' | 'medium' | 'high' = 'high'): UseImageWarpingReturn => {
   const {
     originalImage,
     faceDetection,
@@ -72,7 +72,7 @@ export const useImageWarping = (): UseImageWarpingReturn => {
   }, [originalImage, setProcessing, setError]);
 
   // 画像処理（ワーピング適用）
-  const processImage = useCallback(async () => {
+  const processImage = useCallback(async (quality: 'fast' | 'medium' | 'high' = 'high') => {
     if (
       !originalImage ||
       !faceDetection ||
@@ -88,7 +88,7 @@ export const useImageWarping = (): UseImageWarpingReturn => {
       setProcessing(true);
       setError(null);
 
-      console.log('🔄 ワーピング処理開始', faceParams);
+      console.log('🔄 ワーピング処理開始', { faceParams, quality, renderMode });
 
       // 元画像を読み込む
       const img = new Image();
@@ -109,8 +109,8 @@ export const useImageWarping = (): UseImageWarpingReturn => {
       const canvasWidth = canvas.getWidth();
       const canvasHeight = canvas.getHeight();
 
-      // レンダリングモードに応じたオプションを設定
-      const options = getAdaptiveOptionsFromQuality('high');
+      // 品質設定からオプションを取得
+      const options = getAdaptiveOptionsFromQuality(quality);
       // renderModeをオプションに反映
       options.deformationMode = 'mesh'; // メッシュベースを使用
       if (options.deformationMode === 'mesh') {
@@ -131,7 +131,7 @@ export const useImageWarping = (): UseImageWarpingReturn => {
       const processedDataURL = warpedCanvas.toDataURL('image/png');
       setProcessedImageUrl(processedDataURL);
 
-      console.log('✅ ワーピング処理完了');
+      console.log('✅ ワーピング処理完了', { quality, renderMode });
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : '画像処理エラー';
       setError(errorMessage);
@@ -180,7 +180,7 @@ export const useImageWarping = (): UseImageWarpingReturn => {
       // 少し遅延を入れてUIの応答性を保つ
       const timeoutId = setTimeout(() => {
         console.log('⏰ デバウンス完了 - ワーピング処理開始');
-        processImage();
+        processImage(quality);
       }, 100);
 
       return () => {
@@ -190,7 +190,7 @@ export const useImageWarping = (): UseImageWarpingReturn => {
     } else {
       console.log('❌ 前提条件不足 - ワーピング処理スキップ');
     }
-  }, [faceParams, renderMode, processImage, faceDetection, originalImage]);
+  }, [faceParams, renderMode, processImage, faceDetection, originalImage, quality]);
 
   // クリーンアップ
   useEffect(() => {

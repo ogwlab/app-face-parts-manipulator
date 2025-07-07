@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a React-based face parts manipulation application that allows users to upload images, detect faces, and manipulate individual facial features (eyes, mouth, nose). The app uses face-api.js for face detection and landmark extraction with advanced Triangle Mesh Forward Mapping for natural image transformation.
+This is a React-based face parts manipulation application that allows users to upload images, detect faces, and manipulate individual facial features (eyes, mouth, nose). The app uses face-api.js for face detection and landmark extraction with advanced Triangle Mesh Forward Mapping for natural image transformation. Features unified quality settings for streamlined user experience.
 
 ## Development Commands
 
@@ -24,13 +24,13 @@ src/
 │   │   ├── ImageUpload.tsx
 │   │   ├── ImagePreview.tsx
 │   │   ├── ParameterControl.tsx
-│   │   └── SaveButton.tsx
+│   │   ├── SaveButton.tsx
+│   │   └── UnifiedQualitySelector.tsx
 │   └── panels/          # Control panels
 │       ├── ControlPanel.tsx
 │       ├── EyeControls.tsx
 │       ├── MouthControls.tsx
-│       ├── NoseControls.tsx
-│       └── RenderModeSelector.tsx
+│       └── NoseControls.tsx
 ├── features/            # Feature modules
 │   └── image-warping/   # Advanced warping algorithms
 │       ├── adaptiveWarping.ts
@@ -97,9 +97,21 @@ docs/
 - **FaceDetectionResult**: Complete detection result with confidence, bounds, and centers
 
 ### Face Manipulation Parameters
-- **Eyes**: size (0.5-2.0), positionX/Y (-20 to +20)
-- **Mouth**: width/height (0.5-2.0), positionX/Y (-30 to +30)  
-- **Nose**: width/height (0.7-1.5), positionX/Y (-15 to +15)
+- **Eyes**: size (0.2-4.0, 線形倍率%), positionX/Y (±25%, 顔領域比)
+- **Mouth**: width/height (0.2-4.0, 線形倍率%), positionX/Y (±30%, 顔領域比)  
+- **Nose**: width/height (0.3-3.0, 線形倍率%), positionX/Y (±25%, 顔領域比)
+
+### Parameter Display System
+- **Size Parameters**: 線形倍率をパーセンテージ表示 (1.0 = 100%, 1.5 = 150%)
+- **Position Parameters**: 顔全体領域に対する相対%表示
+  - X位置: 顔領域横幅に対する比率 (±25-30%)
+  - Y位置: 顔領域縦幅に対する比率 (±25-30%)
+- **Help System**: 「❓」アイコンによるパラメータ説明ダイアログ
+
+### Quality Settings
+- **High-Speed Preview**: fast warping + forward rendering (~50-100ms)
+- **Balanced**: medium warping + hybrid rendering (~150-300ms, recommended)
+- **Highest Quality**: high warping + backward rendering (~1000-2000ms)
 
 ## Technology Stack
 
@@ -112,7 +124,13 @@ docs/
 
 ## Development Status
 
-### ✅ Completed Features (Phase 1-5.0)
+### UI/UX Features
+- **Parameter Control System**: 統一された%表示とヘルプシステム
+- **New Image Button**: 元画像ペインから直接新しい画像を開く機能
+- **Unified Quality Selector**: ワーピング品質とレンダリングモードの統合設定
+- **Real-time Parameter Help**: パラメータの意味と操作方法の詳細説明
+
+### ✅ Completed Features (Phase 1-6.0+)
 - Project foundation (React + TypeScript + Vite setup)
 - Face detection using face-api.js (68-point landmark extraction)
 - UI component structure with Material-UI
@@ -137,6 +155,11 @@ docs/
   - Consistent control point weights
   - Eye movement with iris shape preservation
   - UI-accurate movement values
+- **UI improvements and optimization** (Phase 5.1-5.3)
+  - Panel border display fixes
+  - Unified quality settings (combines warping quality + render mode)
+  - Simplified user interface with intelligent defaults
+  - Redundant control elimination
 
 ### ✅ All Major Issues Resolved
 - ~~Horizontal noise/striping~~ → **SOLVED** (Phase 4.1)
@@ -144,6 +167,10 @@ docs/
 - ~~Eye pupil distortion~~ → **SOLVED** (Phase 4.7-4.8)
 - ~~Feature point visualization~~ → **SOLVED** (Phase 4.2)
 - ~~Parts movement functionality~~ → **SOLVED** (Phase 5.0)
+- ~~Panel border clipping~~ → **SOLVED** (Phase 5.1)
+- ~~Setting redundancy and confusion~~ → **SOLVED** (Phase 5.2-5.3)
+- ~~Parameter display clarity~~ → **SOLVED** (Phase 5.3+)
+- ~~Position parameter reference confusion~~ → **SOLVED** (Phase 5.3+)
 
 ### ⏳ Future Enhancement Opportunities (Phase 6+)
 - Image export functionality
@@ -167,6 +194,8 @@ docs/
 - **Core functionality (image warping) is fully implemented and optimized** with advanced anatomical constraints
 - **Independent System** provides feature-point based transformations with part-specific controls
 - **3-layer eye control** ensures anatomically accurate eye transformations
+- **Unified Quality Settings** automatically optimize warping quality and rendering mode combinations
+- **UI has been streamlined** to eliminate redundant controls and improve user experience
 
 ## Implementation History & Lessons Learned
 

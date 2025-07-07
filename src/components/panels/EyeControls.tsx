@@ -38,6 +38,7 @@ const EyeControls: React.FC = () => {
               step={PARAM_LIMITS.eye.size.step}
               unit=""
               onReset={() => updateLeftEye({ size: 1.0 })}
+              parameterType="size"
             />
             
             <ParameterControl
@@ -47,8 +48,9 @@ const EyeControls: React.FC = () => {
               min={PARAM_LIMITS.eye.positionX.min}
               max={PARAM_LIMITS.eye.positionX.max}
               step={PARAM_LIMITS.eye.positionX.step}
-              unit="px"
+              unit="%"
               onReset={() => updateLeftEye({ positionX: 0 })}
+              parameterType="position"
             />
             
             <ParameterControl
@@ -58,8 +60,9 @@ const EyeControls: React.FC = () => {
               min={PARAM_LIMITS.eye.positionY.min}
               max={PARAM_LIMITS.eye.positionY.max}
               step={PARAM_LIMITS.eye.positionY.step}
-              unit="px"
+              unit="%"
               onReset={() => updateLeftEye({ positionY: 0 })}
+              parameterType="position"
             />
           </Box>
           
@@ -99,6 +102,7 @@ const EyeControls: React.FC = () => {
               step={PARAM_LIMITS.eye.size.step}
               unit=""
               onReset={() => updateRightEye({ size: 1.0 })}
+              parameterType="size"
             />
             
             <ParameterControl
@@ -108,8 +112,9 @@ const EyeControls: React.FC = () => {
               min={PARAM_LIMITS.eye.positionX.min}
               max={PARAM_LIMITS.eye.positionX.max}
               step={PARAM_LIMITS.eye.positionX.step}
-              unit="px"
+              unit="%"
               onReset={() => updateRightEye({ positionX: 0 })}
+              parameterType="position"
             />
             
             <ParameterControl
@@ -119,8 +124,9 @@ const EyeControls: React.FC = () => {
               min={PARAM_LIMITS.eye.positionY.min}
               max={PARAM_LIMITS.eye.positionY.max}
               step={PARAM_LIMITS.eye.positionY.step}
-              unit="px"
+              unit="%"
               onReset={() => updateRightEye({ positionY: 0 })}
+              parameterType="position"
             />
           </Box>
           
