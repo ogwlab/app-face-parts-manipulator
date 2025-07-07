@@ -18,7 +18,7 @@ const MouthControls: React.FC = () => {
   } = useFaceStore();
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, px: 1 }}>
       <Card elevation={2}>
         <CardContent>
           <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>

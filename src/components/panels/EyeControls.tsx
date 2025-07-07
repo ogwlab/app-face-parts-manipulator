@@ -20,7 +20,7 @@ const EyeControls: React.FC = () => {
   } = useFaceStore();
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, px: 1 }}>
       {/* 左目制御 */}
       <Card elevation={2}>
         <CardContent>

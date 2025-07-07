@@ -65,12 +65,12 @@ const MainLayout: React.FC = () => {
 
         {/* 制御パネル */}
         <Box sx={{ flex: 1, minHeight: 0, minWidth: { xs: '100%', md: 350 }, maxWidth: { md: 400 } }}>
-          <Paper elevation={3} sx={{ p: 2, height: '100%', display: 'flex', flexDirection: 'column' }}>
+          <Paper elevation={3} sx={{ p: 2, pr: 3, height: '100%', display: 'flex', flexDirection: 'column' }}>
             <Typography variant="h6" gutterBottom sx={{ flexShrink: 0 }}>
               顔パーツ制御
             </Typography>
             
-            <Box sx={{ flex: 1, overflow: 'auto', minHeight: 0 }}>
+            <Box sx={{ flex: 1, overflow: 'auto', minHeight: 0, pr: 1 }}>
               {originalImage ? (
                 <ControlPanel />
               ) : (

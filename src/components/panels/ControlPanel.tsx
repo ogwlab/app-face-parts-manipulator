@@ -29,7 +29,7 @@ const TabPanel: React.FC<TabPanelProps> = ({ children, value, index, ...other })
       {...other}
     >
       {value === index && (
-        <Box sx={{ p: 3 }}>
+        <Box sx={{ p: 2 }}>
           {children}
         </Box>
       )}
@@ -101,7 +101,7 @@ const ControlPanel: React.FC = () => {
       </Box>
 
       {/* タブコンテンツ */}
-      <Box sx={{ flex: 1, overflow: 'auto' }}>
+      <Box sx={{ flex: 1, overflow: 'auto', px: 1 }}>
         <TabPanel value={tabValue} index={0}>
           <EyeControls />
         </TabPanel>
