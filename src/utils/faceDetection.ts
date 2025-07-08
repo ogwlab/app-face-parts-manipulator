@@ -226,9 +226,12 @@ export const detectFaceLandmarks = async (
         
       console.log('🔄 Detection promise created');
       
-      // 30秒タイムアウト
+      // 10秒タイムアウト（診断用）
       const timeoutPromise = new Promise((_, reject) => {
-        setTimeout(() => reject(new Error('顔検出がタイムアウトしました（30秒）')), 30000);
+        setTimeout(() => {
+          console.error('⏰ TIMEOUT: 顔検出が10秒でタイムアウトしました');
+          reject(new Error('顔検出がタイムアウトしました（10秒）'));
+        }, 10000);
       });
       
       detections = await Promise.race([detectionPromise, timeoutPromise]) as faceapi.WithFaceLandmarks<{ detection: faceapi.FaceDetection }>[];
