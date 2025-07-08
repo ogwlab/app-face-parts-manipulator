@@ -192,11 +192,20 @@ export const detectFaceLandmarks = async (
 
     // 最適な検出パラメータを取得
     const detectionOptions = getOptimalDetectionOptions(imageElement);
+    console.log('🔧 Detection options:', detectionOptions);
 
     // 顔検出実行
-    const detections = await faceapi
-      .detectAllFaces(imageElement, detectionOptions)
-      .withFaceLandmarks();
+    console.log('🔄 Starting face detection with options:', detectionOptions);
+    let detections;
+    try {
+      detections = await faceapi
+        .detectAllFaces(imageElement, detectionOptions)
+        .withFaceLandmarks();
+      console.log('✅ Face detection completed, found:', detections.length, 'faces');
+    } catch (error) {
+      console.error('❌ Face detection failed:', error);
+      throw error;
+    }
 
     // 検出結果の検証
     if (detections.length === 0) {
