@@ -129,22 +129,37 @@ export class ImageValidator {
     return new Promise((resolve) => {
       const img = new Image();
       const url = URL.createObjectURL(file);
+      let timeoutId: number | null = null;
+      let resolved = false;
+
+      const cleanup = () => {
+        if (timeoutId !== null) {
+          clearTimeout(timeoutId);
+          timeoutId = null;
+        }
+        URL.revokeObjectURL(url);
+      };
+
+      const resolveOnce = (value: boolean) => {
+        if (!resolved) {
+          resolved = true;
+          cleanup();
+          resolve(value);
+        }
+      };
 
       img.onload = () => {
-        URL.revokeObjectURL(url);
         // 画像が正常に読み込まれ、サイズが妥当であれば整合性OK
-        resolve(img.naturalWidth > 0 && img.naturalHeight > 0);
+        resolveOnce(img.naturalWidth > 0 && img.naturalHeight > 0);
       };
 
       img.onerror = () => {
-        URL.revokeObjectURL(url);
-        resolve(false);
+        resolveOnce(false);
       };
 
       // タイムアウト設定（10秒）
-      setTimeout(() => {
-        URL.revokeObjectURL(url);
-        resolve(false);
+      timeoutId = window.setTimeout(() => {
+        resolveOnce(false);
       }, 10000);
 
       img.src = url;

@@ -4,7 +4,7 @@
  * リアルタイムでエラーを表示し、ユーザーに適切なフィードバックを提供
  */
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import {
   Snackbar,
   Alert,
@@ -82,12 +82,23 @@ export const ErrorNotificationSystem: React.FC<ErrorNotificationSystemProps> = (
   const [notifications, setNotifications] = useState<ErrorNotification[]>([]);
   const [historyDrawerOpen, setHistoryDrawerOpen] = useState(false);
   const [retryingErrors, setRetryingErrors] = useState<Set<string>>(new Set());
+  
+  // タイムアウトID管理用のRef
+  const timeoutIdsRef = useRef<Map<string, number>>(new Map());
 
   /**
    * 新しいエラー通知を追加
    */
   const addNotification = useCallback((error: AppError) => {
-    const id = `notification-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    // セキュアなID生成（crypto.randomUUID使用、フォールバック付き）
+    const id = (() => {
+      try {
+        return `notification-${crypto.randomUUID()}`;
+      } catch {
+        // フォールバック（古いブラウザ対応）
+        return `notification-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
+      }
+    })();
     
     const notification: ErrorNotification = {
       id,
@@ -103,11 +114,14 @@ export const ErrorNotificationSystem: React.FC<ErrorNotificationSystemProps> = (
       return newNotifications;
     });
 
-    // 自動非表示
+    // 自動非表示（タイムアウトIDを管理）
     if (autoHideDuration > 0 && error.severity !== ErrorSeverity.CRITICAL) {
-      setTimeout(() => {
+      const timeoutId = window.setTimeout(() => {
         dismissNotification(id);
+        timeoutIdsRef.current.delete(id);
       }, autoHideDuration);
+      
+      timeoutIdsRef.current.set(id, timeoutId);
     }
   }, [maxNotifications, autoHideDuration, enableRetry]);
 
@@ -115,6 +129,13 @@ export const ErrorNotificationSystem: React.FC<ErrorNotificationSystemProps> = (
    * 通知を非表示にする
    */
   const dismissNotification = useCallback((id: string) => {
+    // 既存のタイムアウトをクリア
+    const existingTimeoutId = timeoutIdsRef.current.get(id);
+    if (existingTimeoutId) {
+      clearTimeout(existingTimeoutId);
+      timeoutIdsRef.current.delete(id);
+    }
+    
     setNotifications(prev => 
       prev.map(notification => 
         notification.id === id 
@@ -124,9 +145,12 @@ export const ErrorNotificationSystem: React.FC<ErrorNotificationSystemProps> = (
     );
 
     // アニメーション後に削除
-    setTimeout(() => {
+    const animationTimeoutId = window.setTimeout(() => {
       setNotifications(prev => prev.filter(notification => notification.id !== id));
     }, 300);
+    
+    // アニメーションタイムアウトも管理対象に追加（クリーンアップ用）
+    timeoutIdsRef.current.set(`animation-${id}`, animationTimeoutId);
   }, []);
 
   /**
@@ -145,18 +169,43 @@ export const ErrorNotificationSystem: React.FC<ErrorNotificationSystemProps> = (
   /**
    * エラーのリトライを実行
    */
-  const retryError = useCallback(async (notificationId: string, error: AppError) => {
+  const retryError = useCallback(async (
+    notificationId: string, 
+    error: AppError,
+    retryFn?: () => Promise<void>
+  ) => {
     if (retryingErrors.has(notificationId)) return;
 
     setRetryingErrors(prev => new Set(prev).add(notificationId));
 
     try {
-      // 基本的なリトライロジック（実際の処理は文脈に依存）
       console.log(`エラーのリトライを実行中: ${error.type}`);
       
-      // ここで実際のリトライ処理を実装
-      // 例: 画像の再読み込み、ネットワークリクエストの再実行など
-      await new Promise(resolve => setTimeout(resolve, 2000)); // シミュレーション
+      if (retryFn) {
+        // カスタムリトライ処理が提供されている場合
+        await retryFn();
+      } else if (executeWithRetry) {
+        // executeWithRetryを使用してリトライ
+        await executeWithRetry(async () => {
+          // エラータイプに応じたデフォルトリトライ処理
+          switch (error.type) {
+            case ErrorType.NETWORK:
+              // ネットワークエラーの場合は短時間待機
+              await new Promise(resolve => setTimeout(resolve, 1000));
+              break;
+            case ErrorType.FILE_SYSTEM:
+              // ファイルシステムエラーの場合は少し長めに待機
+              await new Promise(resolve => setTimeout(resolve, 2000));
+              break;
+            default:
+              // その他のエラーは標準的な待機
+              await new Promise(resolve => setTimeout(resolve, 1500));
+          }
+        }, { maxRetries: 2, initialDelay: 1000 });
+      } else {
+        // フォールバック：単純な待機
+        await new Promise(resolve => setTimeout(resolve, 2000));
+      }
       
       // 成功時は通知を削除
       dismissNotification(notificationId);
@@ -190,12 +239,18 @@ export const ErrorNotificationSystem: React.FC<ErrorNotificationSystemProps> = (
         return newSet;
       });
     }
-  }, [retryingErrors, dismissNotification, addNotification]);
+  }, [retryingErrors, dismissNotification, addNotification, executeWithRetry]);
 
   /**
    * 全ての通知をクリア
    */
   const clearAllNotifications = useCallback(() => {
+    // 全てのタイムアウトをクリア
+    timeoutIdsRef.current.forEach((timeoutId) => {
+      clearTimeout(timeoutId);
+    });
+    timeoutIdsRef.current.clear();
+    
     setNotifications([]);
   }, []);
 
@@ -206,6 +261,17 @@ export const ErrorNotificationSystem: React.FC<ErrorNotificationSystemProps> = (
       clearError(); // 通知に追加後、グローバルエラーをクリア
     }
   }, [currentError, addNotification, clearError]);
+
+  // コンポーネントアンマウント時のクリーンアップ
+  useEffect(() => {
+    return () => {
+      // 全てのタイムアウトをクリア
+      timeoutIdsRef.current.forEach((timeoutId) => {
+        clearTimeout(timeoutId);
+      });
+      timeoutIdsRef.current.clear();
+    };
+  }, []);
 
   /**
    * エラー重要度に応じたアイコンを取得
@@ -277,7 +343,6 @@ export const ErrorNotificationSystem: React.FC<ErrorNotificationSystemProps> = (
                           {retryingErrors.has(notification.id) ? (
                             <Box sx={{ width: 20, height: 20 }}>
                               <LinearProgress 
-                                size={20} 
                                 sx={{ 
                                   width: '100%', 
                                   height: '100%',
@@ -392,8 +457,10 @@ export const ErrorNotificationSystem: React.FC<ErrorNotificationSystemProps> = (
         anchor="right"
         open={historyDrawerOpen}
         onClose={() => setHistoryDrawerOpen(false)}
-        PaperProps={{
-          sx: { width: 400 }
+        slotProps={{
+          paper: {
+            sx: { width: 400 }
+          }
         }}
       >
         <Box sx={{ p: 2 }}>

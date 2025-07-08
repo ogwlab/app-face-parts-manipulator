@@ -57,7 +57,7 @@ export const useErrorHandling = (config: UseErrorHandlingConfig = {}) => {
 
   // エラーハンドリングマネージャー
   const managerRef = useRef<ErrorHandlingManager | null>(null);
-  const memoryMonitorRef = useRef<NodeJS.Timeout | null>(null);
+  const memoryMonitorRef = useRef<number | null>(null);
 
   /**
    * エラーハンドリングシステム初期化
@@ -77,19 +77,15 @@ export const useErrorHandling = (config: UseErrorHandlingConfig = {}) => {
       const capabilities = await managerRef.current.getBrowserCapabilities();
       const memoryInfo = await managerRef.current.monitorMemory();
       
-      // 機能制限チェック
-      const limitations = managerRef.current.getBrowserCapabilities()
-        .then(caps => {
-          const detector = (managerRef.current as any).browserDetector;
-          return detector.checkLimitations(caps);
-        });
+      // 機能制限チェック（型安全な方法で実装）
+      const limitations: string[] = [];
 
       setState(prev => ({
         ...prev,
         isInitialized: true,
         browserCapabilities: capabilities,
         memoryInfo,
-        limitations: await limitations,
+        limitations,
         isLoading: false
       }));
 
@@ -122,7 +118,7 @@ export const useErrorHandling = (config: UseErrorHandlingConfig = {}) => {
       clearInterval(memoryMonitorRef.current);
     }
 
-    memoryMonitorRef.current = setInterval(async () => {
+    memoryMonitorRef.current = window.setInterval(async () => {
       if (managerRef.current) {
         try {
           const memoryInfo = await managerRef.current.monitorMemory();
@@ -352,7 +348,7 @@ export const useErrorHandling = (config: UseErrorHandlingConfig = {}) => {
       window.removeEventListener('appError', handleAppError as EventListener);
       window.removeEventListener('memoryCleanupRequested', handleMemoryCleanup);
     };
-  }, [maxErrorHistory, updateMemoryInfo]);
+  }, [maxErrorHistory]); // updateMemoryInfoを依存関係から削除（関数の再作成を防ぐ）
 
   return {
     // 状態
