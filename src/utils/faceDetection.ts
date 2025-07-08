@@ -231,7 +231,7 @@ export const detectFaceLandmarks = async (
         setTimeout(() => reject(new Error('顔検出がタイムアウトしました（30秒）')), 30000);
       });
       
-      detections = await Promise.race([detectionPromise, timeoutPromise]);
+      detections = await Promise.race([detectionPromise, timeoutPromise]) as faceapi.WithFaceLandmarks<{ detection: faceapi.FaceDetection }>[];
       console.log('✅ Face detection completed, found:', detections.length, 'faces');
     } catch (error) {
       console.error('❌ Face detection failed:', error);
