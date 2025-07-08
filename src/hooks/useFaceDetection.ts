@@ -42,13 +42,16 @@ export const useFaceDetection = (): UseFaceDetectionReturn => {
 
   // 顔検出の実行
   const detectFace = useCallback(async (imageElement: HTMLImageElement) => {
+    console.log('🎯 useFaceDetection.detectFace 開始');
     try {
       setIsLoading(true);
       setError(null);
       setResult(null);
 
+      console.log('🔄 detectFaceLandmarks 呼び出し前');
       // 顔検出を実行
       const detection = await detectFaceLandmarks(imageElement);
+      console.log('✅ detectFaceLandmarks 完了:', detection);
       
       // 検出結果の検証
       const warning = validateDetection(detection);
@@ -106,7 +109,9 @@ export const useFaceDetection = (): UseFaceDetectionReturn => {
       });
 
     } catch (err) {
+      console.error('🚨 useFaceDetection.detectFace でエラー:', err);
       const errorMessage = err instanceof Error ? err.message : '顔検出でエラーが発生しました';
+      console.error('🚨 エラーメッセージ:', errorMessage);
       setError(errorMessage);
       setResult(null);
       

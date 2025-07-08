@@ -23,6 +23,16 @@ dist-ssr
 *.sln
 *.sw?
 
+# 環境変数ファイル
+.env
+.env.local
+.env.production
+.env.development
+!.env.example
+
+# Vercel
+.vercel
+
 # 仮想環境
 venv
 venv_*
