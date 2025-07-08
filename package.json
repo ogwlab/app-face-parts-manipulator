@@ -1,13 +1,15 @@
 {
   "name": "app-face-parts-manipulator",
   "private": true,
-  "version": "0.0.0",
+  "version": "6.1.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "vercel-build": "npm run build",
+    "start": "vite preview --port 4173"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
