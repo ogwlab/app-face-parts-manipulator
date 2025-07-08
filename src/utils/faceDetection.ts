@@ -94,14 +94,17 @@ export const loadModels = async (): Promise<void> => {
  * 画像の妥当性チェック
  */
 const validateImage = (imageElement: HTMLImageElement): void => {
+  console.log('🔍 validateImage: 要素存在チェック');
   if (!imageElement) {
     throw new Error('画像要素が指定されていません');
   }
   
+  console.log('🔍 validateImage: 読み込み完了チェック', imageElement.complete);
   if (!imageElement.complete) {
     throw new Error('画像の読み込みが完了していません');
   }
   
+  console.log('🔍 validateImage: サイズチェック', imageElement.naturalWidth, 'x', imageElement.naturalHeight);
   if (imageElement.naturalWidth === 0 || imageElement.naturalHeight === 0) {
     throw new Error('画像が破損しているか、読み込めません');
   }
@@ -117,6 +120,7 @@ const validateImage = (imageElement: HTMLImageElement): void => {
   if (imageElement.naturalWidth < minSize || imageElement.naturalHeight < minSize) {
     throw new Error(`画像サイズが小さすぎます（最小${minSize}x${minSize}px）`);
   }
+  console.log('✅ validateImage: 全チェック完了');
 };
 
 /**
@@ -182,12 +186,19 @@ export const detectFaceLandmarks = async (
   imageElement: HTMLImageElement
 ): Promise<faceapi.WithFaceLandmarks<{ detection: faceapi.FaceDetection }>> => {
   try {
+    console.log('🚀 detectFaceLandmarks開始');
+    
     // 画像の妥当性チェック
+    console.log('🔍 画像妥当性チェック開始');
     validateImage(imageElement);
+    console.log('✅ 画像妥当性チェック完了');
 
     // モデルが読み込まれていない場合は読み込む
+    console.log('📚 モデル読み込み状態確認:', modelsLoaded);
     if (!modelsLoaded) {
+      console.log('🔄 モデル読み込み開始');
       await loadModels();
+      console.log('✅ モデル読み込み完了');
     }
 
     // 最適な検出パラメータを取得
