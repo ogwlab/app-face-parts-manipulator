@@ -233,6 +233,7 @@ export const detectFaceLandmarks = async (
       
       detections = await Promise.race([detectionPromise, timeoutPromise]) as faceapi.WithFaceLandmarks<{ detection: faceapi.FaceDetection }>[];
       console.log('✅ Face detection completed, found:', detections.length, 'faces');
+      console.log('🔍 Detection results details:', detections);
     } catch (error) {
       console.error('❌ Face detection failed:', error);
       throw error;
@@ -266,6 +267,8 @@ export const detectFaceLandmarks = async (
     const primaryDetection = detections[0];
     validateFaceDetectionQuality(primaryDetection);
 
+    console.log('🎯 Returning detection result:', primaryDetection);
+    console.log('🎯 Landmarks count:', primaryDetection.landmarks.positions.length);
     return primaryDetection;
   } catch (error) {
     console.error('❌ Face detection failed:', error);
