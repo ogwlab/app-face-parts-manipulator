@@ -60,12 +60,6 @@
       ]
     }
   ],
-  "functions": {
-    "app/api/health.js": {
-      "memory": 128
-    }
-  },
-  "regions": ["nrt1"],
   "env": {
     "NODE_ENV": "production"
   }
