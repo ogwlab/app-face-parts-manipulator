@@ -127,7 +127,9 @@ const validateImage = (imageElement: HTMLImageElement): void => {
  * 顔検出パラメータの動的調整
  */
 const getOptimalDetectionOptions = (imageElement: HTMLImageElement): faceapi.TinyFaceDetectorOptions => {
+  console.log('🔧 getOptimalDetectionOptions開始');
   const imageSize = Math.max(imageElement.naturalWidth, imageElement.naturalHeight);
+  console.log('🔧 画像サイズ:', imageSize);
   
   // 画像サイズに応じて検出パラメータを調整
   let inputSize = 416;
@@ -137,16 +139,22 @@ const getOptimalDetectionOptions = (imageElement: HTMLImageElement): faceapi.Tin
     // 高解像度画像の場合
     inputSize = 608;
     scoreThreshold = 0.6;
+    console.log('🔧 高解像度モード:', inputSize, scoreThreshold);
   } else if (imageSize < 500) {
     // 低解像度画像の場合
     inputSize = 320;
     scoreThreshold = 0.4;
+    console.log('🔧 低解像度モード:', inputSize, scoreThreshold);
+  } else {
+    console.log('🔧 標準モード:', inputSize, scoreThreshold);
   }
   
-  return new faceapi.TinyFaceDetectorOptions({
+  const options = new faceapi.TinyFaceDetectorOptions({
     inputSize,
     scoreThreshold
   });
+  console.log('🔧 作成されたオプション:', options);
+  return options;
 };
 
 /**
@@ -209,9 +217,21 @@ export const detectFaceLandmarks = async (
     console.log('🔄 Starting face detection with options:', detectionOptions);
     let detections;
     try {
-      detections = await faceapi
+      console.log('🔄 Calling faceapi.detectAllFaces...');
+      
+      // タイムアウト付きで実行
+      const detectionPromise = faceapi
         .detectAllFaces(imageElement, detectionOptions)
         .withFaceLandmarks();
+        
+      console.log('🔄 Detection promise created');
+      
+      // 30秒タイムアウト
+      const timeoutPromise = new Promise((_, reject) => {
+        setTimeout(() => reject(new Error('顔検出がタイムアウトしました（30秒）')), 30000);
+      });
+      
+      detections = await Promise.race([detectionPromise, timeoutPromise]);
       console.log('✅ Face detection completed, found:', detections.length, 'faces');
     } catch (error) {
       console.error('❌ Face detection failed:', error);
