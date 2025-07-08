@@ -27,18 +27,27 @@ AddType application/wasm .wasm
 # セキュリティヘッダー
 <IfModule mod_headers.c>
     # CORS設定（モデルファイル用）
-    # 注意: 本番環境では具体的なドメインに制限することを推奨
-    # 例: Header set Access-Control-Allow-Origin "https://yourdomain.com"
     <FilesMatch "\.(json|wasm)$">
-        # 開発環境用: すべてのオリジンを許可
-        Header set Access-Control-Allow-Origin "*"
-        Header set Access-Control-Allow-Methods "GET, OPTIONS"
-        Header set Access-Control-Allow-Headers "Content-Type"
+        # 環境変数PRODUCTIONが設定されていない場合（開発環境）
+        <If "-z env('PRODUCTION')">
+            # 開発環境用: すべてのオリジンを許可
+            Header set Access-Control-Allow-Origin "*"
+            Header set Access-Control-Allow-Methods "GET, OPTIONS"
+            Header set Access-Control-Allow-Headers "Content-Type"
+        </If>
         
-        # 本番環境用（コメントアウト解除して使用）:
-        # Header unset Access-Control-Allow-Origin
-        # Header set Access-Control-Allow-Origin "https://yourdomain.com"
-        # Header set Access-Control-Allow-Origin "https://cdn.yourdomain.com"
+        # 環境変数PRODUCTIONが設定されている場合（本番環境）
+        <If "-n env('PRODUCTION')">
+            # 本番環境用: 自己オリジンのみ許可（より安全）
+            Header set Access-Control-Allow-Origin "https://%{HTTP_HOST}s"
+            Header set Access-Control-Allow-Methods "GET, OPTIONS"
+            Header set Access-Control-Allow-Headers "Content-Type"
+            Header set Access-Control-Max-Age "86400"
+            
+            # 特定ドメインのみ許可する場合は下記を使用:
+            # Header unset Access-Control-Allow-Origin
+            # Header set Access-Control-Allow-Origin "https://yourdomain.com"
+        </If>
     </FilesMatch>
     
     # セキュリティヘッダー
@@ -47,14 +56,31 @@ AddType application/wasm .wasm
     Header always set X-XSS-Protection "1; mode=block"
     Header always set Referrer-Policy "strict-origin-when-cross-origin"
     
-    # Content Security Policy（環境別設定）
-    # 開発環境用: face-api.js (TensorFlow.js) 用に 'unsafe-eval' を許可
-    Header always set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self'"
+    # HSTS（HTTPS強制）- HTTPS使用時のみ有効
+    Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains; preload" env=HTTPS
     
-    # 本番環境用（より安全・コメントアウト解除して使用）:
-    # 注意: face-api.jsが動作しない場合は 'unsafe-eval' が必要
-    # Header unset Content-Security-Policy
-    # Header always set Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self'"
+    # 機能ポリシー（カメラ・マイクロフォンなど不要な機能を無効化）
+    Header always set Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=(), usb=(), bluetooth=(), magnetometer=(), gyroscope=(), accelerometer=()"
+    
+    # ブラウザの自動MIME検出を無効化
+    Header always set X-Download-Options "noopen"
+    Header always set X-Permitted-Cross-Domain-Policies "none"
+    
+    # Content Security Policy（環境別設定）
+    # 環境変数PRODUCTIONが設定されていない場合（開発環境）
+    <If "-z env('PRODUCTION')">
+        # 開発環境用: face-api.js (TensorFlow.js) 用に 'unsafe-eval' を許可
+        Header always set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self'"
+    </If>
+    
+    # 環境変数PRODUCTIONが設定されている場合（本番環境）
+    <If "-n env('PRODUCTION')">
+        # 本番環境用: より厳格なCSP（face-api.jsが動作しない場合は 'unsafe-eval' を追加）
+        Header always set Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self'; upgrade-insecure-requests"
+        
+        # 注意: face-api.jsでエラーが発生する場合は下記を使用
+        # Header always set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self'; upgrade-insecure-requests"
+    </If>
 </IfModule>
 
 # キャッシュ設定

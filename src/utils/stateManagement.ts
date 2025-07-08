@@ -90,6 +90,13 @@ export class StateValidator {
   }
 
   /**
+   * バリデーションルール数を取得
+   */
+  getRuleCount(): number {
+    return this.rules.length;
+  }
+
+  /**
    * デフォルトのバリデーションルールを設定
    */
   setupDefaultRules(): void {
@@ -392,10 +399,12 @@ export class SafeStateManager {
   private snapshotManager = new StateSnapshotManager();
   private errorManager: ErrorHandlingManager | null = null;
   private autoSnapshotInterval = 10; // 10回の変更ごとにスナップショット作成
+  private isInitialized = false;
+  private initializationPromise: Promise<void> | null = null;
 
   constructor() {
     this.validator.setupDefaultRules();
-    this.initializeErrorManager();
+    this.initializationPromise = this.initializeErrorManager();
   }
 
   /**
@@ -405,8 +414,19 @@ export class SafeStateManager {
     try {
       this.errorManager = ErrorHandlingManager.getInstance();
       await this.errorManager.initialize();
+      this.isInitialized = true;
     } catch (error) {
       console.warn('エラーマネージャーの初期化に失敗しました:', error);
+      this.isInitialized = true; // エラーマネージャーなしでも動作継続
+    }
+  }
+
+  /**
+   * 初期化完了を確認
+   */
+  private async ensureInitialized(): Promise<void> {
+    if (!this.isInitialized && this.initializationPromise) {
+      await this.initializationPromise;
     }
   }
 
@@ -419,6 +439,8 @@ export class SafeStateManager {
     changeType: StateChangeType,
     context?: string
   ): Promise<T> {
+    await this.ensureInitialized();
+    
     return globalSafeExecutor.safeStateUpdate(async () => {
       // 新しい状態を作成
       const newState = { ...currentState, ...updates };
@@ -459,6 +481,8 @@ export class SafeStateManager {
    * 状態復旧
    */
   async recoverState(targetVersion?: number): Promise<any> {
+    await this.ensureInitialized();
+    
     try {
       let snapshot: StateSnapshot | null;
       
@@ -503,6 +527,7 @@ export class SafeStateManager {
     issues: Array<{ field: string; message: string; severity: 'error' | 'warning' }>;
     recommendations: string[];
   }> {
+    await this.ensureInitialized();
     const violations = this.validator.validate(state);
     const errors = violations.filter(v => v.severity === 'error');
     const warnings = violations.filter(v => v.severity === 'warning');
@@ -543,7 +568,7 @@ export class SafeStateManager {
         latest: this.snapshotManager.getLatestSnapshot()?.version || 0
       },
       validator: {
-        ruleCount: this.validator['rules'].length
+        ruleCount: this.validator.getRuleCount()
       }
     };
   }

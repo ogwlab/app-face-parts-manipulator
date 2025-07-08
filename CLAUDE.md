@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a React-based face parts manipulation application that allows users to upload images, detect faces, and manipulate individual facial features (eyes, mouth, nose). The app uses face-api.js for face detection and landmark extraction with advanced Triangle Mesh Forward Mapping for natural image transformation. Features unified quality settings for streamlined user experience.
+This is a React-based face parts manipulation application that allows users to upload images, detect faces, and manipulate individual facial features (eyes, mouth, nose). The app uses face-api.js for face detection and landmark extraction with advanced Triangle Mesh Forward Mapping for natural image transformation. Features unified quality settings for streamlined user experience, enterprise-grade error handling, and comprehensive security measures for web deployment.
 
 ## Development Commands
 
@@ -73,8 +73,9 @@ src/
 ```
 deploy/
 ├── templates/
-│   └── .htaccess.template    # Apache configuration template
-└── utils.sh                 # Deployment utilities
+│   └── .htaccess.template    # Apache configuration template with security headers
+├── utils.sh                 # Deployment utilities
+└── SECURITY.md              # Security deployment guide
 
 docs/
 ├── technical-specification.md  # Complete system architecture
@@ -143,7 +144,7 @@ docs/
 - **Unified Quality Selector**: ワーピング品質とレンダリングモードの統合設定
 - **Real-time Parameter Help**: パラメータの意味と操作方法の詳細説明
 
-### ✅ Completed Features (Phase 1-6.0+)
+### ✅ Completed Features (Phase 1-6.1+)
 - Project foundation (React + TypeScript + Vite setup)
 - Face detection using face-api.js (68-point landmark extraction)
 - UI component structure with Material-UI
@@ -182,6 +183,15 @@ docs/
   - Image processing robustness (corruption detection, EXIF handling)
   - State management integrity with validation and recovery
   - Advanced UI error handling with notifications and diagnostics
+- **Security hardening and web deployment preparation** (Phase 6.1)
+  - Error handling code quality improvements (8 critical issues resolved)
+  - Memory leak prevention with timeout cleanup mechanisms
+  - Secure ID generation using crypto.randomUUID()
+  - Type safety improvements and encapsulation fixes
+  - Security vulnerability assessment and mitigation
+  - Comprehensive security headers implementation (HSTS, CSP, Permissions-Policy)
+  - Environment-specific configuration (development/production)
+  - Web deployment security guide and automated deployment utilities
 
 ### ✅ All Major Issues Resolved
 - ~~Horizontal noise/striping~~ → **SOLVED** (Phase 4.1)
@@ -194,6 +204,8 @@ docs/
 - ~~Parameter display clarity~~ → **SOLVED** (Phase 5.3+)
 - ~~Position parameter reference confusion~~ → **SOLVED** (Phase 5.3+)
 - ~~Comprehensive error handling gaps~~ → **SOLVED** (Phase 6.0)
+- ~~Error handling code quality issues~~ → **SOLVED** (Phase 6.1)
+- ~~Security vulnerabilities for web deployment~~ → **SOLVED** (Phase 6.1)
 
 ### ⏳ Future Enhancement Opportunities (Phase 7+)
 - Advanced facial feature controls (eyebrows, cheeks, chin)
