@@ -17,6 +17,7 @@ interface ExportSettings {
 interface FaceStore {
   // 画像データ
   originalImage: ImageData | null;
+  originalFileName: string | null;
   processedImageUrl: string | null;
   
   // 顔検出結果
@@ -37,7 +38,8 @@ interface FaceStore {
   renderMode: 'forward' | 'backward' | 'hybrid';
   
   // アクション
-  setOriginalImage: (image: ImageData | null) => void;
+  setOriginalImage: (image: ImageData | null, fileName?: string) => void;
+  setOriginalFileName: (fileName: string | null) => void;
   setProcessedImageUrl: (url: string | null) => void;
   setFaceDetection: (result: FaceDetectionResult | null) => void;
   updateFaceParams: (params: Partial<FaceParams>) => void;
@@ -61,6 +63,7 @@ interface FaceStore {
 export const useFaceStore = create<FaceStore>((set) => ({
   // 初期状態
   originalImage: null,
+  originalFileName: null,
   processedImageUrl: null,
   faceDetection: null,
   faceParams: { ...defaultFaceParams },
@@ -74,7 +77,12 @@ export const useFaceStore = create<FaceStore>((set) => ({
   renderMode: 'hybrid',
 
   // アクション
-  setOriginalImage: (image) => set({ originalImage: image }),
+  setOriginalImage: (image, fileName) => set({ 
+    originalImage: image,
+    originalFileName: fileName || (image?.file.name) || null
+  }),
+  
+  setOriginalFileName: (fileName) => set({ originalFileName: fileName }),
   
   setProcessedImageUrl: (url) => set({ processedImageUrl: url }),
   
@@ -154,6 +162,7 @@ export const useFaceStore = create<FaceStore>((set) => ({
   
   clearAll: () => set({
     originalImage: null,
+    originalFileName: null,
     processedImageUrl: null,
     faceDetection: null,
     faceParams: { ...defaultFaceParams },

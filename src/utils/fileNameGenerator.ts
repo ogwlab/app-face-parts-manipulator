@@ -21,92 +21,158 @@ function generateTimestamp(): string {
 }
 
 /**
- * 編集パラメータの概要を生成
+ * 元ファイル名から拡張子を除去し、ファイル名として安全な形式に変換
+ * @param originalFileName 元ファイル名
+ * @returns 安全な形式のファイル名（拡張子なし）
+ */
+function sanitizeOriginalFileName(originalFileName: string): string {
+  // 拡張子を除去
+  const nameWithoutExt = originalFileName.replace(/\.[^/.]+$/, '');
+  
+  // ファイル名として使用できない文字を置換
+  const sanitized = nameWithoutExt
+    .replace(/[<>:"/\\|?*]/g, '_')  // 無効な文字を_に置換
+    .replace(/\s+/g, '_')          // 空白を_に置換
+    .replace(/_{2,}/g, '_')        // 連続する_を単一に
+    .replace(/^_|_$/g, '');        // 先頭と末尾の_を削除
+  
+  return sanitized || 'unnamed';
+}
+
+/**
+ * 編集パラメータの詳細情報を生成（全変形記録）
  * @param faceParams 顔パラメータ
- * @returns パラメータの概要文字列
+ * @returns パラメータの詳細文字列
  */
 function generateParamsSummary(faceParams: FaceParams): string {
   const parts: string[] = [];
   
-  // 目の変更をチェック
-  const leftEyeChanged = faceParams.leftEye.size !== 1 || 
-                        faceParams.leftEye.positionX !== 0 || 
-                        faceParams.leftEye.positionY !== 0;
-  const rightEyeChanged = faceParams.rightEye.size !== 1 || 
-                         faceParams.rightEye.positionX !== 0 || 
-                         faceParams.rightEye.positionY !== 0;
+  // 左目の変更をチェック
+  const leftEyeParams: string[] = [];
+  if (faceParams.leftEye.size !== 1) {
+    leftEyeParams.push(`S${Math.round(faceParams.leftEye.size * 100)}`);
+  }
+  if (faceParams.leftEye.positionX !== 0) {
+    const xVal = Math.round(faceParams.leftEye.positionX);
+    leftEyeParams.push(`X${xVal >= 0 ? xVal : xVal}`);
+  }
+  if (faceParams.leftEye.positionY !== 0) {
+    const yVal = Math.round(faceParams.leftEye.positionY);
+    leftEyeParams.push(`Y${yVal >= 0 ? yVal : yVal}`);
+  }
   
-  if (leftEyeChanged || rightEyeChanged) {
-    // 両目が同じサイズの場合は統合表示
-    if (faceParams.leftEye.size === faceParams.rightEye.size && 
-        faceParams.leftEye.size !== 1) {
-      parts.push(`eye${faceParams.leftEye.size.toFixed(1)}x`);
-    } else {
-      if (leftEyeChanged) parts.push(`leye${faceParams.leftEye.size.toFixed(1)}x`);
-      if (rightEyeChanged) parts.push(`reye${faceParams.rightEye.size.toFixed(1)}x`);
+  // 右目の変更をチェック
+  const rightEyeParams: string[] = [];
+  if (faceParams.rightEye.size !== 1) {
+    rightEyeParams.push(`S${Math.round(faceParams.rightEye.size * 100)}`);
+  }
+  if (faceParams.rightEye.positionX !== 0) {
+    const xVal = Math.round(faceParams.rightEye.positionX);
+    rightEyeParams.push(`X${xVal >= 0 ? xVal : xVal}`);
+  }
+  if (faceParams.rightEye.positionY !== 0) {
+    const yVal = Math.round(faceParams.rightEye.positionY);
+    rightEyeParams.push(`Y${yVal >= 0 ? yVal : yVal}`);
+  }
+  
+  // 両目が同じ変形の場合は統合表示
+  if (leftEyeParams.length > 0 && rightEyeParams.length > 0 &&
+      faceParams.leftEye.size === faceParams.rightEye.size &&
+      faceParams.leftEye.positionX === faceParams.rightEye.positionX &&
+      faceParams.leftEye.positionY === faceParams.rightEye.positionY) {
+    parts.push(`BOTH_EYES_${leftEyeParams.join('_')}`);
+  } else {
+    if (leftEyeParams.length > 0) {
+      parts.push(`LE_${leftEyeParams.join('_')}`);
+    }
+    if (rightEyeParams.length > 0) {
+      parts.push(`RE_${rightEyeParams.join('_')}`);
     }
   }
   
   // 口の変更をチェック
-  if (faceParams.mouth.width !== 1 || faceParams.mouth.height !== 1 ||
-      faceParams.mouth.positionX !== 0 || faceParams.mouth.positionY !== 0) {
-    if (faceParams.mouth.width === faceParams.mouth.height && faceParams.mouth.width !== 1) {
-      parts.push(`mouth${faceParams.mouth.width.toFixed(1)}x`);
-    } else {
-      if (faceParams.mouth.width !== 1) parts.push(`mouthW${faceParams.mouth.width.toFixed(1)}`);
-      if (faceParams.mouth.height !== 1) parts.push(`mouthH${faceParams.mouth.height.toFixed(1)}`);
-    }
+  const mouthParams: string[] = [];
+  if (faceParams.mouth.width !== 1) {
+    mouthParams.push(`W${Math.round(faceParams.mouth.width * 100)}`);
+  }
+  if (faceParams.mouth.height !== 1) {
+    mouthParams.push(`H${Math.round(faceParams.mouth.height * 100)}`);
+  }
+  if (faceParams.mouth.positionX !== 0) {
+    const xVal = Math.round(faceParams.mouth.positionX);
+    mouthParams.push(`X${xVal >= 0 ? xVal : xVal}`);
+  }
+  if (faceParams.mouth.positionY !== 0) {
+    const yVal = Math.round(faceParams.mouth.positionY);
+    mouthParams.push(`Y${yVal >= 0 ? yVal : yVal}`);
+  }
+  if (mouthParams.length > 0) {
+    parts.push(`MO_${mouthParams.join('_')}`);
   }
   
   // 鼻の変更をチェック
-  if (faceParams.nose.width !== 1 || faceParams.nose.height !== 1 ||
-      faceParams.nose.positionX !== 0 || faceParams.nose.positionY !== 0) {
-    if (faceParams.nose.width === faceParams.nose.height && faceParams.nose.width !== 1) {
-      parts.push(`nose${faceParams.nose.width.toFixed(1)}x`);
-    } else {
-      if (faceParams.nose.width !== 1) parts.push(`noseW${faceParams.nose.width.toFixed(1)}`);
-      if (faceParams.nose.height !== 1) parts.push(`noseH${faceParams.nose.height.toFixed(1)}`);
-    }
+  const noseParams: string[] = [];
+  if (faceParams.nose.width !== 1) {
+    noseParams.push(`W${Math.round(faceParams.nose.width * 100)}`);
+  }
+  if (faceParams.nose.height !== 1) {
+    noseParams.push(`H${Math.round(faceParams.nose.height * 100)}`);
+  }
+  if (faceParams.nose.positionX !== 0) {
+    const xVal = Math.round(faceParams.nose.positionX);
+    noseParams.push(`X${xVal >= 0 ? xVal : xVal}`);
+  }
+  if (faceParams.nose.positionY !== 0) {
+    const yVal = Math.round(faceParams.nose.positionY);
+    noseParams.push(`Y${yVal >= 0 ? yVal : yVal}`);
+  }
+  if (noseParams.length > 0) {
+    parts.push(`NO_${noseParams.join('_')}`);
   }
   
-  return parts.length > 0 ? `-${parts.join('-')}` : '';
+  return parts.length > 0 ? parts.join('-') : 'original';
 }
 
 export interface FileNameOptions {
   format: 'png' | 'jpg';
-  prefix?: string;
+  originalFileName?: string;
   includeTimestamp?: boolean;
   includeParams?: boolean;
   faceParams?: FaceParams;
 }
 
 /**
- * ファイル名を生成
+ * ファイル名を生成（日付先頭 + 元ファイル名 + 変形記録）
  * @param options ファイル名生成オプション
  * @returns 生成されたファイル名
  */
 export function generateFileName(options: FileNameOptions): string {
   const {
     format,
-    prefix = 'face-edit',
+    originalFileName,
     includeTimestamp = true,
-    includeParams = false,
+    includeParams = true,
     faceParams
   } = options;
   
-  const parts: string[] = [prefix];
+  const parts: string[] = [];
   
-  // タイムスタンプを追加
+  // タイムスタンプを先頭に追加
   if (includeTimestamp) {
     parts.push(generateTimestamp());
+  }
+  
+  // 元ファイル名を追加
+  if (originalFileName) {
+    parts.push(sanitizeOriginalFileName(originalFileName));
+  } else {
+    parts.push('face-edit');
   }
   
   // パラメータサマリーを追加
   if (includeParams && faceParams) {
     const paramsSummary = generateParamsSummary(faceParams);
-    if (paramsSummary) {
-      parts.push(paramsSummary.substring(1)); // 先頭の'-'を除去
-    }
+    parts.push(paramsSummary);
   }
   
   // 拡張子を追加

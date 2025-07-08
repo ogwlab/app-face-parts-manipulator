@@ -78,8 +78,8 @@ const ImageUpload: React.FC = () => {
       const imageData = await validateFile(file);
       console.log('✅ 画像検証成功:', imageData.width, 'x', imageData.height);
       
-      setOriginalImage(imageData);
-      console.log('✅ 画像をストアに保存しました');
+      setOriginalImage(imageData, file.name);
+      console.log('✅ 画像をストアに保存しました (ファイル名:', file.name, ')');
       
       // 画像が正常にアップロードされたら顔検出を実行
       const img = new Image();

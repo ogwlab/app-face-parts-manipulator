@@ -25,7 +25,7 @@ const SaveButton: React.FC<SaveButtonProps> = ({ canvasRef }) => {
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [snackbarSeverity, setSnackbarSeverity] = useState<'success' | 'error'>('success');
-  const { exportSettings, setExportSettings, faceParams } = useFaceStore();
+  const { exportSettings, setExportSettings, faceParams, originalFileName } = useFaceStore();
   
   const open = Boolean(anchorEl);
 
@@ -63,6 +63,7 @@ const SaveButton: React.FC<SaveButtonProps> = ({ canvasRef }) => {
       // ファイル名を生成
       const fileName = generateFileName({
         format,
+        originalFileName: originalFileName || undefined,
         includeTimestamp: true,
         includeParams: true,
         faceParams
@@ -158,6 +159,7 @@ const SaveButton: React.FC<SaveButtonProps> = ({ canvasRef }) => {
             <Typography variant="caption" color="text.secondary" sx={{ fontFamily: 'monospace', fontSize: '0.75rem' }}>
               {generateFileName({
                 format: 'png',
+                originalFileName: originalFileName || undefined,
                 includeTimestamp: false,
                 includeParams: true,
                 faceParams

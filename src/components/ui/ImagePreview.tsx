@@ -91,7 +91,7 @@ const ImagePreview: React.FC = () => {
           img.src = URL.createObjectURL(file);
         });
 
-        setOriginalImage(imageData);
+        setOriginalImage(imageData, file.name);
 
         // 顔検出を実行
         const img = new Image();
