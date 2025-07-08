@@ -1,5 +1,82 @@
 # 開発ログ
 
+## Version 6.1.0 Rollback (2025-07-08) - Vercel公開断念・安定版復帰
+
+### 🎯 主な変更内容
+
+#### 1. Vercel公開試行と技術的制約確認
+- **実施期間**: 2025-07-08
+- **試行内容**: Face Parts Manipulator v6.1.0のVercel環境デプロイ
+- **技術課題**:
+  - face-api.js量子化モデルのWebAssembly実行制限
+  - サーバーレス環境でのTensorFlow.js制約
+  - CDN非量子化モデルのタイムアウト問題（20秒+）
+
+#### 2. Vercel環境での検証結果
+- **設定ファイル作成**: `vercel.json`, CSP設定, SPA対応
+- **ビルド**: ✅ 成功
+- **デプロイ**: ✅ 成功（URL: https://app-face-parts-manipulator-xxx.vercel.app）
+- **顔検出**: ❌ 本番環境でfaceapi.detectAllFaces()が永続的にハング
+- **根本原因**: 量子化モデルとサーバーレス環境の互換性問題
+
+#### 3. システムロールバック実行
+- **決定**: Vercel公開を断念、ローカル完全動作状態に復帰
+- **実行コマンド**: `git reset --hard 9580405`
+- **対象コミット**: "v6.1.0 完全統合 - ファイル名生成システム & セキュリティ強化版"
+- **削除ファイル**:
+  - `vercel.json`, `.vercel/`フォルダ
+  - エラーハンドリングシステム関連ファイル（8ファイル）
+
+#### 4. エラーハンドリングシステム簡素化
+- **削除対象ファイル**:
+  - `src/utils/errorHandling.ts`
+  - `src/utils/concurrency.ts`
+  - `src/utils/stateManagement.ts`
+  - `src/utils/imageProcessing.ts`
+  - `src/components/ui/ErrorBoundary.tsx`
+  - `src/components/ui/ErrorNotificationSystem.tsx`
+  - `src/components/ui/SystemStatusDashboard.tsx`
+  - `src/hooks/useErrorHandling.ts`
+
+#### 5. faceDetection.ts復元
+- **修正内容**: 複雑なエラーハンドリング依存を除去
+- **復元機能**:
+  - シンプルなモデル読み込み処理
+  - 基本的な顔検出機能
+  - 68ポイント特徴点抽出
+  - フォールバック検出機能
+
+#### 6. ビルド・動作確認
+- **TypeScript**: ✅ コンパイル成功
+- **Vite Build**: ✅ ビルド成功（警告のみ）
+- **ローカル実行**: ✅ http://localhost:5174/ で完全動作
+- **コア機能**: ✅ 顔検出、画像変形、パーツ操作すべて正常
+
+### 📊 技術的学習事項
+
+#### Vercel環境制約
+1. **face-api.js制約**: 量子化モデル必須だが、WebAssembly実行に制限
+2. **サーバーレス制限**: 30秒実行時間制限、メモリ制限（512MB-1GB）
+3. **TensorFlow.js互換性**: 非量子化モデルはCDN経由でもタイムアウト
+
+#### 最適解
+1. **ローカル環境**: 完全な機能提供が可能
+2. **デプロイ選択肢**: GitHub Pages（静的サイト）が最適
+3. **モデル配置**: `/public/models/`でのローカル量子化モデル
+
+### 🎯 現在の状態
+- **Version**: 6.1.0 安定版
+- **環境**: ローカル開発環境で完全動作
+- **機能**: 全コア機能（顔検出、変形、エクスポート）正常
+- **品質**: エンタープライズ級の安定性維持
+
+### 🚀 今後の方針
+1. **公開**: GitHub Pagesでの静的サイト公開検討
+2. **開発**: ローカル環境での機能拡張継続
+3. **最適化**: 軽量化と互換性向上
+
+---
+
 ## Version 5.2.2 (2025-01-04) - ハイブリッドレンダリング実装
 
 ### 🎯 主な変更内容

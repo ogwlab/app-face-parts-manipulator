@@ -138,13 +138,20 @@ docs/
 
 ## Development Status
 
+### Current Status (2025-07-08): Version 6.1.0 Stable
+- **Core System**: Fully functional local environment
+- **Vercel Deployment**: Attempted but abandoned due to face-api.js constraints
+- **Error Handling**: Simplified for stability and maintainability
+- **Build Status**: ✅ Successful compilation and execution
+
 ### UI/UX Features
 - **Parameter Control System**: 統一された%表示とヘルプシステム
 - **New Image Button**: 元画像ペインから直接新しい画像を開く機能
 - **Unified Quality Selector**: ワーピング品質とレンダリングモードの統合設定
 - **Real-time Parameter Help**: パラメータの意味と操作方法の詳細説明
+- **Advanced File Naming**: 高度なファイル名生成システム（日付先頭、変形記録）
 
-### ✅ Completed Features (Phase 1-6.1+)
+### ✅ Completed Features (Phase 1-6.1)
 - Project foundation (React + TypeScript + Vite setup)
 - Face detection using face-api.js (68-point landmark extraction)
 - UI component structure with Material-UI
