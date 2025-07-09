@@ -5,11 +5,13 @@ import {
   Tab,
   Typography,
   Button,
+  CircularProgress,
 } from '@mui/material';
 import EyeControls from './EyeControls';
 import MouthControls from './MouthControls';
 import NoseControls from './NoseControls';
 import { useFaceStore } from '../../stores/faceStore';
+import { useFaceDetection } from '../../hooks/useFaceDetection';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -38,6 +40,7 @@ const TabPanel: React.FC<TabPanelProps> = ({ children, value, index, ...other })
 const ControlPanel: React.FC = () => {
   const [tabValue, setTabValue] = useState(0);
   const { resetAllParams, faceDetection } = useFaceStore();
+  const { isLoadingModels } = useFaceDetection();
 
   const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue);
@@ -63,9 +66,20 @@ const ControlPanel: React.FC = () => {
         <Typography variant="h6" gutterBottom>
           顔検出が必要です
         </Typography>
-        <Typography variant="body2" color="text.secondary">
+        <Typography variant="body2" color="text.secondary" gutterBottom>
           アップロードした画像から顔を検出してください
         </Typography>
+        {isLoadingModels && (
+          <Box sx={{ mt: 2, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <CircularProgress size={24} sx={{ mb: 1 }} />
+            <Typography variant="body2" color="primary.main">
+              初回は顔検出モデルの読み込みに時間がかかります
+            </Typography>
+            <Typography variant="caption" color="text.secondary">
+              しばらくお待ちください...
+            </Typography>
+          </Box>
+        )}
       </Box>
     );
   }

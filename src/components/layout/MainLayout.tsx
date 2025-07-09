@@ -7,7 +7,8 @@ import {
   Typography,
   Alert,
   IconButton,
-  Tooltip
+  Tooltip,
+  Link
 } from '@mui/material';
 import { useFaceStore } from '../../stores/faceStore';
 import ImageUpload from '../ui/ImageUpload';
@@ -117,6 +118,35 @@ const MainLayout: React.FC = () => {
         open={helpDialogOpen}
         onClose={() => setHelpDialogOpen(false)}
       />
+      
+      {/* フッター */}
+      <Box 
+        sx={{ 
+          mt: 2, 
+          py: 1, 
+          textAlign: 'center', 
+          borderTop: '1px solid',
+          borderColor: 'divider',
+          flexShrink: 0
+        }}
+      >
+        <Link 
+          href="https://github.com/ogwlab/app-face-parts-manipulator" 
+          target="_blank" 
+          rel="noopener noreferrer"
+          sx={{
+            fontSize: '0.75rem',
+            color: 'text.secondary',
+            textDecoration: 'none',
+            '&:hover': {
+              textDecoration: 'underline',
+              color: 'text.primary'
+            }
+          }}
+        >
+          ogwlab/app-face-parts-manipulator
+        </Link>
+      </Box>
     </Container>
   );
 };

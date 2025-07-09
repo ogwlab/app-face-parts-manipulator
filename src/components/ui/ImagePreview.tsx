@@ -36,7 +36,7 @@ const ImagePreview: React.FC = () => {
   const [qualityMode, setQualityMode] = useState<UnifiedQualityMode>('balanced');
   
   const { initializeCanvas } = useImageWarping(warpingQuality);
-  const { detectFace, initializeModels } = useFaceDetection();
+  const { detectFace, initializeModels, isLoadingModels } = useFaceDetection();
 
   // 統合品質設定の変更ハンドラー
   const handleQualityModeChange = (mode: UnifiedQualityMode) => {
@@ -459,6 +459,11 @@ const ImagePreview: React.FC = () => {
                   <Typography variant="body2" color="text.secondary">
                     処理中...
                   </Typography>
+                  {isLoadingModels && (
+                    <Typography variant="caption" color="primary.main" sx={{ mt: 1, display: 'block' }}>
+                      初回は顔検出モデルの読み込みに時間がかかります
+                    </Typography>
+                  )}
                 </Box>
               )}
               {!originalImage && !isProcessing && (

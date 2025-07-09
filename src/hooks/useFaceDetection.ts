@@ -5,7 +5,8 @@ import {
   loadModels, 
   validateDetection,
   calculatePartCenter,
-  calculatePartBounds 
+  calculatePartBounds,
+  isModelsLoaded
 } from '../utils/faceDetection';
 import { useFaceStore } from '../stores/faceStore';
 import type { FaceDetectionResult } from '../types/face';
@@ -17,12 +18,14 @@ export interface UseFaceDetectionReturn {
   detectFace: (imageElement: HTMLImageElement) => Promise<void>;
   clearError: () => void;
   initializeModels: () => Promise<void>;
+  isLoadingModels: boolean;
 }
 
 export const useFaceDetection = (): UseFaceDetectionReturn => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<FaceDetectionResult | null>(null);
+  const [isLoadingModels, setIsLoadingModels] = useState(false);
   
   const { setFaceDetection } = useFaceStore();
 
@@ -48,9 +51,21 @@ export const useFaceDetection = (): UseFaceDetectionReturn => {
       setError(null);
       setResult(null);
 
+      // 初回モデルロード確認
+      if (!isModelsLoaded()) {
+        setIsLoadingModels(true);
+        console.log('📦 初回モデルロード開始...');
+      }
+
       console.log('🔄 detectFaceLandmarks 呼び出し前');
       // 顔検出を実行
       const detection = await detectFaceLandmarks(imageElement);
+      
+      // モデルロード完了
+      if (isLoadingModels) {
+        setIsLoadingModels(false);
+        console.log('✅ モデルロード完了');
+      }
       console.log('✅ detectFaceLandmarks 完了:', detection);
       
       // 検出結果の検証
@@ -115,6 +130,11 @@ export const useFaceDetection = (): UseFaceDetectionReturn => {
       setError(errorMessage);
       setResult(null);
       
+      // エラー時もモデルロード状態をリセット
+      if (isLoadingModels) {
+        setIsLoadingModels(false);
+      }
+      
       // グローバル状態をリセット
       setFaceDetection({
         isDetected: false,
@@ -149,6 +169,7 @@ export const useFaceDetection = (): UseFaceDetectionReturn => {
     result,
     detectFace,
     clearError,
-    initializeModels
+    initializeModels,
+    isLoadingModels
   };
 }; 

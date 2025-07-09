@@ -1,16 +1,43 @@
-import * as faceapi from 'face-api.js';
+import * as faceapi from '@vladmandic/face-api';
 
 // モデルの読み込み状態を管理
 let modelsLoaded = false;
+let backendInitialized = false;
 
 /**
  * face-api.jsのモデルを読み込む
  */
+/**
+ * @vladmandic/face-api用の初期化
+ */
+const initializeBackend = async (): Promise<void> => {
+  if (backendInitialized) return;
+
+  console.log('🔧 Setting up @vladmandic/face-api backend...');
+  
+  try {
+    // @vladmandic/face-apiは自動的にTensorFlow.jsバックエンドを管理
+    // 手動でバックエンドを設定する必要はない
+    console.log('✅ @vladmandic/face-api backend ready');
+    
+    backendInitialized = true;
+    
+  } catch (error) {
+    console.error('❌ Backend initialization failed:', error);
+    throw new Error('@vladmandic/face-apiバックエンドの初期化に失敗しました');
+  }
+};
+
 export const loadModels = async (): Promise<void> => {
   if (modelsLoaded) return;
 
   try {
-    const MODEL_URL = '/models';
+    console.log('🔧 Initializing @vladmandic/face-api...');
+    
+    // バックエンドの初期化
+    await initializeBackend();
+    
+    const MODEL_URL = './models';
     
     // 必要なモデルを並列で読み込み
     await Promise.all([
@@ -19,10 +46,22 @@ export const loadModels = async (): Promise<void> => {
     ]);
 
     modelsLoaded = true;
-    console.log('✅ face-api.js models loaded successfully');
+    console.log('✅ @vladmandic/face-api models loaded successfully');
     
   } catch (error) {
-    console.error('❌ Failed to load face-api.js models:', error);
+    console.error('❌ Failed to load @vladmandic/face-api models:', error);
+    
+    // 詳細なエラー情報を出力
+    try {
+      console.error('❌ @vladmandic/face-api error info:', {
+        error: error,
+        modelsLoaded: modelsLoaded,
+        backendInitialized: backendInitialized
+      });
+    } catch (debugError) {
+      console.error('❌ Cannot get @vladmandic/face-api debug info:', debugError);
+    }
+    
     throw new Error('顔検出モデルの読み込みに失敗しました');
   }
 };
