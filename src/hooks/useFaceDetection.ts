@@ -32,14 +32,17 @@ export const useFaceDetection = (): UseFaceDetectionReturn => {
   // モデルの初期化
   const initializeModels = useCallback(async () => {
     try {
-      setIsLoading(true);
+      setIsLoadingModels(true);
       setError(null);
+      console.log('📦 face-api.jsモデル初期化開始...');
       await loadModels();
+      console.log('✅ face-api.jsモデル初期化完了');
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : '不明なエラーが発生しました';
       setError(errorMessage);
+      console.error('❌ face-api.jsモデル初期化エラー:', errorMessage);
     } finally {
-      setIsLoading(false);
+      setIsLoadingModels(false);
     }
   }, []);
 
@@ -156,7 +159,7 @@ export const useFaceDetection = (): UseFaceDetectionReturn => {
     } finally {
       setIsLoading(false);
     }
-  }, [setFaceDetection]);
+  }, [setFaceDetection, isLoadingModels]);
 
   // エラーのクリア
   const clearError = useCallback(() => {

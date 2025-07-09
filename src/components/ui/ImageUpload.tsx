@@ -13,7 +13,7 @@ import type { ImageData } from '../../types/face';
 const ImageUpload: React.FC = () => {
   const { setOriginalImage, setError, isLoading, setLoading } = useFaceStore();
   const [dragActive, setDragActive] = useState(false);
-  const { detectFace, initializeModels, isLoading: faceDetectionLoading, error: faceDetectionError } = useFaceDetection();
+  const { detectFace, initializeModels, isLoading: faceDetectionLoading, error: faceDetectionError, isLoadingModels } = useFaceDetection();
 
   // ファイル検証の定数
   const MAX_FILE_SIZE = 8 * 1024 * 1024; // 8MB
@@ -184,7 +184,7 @@ const ImageUpload: React.FC = () => {
         id="raised-button-file"
         type="file"
         onChange={handleInputChange}
-        disabled={isLoading}
+        disabled={isLoadingModels || isLoading}
       />
       <label htmlFor="raised-button-file">
         <Box
@@ -195,7 +195,7 @@ const ImageUpload: React.FC = () => {
             gap: 2,
           }}
         >
-          {isLoading ? (
+          {isLoadingModels || isLoading ? (
             <CircularProgress size={60} />
           ) : (
             <Box
@@ -212,7 +212,8 @@ const ImageUpload: React.FC = () => {
           )}
           
           <Typography variant="h6" component="div" textAlign="center">
-            {isLoading ? '画像を処理中...' : 
+            {isLoadingModels ? 'face-api.jsモデルを読み込み中...' :
+             isLoading ? '画像を処理中...' : 
              faceDetectionLoading ? '顔検出中...' : 
              '画像をアップロード'}
           </Typography>
@@ -226,7 +227,7 @@ const ImageUpload: React.FC = () => {
           <Button
             variant="contained"
             component="span"
-            disabled={isLoading}
+            disabled={isLoadingModels || isLoading}
           >
             ファイルを選択
           </Button>
