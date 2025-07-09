@@ -36,3 +36,14 @@ dist-ssr
 # 仮想環境
 venv
 venv_*
+
+# Claude Code設定ファイル（機密情報含む）
+.claude/
+.claude/settings.local.json
+
+# デプロイ関連ファイル
+.htaccess
+deploy/
+
+# 開発履歴・内部ドキュメント
+docs/todo.md

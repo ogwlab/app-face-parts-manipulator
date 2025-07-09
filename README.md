@@ -4,11 +4,11 @@
 
 ## 概要
 
-Face Parts Manipulatorは、アップロードした顔画像の各パーツ（目・口・鼻）を個別に拡大・縮小・移動できるWebアプリケーションです。face-api.jsによる高精度な顔検出と、Triangle Mesh Forward Mappingによる自然な画像変形を実現しています。エンタープライズ級のエラーハンドリングと包括的なセキュリティ対策により、安全なWeb公開に対応しています。
+Face Parts Manipulatorは、アップロードした顔画像の各パーツ（目・口・鼻）を個別に拡大・縮小・移動できるWebアプリケーションです。@vladmandic/face-apiによる高精度な顔検出と、Triangle Mesh Forward Mappingによる自然な画像変形を実現しています。エンタープライズ級のエラーハンドリングと包括的なセキュリティ対策により、安全なWeb公開に対応しています。
 
 ## 主な機能
 
-- 🎯 **高精度な顔検出** - face-api.jsによる68点顔特徴点検出
+- 🎯 **高精度な顔検出** - @vladmandic/face-apiによる68点顔特徴点検出
 - 👁️ **目の操作** - 左右の目を個別に拡大・縮小・移動（虹彩形状保持）
 - 👄 **口の操作** - 幅・高さの調整と位置移動
 - 👃 **鼻の操作** - 幅・高さの調整と位置移動
@@ -23,7 +23,7 @@ Face Parts Manipulatorは、アップロードした顔画像の各パーツ（�
 
 - **Frontend**: React 19 + TypeScript + Vite
 - **UI**: Material-UI (MUI)
-- **顔検出**: face-api.js
+- **顔検出**: @vladmandic/face-api
 - **画像処理**: Canvas API + 独自のTriangle Mesh変形アルゴリズム
 - **状態管理**: Zustand
 
@@ -70,6 +70,14 @@ npm run preview
 
 詳細な開発情報は [CLAUDE.md](./CLAUDE.md) を参照してください。
 
+## 技術的特徴
+
+- **高度な顔検出**: 68点顔特徴点による正確な顔パーツ識別
+- **Triangle Mesh変形**: Delaunay三角分割による自然な画像変形
+- **リアルタイム処理**: 高速Forward Mapping & Hybrid Renderingによる即座のプレビュー
+- **解剖学的制約**: 虹彩形状保持・首部変形防止など自然な変形制御
+- **エンタープライズ対応**: 包括的エラーハンドリング・メモリ管理・セキュリティ対策
+
 ## ライセンス
 
 MIT License
@@ -80,5 +88,5 @@ ogwlab
 
 ## 謝辞
 
-- [face-api.js](https://github.com/justadudewhohacks/face-api.js) - 顔検出ライブラリ
+- [@vladmandic/face-api](https://github.com/vladmandic/face-api) - 顔検出ライブラリ
 - [Material-UI](https://mui.com/) - UIコンポーネント
