@@ -68,7 +68,7 @@ npm run preview
 
 ## 開発者向け情報
 
-詳細な開発情報は [CLAUDE.md](./CLAUDE.md) を参照してください。
+詳細な開発情報は [DEVELOPMENT.md](./DEVELOPMENT.md) を参照してください。
 
 ## 技術的特徴
 
