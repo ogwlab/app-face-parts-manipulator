@@ -48,3 +48,4 @@ deploy/
 # 開発履歴・内部ドキュメント
 docs/todo.md
 CLAUDE.md
+deploy-record.md
