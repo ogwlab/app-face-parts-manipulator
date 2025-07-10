@@ -13,7 +13,7 @@ import {
 import { useFaceStore } from '../../stores/faceStore';
 import ImageUpload from '../ui/ImageUpload';
 import ImagePreview from '../ui/ImagePreview';
-import ControlPanel from '../panels/ControlPanel';
+import TopLevelTabs from '../TopLevelTabs';
 import ParameterHelpDialog from '../ui/ParameterHelpDialog';
 
 const MainLayout: React.FC = () => {
@@ -70,46 +70,45 @@ const MainLayout: React.FC = () => {
 
         {/* 制御パネル */}
         <Box sx={{ flex: 1, minHeight: 0, minWidth: { xs: '100%', md: 350 }, maxWidth: { md: 400 } }}>
-          <Paper elevation={3} sx={{ p: 2, pr: 3, height: '100%', display: 'flex', flexDirection: 'column' }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
-              <Typography variant="h6" sx={{ flexShrink: 0 }}>
-                顔パーツ制御
-              </Typography>
+          {originalImage ? (
+            <TopLevelTabs />
+          ) : (
+            <Paper elevation={3} sx={{ p: 2, height: '100%', display: 'flex', flexDirection: 'column' }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
+                <Typography variant="h6" sx={{ flexShrink: 0 }}>
+                  顔パーツ制御
+                </Typography>
+                
+                <Tooltip title="パラメータの説明">
+                  <IconButton
+                    size="small"
+                    onClick={() => setHelpDialogOpen(true)}
+                    sx={{
+                      '&:hover': {
+                        backgroundColor: 'action.hover',
+                      },
+                    }}
+                  >
+                    ❓
+                  </IconButton>
+                </Tooltip>
+              </Box>
               
-              <Tooltip title="パラメータの説明">
-                <IconButton
-                  size="small"
-                  onClick={() => setHelpDialogOpen(true)}
-                  sx={{
-                    '&:hover': {
-                      backgroundColor: 'action.hover',
-                    },
-                  }}
-                >
-                  ❓
-                </IconButton>
-              </Tooltip>
-            </Box>
-            
-            <Box sx={{ flex: 1, overflow: 'auto', minHeight: 0, pr: 1 }}>
-              {originalImage ? (
-                <ControlPanel />
-              ) : (
-                <Box
-                  sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    height: '100%',
-                  }}
-                >
-                  <Typography variant="body1" color="text.secondary">
-                    画像をアップロードしてください
-                  </Typography>
-                </Box>
-              )}
-            </Box>
-          </Paper>
+              <Box
+                sx={{
+                  flex: 1,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  height: '100%',
+                }}
+              >
+                <Typography variant="body1" color="text.secondary">
+                  画像をアップロードしてください
+                </Typography>
+              </Box>
+            </Paper>
+          )}
         </Box>
       </Stack>
       
