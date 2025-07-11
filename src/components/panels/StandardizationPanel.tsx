@@ -8,7 +8,6 @@ import {
   FormControlLabel,
   Alert,
   CircularProgress,
-  Button,
 } from '@mui/material';
 import { useFaceStore } from '../../stores/faceStore';
 import { useStandardizationStore } from '../../stores/standardizationStore';
@@ -182,20 +181,6 @@ const StandardizationPanel: React.FC = () => {
           </CardContent>
         </Card>
 
-        {/* 手動実行ボタン */}
-        {standardizationEnabled && canStandardize && (
-          <Card>
-            <CardContent>
-              <Button
-                variant="outlined"
-                onClick={executeStandardization}
-                disabled={isStandardizing}
-              >
-                🔄 手動で標準化実行
-              </Button>
-            </CardContent>
-          </Card>
-        )}
         
         {/* 標準化パラメータ */}
         {standardizationEnabled && (
@@ -222,22 +207,6 @@ const StandardizationPanel: React.FC = () => {
           </Card>
         )}
 
-        {/* 背景除去セクション */}
-        <Card>
-          <CardContent>
-            <Typography variant="subtitle1" gutterBottom>
-              🖼️ 背景除去
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              画像の背景を自動で除去し、顔部分のみを抽出します
-            </Typography>
-            <Box sx={{ mt: 2 }}>
-              <Typography variant="caption" color="text.disabled">
-                実装予定: Phase 3で背景除去機能を追加
-              </Typography>
-            </Box>
-          </CardContent>
-        </Card>
       </Box>
     </Box>
   );

@@ -28,7 +28,9 @@ const ImagePreview: React.FC = () => {
     // 🚀 統合ベースデータを使用
     currentBaseImageUrl,
     currentBaseLandmarks,
-    isStandardized
+    isStandardized,
+    // 🎯 自動設定適用機能
+    autoApplyStoredSettings
   } = useFaceStore();
   
   const { 
@@ -40,7 +42,7 @@ const ImagePreview: React.FC = () => {
   const [imageLoaded, setImageLoaded] = useState(false);
   const [canvasSize, setCanvasSize] = useState<{width: number, height: number} | null>(null);
   const [warpingQuality, setWarpingQuality] = useState<'fast' | 'medium' | 'high'>('medium');
-  const [showLandmarks, setShowLandmarks] = useState<boolean>(true);
+  const [showLandmarks, setShowLandmarks] = useState<boolean>(false);
   const [qualityMode, setQualityMode] = useState<UnifiedQualityMode>('balanced');
   
   const { initializeCanvas } = useImageWarping(warpingQuality);
@@ -107,6 +109,11 @@ const ImagePreview: React.FC = () => {
           try {
             await initializeModels();
             await detectFace(img);
+            
+            // 🎯 顔検出成功後に保存された設定を自動適用
+            setTimeout(() => {
+              autoApplyStoredSettings();
+            }, 500); // 顔検出完了を待ってから適用
           } catch (faceError) {
             const errorMessage = faceError instanceof Error ? faceError.message : '顔検出でエラーが発生しました。';
             setError(errorMessage);

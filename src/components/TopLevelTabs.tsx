@@ -7,6 +7,7 @@ import {
 } from '@mui/material';
 import ControlPanel from './panels/ControlPanel';
 import StandardizationPanel from './panels/StandardizationPanel';
+import SettingsButtons from './ui/SettingsButtons';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -41,6 +42,11 @@ const TopLevelTabs: React.FC = () => {
 
   return (
     <Paper elevation={3} sx={{ p: 2, pr: 3, height: '100%', display: 'flex', flexDirection: 'column' }}>
+      {/* 設定管理ボタン */}
+      <Box sx={{ mb: 2 }}>
+        <SettingsButtons />
+      </Box>
+      
       <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
         <Tabs value={value} onChange={handleChange} aria-label="top level tabs">
           <Tab label="🎨 標準化" id="top-level-tab-0" aria-controls="top-level-tabpanel-0" />
@@ -48,7 +54,7 @@ const TopLevelTabs: React.FC = () => {
         </Tabs>
       </Box>
       
-      <Box sx={{ flex: 1, overflow: 'hidden' }}>
+      <Box sx={{ flex: 1, overflow: 'auto', minHeight: 0 }}>
         <TabPanel value={value} index={0}>
           <StandardizationPanel />
         </TabPanel>

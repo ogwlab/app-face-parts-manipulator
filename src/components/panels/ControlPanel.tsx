@@ -85,7 +85,12 @@ const ControlPanel: React.FC = () => {
   }
 
   return (
-    <Box sx={{ width: '100%', height: '100%' }}>
+    <Box sx={{ 
+      width: '100%', 
+      height: '100%',
+      display: 'flex',
+      flexDirection: 'column'
+    }}>
       {/* タブヘッダー */}
       <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
         <Tabs 
@@ -114,7 +119,12 @@ const ControlPanel: React.FC = () => {
       </Box>
 
       {/* タブコンテンツ */}
-      <Box sx={{ flex: 1, overflow: 'auto', px: 1 }}>
+      <Box sx={{ 
+        flex: 1, 
+        overflow: 'auto', 
+        minHeight: 0,
+        px: 1 
+      }}>
         <TabPanel value={tabValue} index={0}>
           <EyeControls />
         </TabPanel>

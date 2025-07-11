@@ -8,6 +8,10 @@ import type {
 import { 
   defaultFaceParams 
 } from '../types/face';
+import { 
+  loadSettingsFromStorage, 
+  isStorageAvailable 
+} from '../utils/settingsStorage';
 
 interface ExportSettings {
   format: 'png' | 'jpg';
@@ -71,6 +75,9 @@ interface FaceStore {
   // 標準化関連アクション
   setStandardizationResult: (imageUrl: string, landmarks: FaceLandmarks) => void;
   clearStandardization: () => void;
+  
+  // 設定管理アクション
+  autoApplyStoredSettings: () => void;
   
   clearAll: () => void;
   
@@ -228,6 +235,36 @@ export const useFaceStore = create<FaceStore>((set, get) => ({
       standardizedLandmarks: null,
     });
     get()._updateDerivedState();
+  },
+
+  // 保存された設定を自動適用
+  autoApplyStoredSettings: () => {
+    try {
+      // LocalStorageが利用可能かチェック
+      if (!isStorageAvailable()) {
+        console.log('🚫 LocalStorageが利用できません');
+        return;
+      }
+
+      // 保存された設定を読み込み
+      const savedSettings = loadSettingsFromStorage();
+      if (!savedSettings) {
+        console.log('💡 適用する保存済み設定がありません');
+        return;
+      }
+
+      // パラメータを適用
+      set({ faceParams: { ...savedSettings.faceParams } });
+      
+      console.log('✅ 保存された設定を自動適用しました:', savedSettings.faceParams);
+      
+      // 品質設定なども適用（将来の拡張）
+      // if (savedSettings.qualityMode) {
+      //   // 品質設定を適用するロジック
+      // }
+    } catch (error) {
+      console.error('❌ 設定自動適用エラー:', error);
+    }
   },
   
   clearAll: () => {
