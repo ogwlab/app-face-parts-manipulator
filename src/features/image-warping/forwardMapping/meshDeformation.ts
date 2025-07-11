@@ -12,6 +12,29 @@ import { renderTriangleMeshBackward } from './backwardRenderer';
 import { renderTriangleMeshHybrid } from './hybridRenderer';
 
 /**
+ * 特徴点ベース変形用の拡張されたメッシュ変形オプション
+ */
+export interface MeshDeformationOptions {
+  quality: 'fast' | 'medium' | 'high';
+  renderMode: 'forward' | 'hybrid' | 'backward';
+  preserveFeatures: boolean;
+  smoothBoundaries: boolean;
+}
+
+/**
+ * 特徴点ベース変形結果
+ */
+export interface FeatureBasedMeshResult {
+  canvas: HTMLCanvasElement;
+  transformedLandmarks: FaceLandmarks;
+  quality: {
+    renderTime: number;
+    triangleCount: number;
+    controlPointCount: number;
+  };
+}
+
+/**
  * 顔パラメータに基づいてランドマークを変形
  */
 export function deformLandmarks(
@@ -589,3 +612,296 @@ export function performMeshBasedDeformation(
   console.log(`✅ [Version 5.2.2] メッシュベース変形処理完了 (${renderMode}モード)`);
   return targetCanvas;
 }
+
+/**
+ * 特徴点ベース変形専用のメッシュ変形処理
+ * @param sourceImage - 元画像
+ * @param landmarks - 顔のランドマーク  
+ * @param originalPoints - 元の制御点
+ * @param targetPoints - 目標制御点
+ * @param options - 変形オプション
+ * @returns 特徴点ベース変形結果
+ */
+export async function performFeatureBasedMeshDeformation(
+  sourceImage: HTMLImageElement,
+  landmarks: FaceLandmarks,
+  originalPoints: Point[],
+  targetPoints: Point[],
+  options: MeshDeformationOptions
+): Promise<FeatureBasedMeshResult> {
+  const startTime = performance.now();
+  
+  console.log('🎯 特徴点ベースメッシュ変形開始:', {
+    imageSize: { width: sourceImage.naturalWidth, height: sourceImage.naturalHeight },
+    controlPoints: originalPoints.length,
+    options
+  });
+  
+  try {
+    // 1. Canvas作成
+    const canvas = document.createElement('canvas');
+    canvas.width = sourceImage.naturalWidth;
+    canvas.height = sourceImage.naturalHeight;
+    
+    const ctx = canvas.getContext('2d');
+    if (!ctx) {
+      throw new Error('Failed to get canvas 2D context');
+    }
+    
+    // 2. 高品質設定
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = options.quality === 'high' ? 'high' : 'medium';
+    
+    // 3. 背景をクリア
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    // 4. 制御点から疑似FaceParamsを生成
+    const pseudoFaceParams = generatePseudoFaceParams(originalPoints, targetPoints, landmarks);
+    
+    // 5. メッシュベース変形を実行（既存システムを活用）
+    const resultCanvas = performMeshBasedDeformation(
+      sourceImage,
+      landmarks,
+      pseudoFaceParams,
+      canvas.width,
+      canvas.height,
+      {
+        enabled: false,
+        renderMode: options.renderMode
+      }
+    );
+    
+    // 6. 結果をメインCanvasにコピー
+    ctx.drawImage(resultCanvas, 0, 0);
+    
+    // 7. 変換後ランドマークを計算（簡易版）
+    const transformedLandmarks = calculateTransformedLandmarks(landmarks, originalPoints, targetPoints);
+    
+    const endTime = performance.now();
+    const renderTime = endTime - startTime;
+    
+    return {
+      canvas,
+      transformedLandmarks,
+      quality: {
+        renderTime,
+        triangleCount: 163, // 固定値（delaunayシステムの標準）
+        controlPointCount: originalPoints.length
+      }
+    };
+    
+  } catch (error) {
+    console.error('❌ 特徴点ベースメッシュ変形エラー:', error);
+    throw new Error(`メッシュ変形に失敗しました: ${error instanceof Error ? error.message : String(error)}`);
+  }
+}
+
+/**
+ * 制御点から疑似FaceParamsを生成する
+ * @param originalPoints - 元制御点
+ * @param targetPoints - 目標制御点
+ * @param landmarks - ランドマーク
+ * @returns 疑似FaceParams
+ */
+const generatePseudoFaceParams = (
+  originalPoints: Point[],
+  targetPoints: Point[],
+  landmarks: FaceLandmarks
+): FaceParams => {
+  // 制御点の変化から近似的なパラメータを計算
+  const eyeIndices = findEyeControlPointIndices(originalPoints, landmarks);
+  
+  let leftEyeScale = 1.0;
+  let rightEyeScale = 1.0;
+  let leftEyePositionX = 0;
+  let leftEyePositionY = 0;
+  let rightEyePositionX = 0;
+  let rightEyePositionY = 0;
+  
+  // 左目の制御点がある場合
+  if (eyeIndices.leftEye.length > 0) {
+    const originalLeftCenter = calculateCentroid(eyeIndices.leftEye.map(i => originalPoints[i]));
+    const targetLeftCenter = calculateCentroid(eyeIndices.leftEye.map(i => targetPoints[i]));
+    
+    leftEyePositionX = targetLeftCenter.x - originalLeftCenter.x;
+    leftEyePositionY = targetLeftCenter.y - originalLeftCenter.y;
+    
+    // スケールは距離の変化から推定
+    const originalSpread = calculatePointSpread(eyeIndices.leftEye.map(i => originalPoints[i]));
+    const targetSpread = calculatePointSpread(eyeIndices.leftEye.map(i => targetPoints[i]));
+    leftEyeScale = originalSpread > 0 ? targetSpread / originalSpread : 1.0;
+  }
+  
+  // 右目の制御点がある場合
+  if (eyeIndices.rightEye.length > 0) {
+    const originalRightCenter = calculateCentroid(eyeIndices.rightEye.map(i => originalPoints[i]));
+    const targetRightCenter = calculateCentroid(eyeIndices.rightEye.map(i => targetPoints[i]));
+    
+    rightEyePositionX = targetRightCenter.x - originalRightCenter.x;
+    rightEyePositionY = targetRightCenter.y - originalRightCenter.y;
+    
+    const originalSpread = calculatePointSpread(eyeIndices.rightEye.map(i => originalPoints[i]));
+    const targetSpread = calculatePointSpread(eyeIndices.rightEye.map(i => targetPoints[i]));
+    rightEyeScale = originalSpread > 0 ? targetSpread / originalSpread : 1.0;
+  }
+  
+  return {
+    leftEye: {
+      size: leftEyeScale,
+      positionX: leftEyePositionX,
+      positionY: leftEyePositionY
+    },
+    rightEye: {
+      size: rightEyeScale,
+      positionX: rightEyePositionX,
+      positionY: rightEyePositionY
+    },
+    mouth: {
+      width: 1.0,
+      height: 1.0,
+      positionX: 0,
+      positionY: 0
+    },
+    nose: {
+      width: 1.0,
+      height: 1.0,
+      positionX: 0,
+      positionY: 0
+    }
+  };
+};
+
+/**
+ * 制御点から眼のインデックスを特定する
+ * @param controlPoints - 制御点配列
+ * @param landmarks - ランドマーク
+ * @returns 眼の制御点インデックス
+ */
+const findEyeControlPointIndices = (
+  controlPoints: Point[],
+  landmarks: FaceLandmarks
+): { leftEye: number[]; rightEye: number[] } => {
+  const leftEyeIndices: number[] = [];
+  const rightEyeIndices: number[] = [];
+  
+  // 左目の重心を計算
+  const leftEyeCenter = landmarks.leftEye.reduce(
+    (acc, p) => ({ x: acc.x + p.x, y: acc.y + p.y }),
+    { x: 0, y: 0 }
+  );
+  leftEyeCenter.x /= landmarks.leftEye.length;
+  leftEyeCenter.y /= landmarks.leftEye.length;
+  
+  // 右目の重心を計算
+  const rightEyeCenter = landmarks.rightEye.reduce(
+    (acc, p) => ({ x: acc.x + p.x, y: acc.y + p.y }),
+    { x: 0, y: 0 }
+  );
+  rightEyeCenter.x /= landmarks.rightEye.length;
+  rightEyeCenter.y /= landmarks.rightEye.length;
+  
+  // 制御点を眼の中心に近いものでグループ分け
+  controlPoints.forEach((point, index) => {
+    const leftDistance = Math.sqrt(
+      Math.pow(point.x - leftEyeCenter.x, 2) + Math.pow(point.y - leftEyeCenter.y, 2)
+    );
+    const rightDistance = Math.sqrt(
+      Math.pow(point.x - rightEyeCenter.x, 2) + Math.pow(point.y - rightEyeCenter.y, 2)
+    );
+    
+    // 眼の周辺（50ピクセル以内）にある制御点を識別
+    if (leftDistance < 50) {
+      leftEyeIndices.push(index);
+    }
+    if (rightDistance < 50) {
+      rightEyeIndices.push(index);
+    }
+  });
+  
+  return { leftEye: leftEyeIndices, rightEye: rightEyeIndices };
+};
+
+/**
+ * 点群の重心を計算する
+ * @param points - 点群
+ * @returns 重心
+ */
+const calculateCentroid = (points: Point[]): Point => {
+  if (points.length === 0) return { x: 0, y: 0 };
+  
+  const sum = points.reduce(
+    (acc, p) => ({ x: acc.x + p.x, y: acc.y + p.y }),
+    { x: 0, y: 0 }
+  );
+  
+  return {
+    x: sum.x / points.length,
+    y: sum.y / points.length
+  };
+};
+
+/**
+ * 点群の広がりを計算する
+ * @param points - 点群
+ * @returns 広がり（標準偏差）
+ */
+const calculatePointSpread = (points: Point[]): number => {
+  if (points.length === 0) return 0;
+  
+  const center = calculateCentroid(points);
+  const distances = points.map(p => 
+    Math.sqrt(Math.pow(p.x - center.x, 2) + Math.pow(p.y - center.y, 2))
+  );
+  
+  const avgDistance = distances.reduce((sum, d) => sum + d, 0) / distances.length;
+  return avgDistance;
+};
+
+/**
+ * 変換後ランドマークを計算する（簡易版）
+ * @param landmarks - 元のランドマーク
+ * @param originalPoints - 元制御点
+ * @param targetPoints - 目標制御点
+ * @returns 変換後ランドマーク
+ */
+const calculateTransformedLandmarks = (
+  landmarks: FaceLandmarks,
+  originalPoints: Point[],
+  targetPoints: Point[]
+): FaceLandmarks => {
+  // 簡易的な変換（最近傍制御点の変換を適用）
+  const transformPoint = (point: Point): Point => {
+    let minDistance = Infinity;
+    let bestTransform = { x: 0, y: 0 };
+    
+    for (let i = 0; i < originalPoints.length; i++) {
+      const distance = Math.sqrt(
+        Math.pow(point.x - originalPoints[i].x, 2) + 
+        Math.pow(point.y - originalPoints[i].y, 2)
+      );
+      
+      if (distance < minDistance) {
+        minDistance = distance;
+        bestTransform = {
+          x: targetPoints[i].x - originalPoints[i].x,
+          y: targetPoints[i].y - originalPoints[i].y
+        };
+      }
+    }
+    
+    return {
+      x: point.x + bestTransform.x,
+      y: point.y + bestTransform.y
+    };
+  };
+  
+  return {
+    leftEye: landmarks.leftEye.map(transformPoint),
+    rightEye: landmarks.rightEye.map(transformPoint),
+    mouth: landmarks.mouth.map(transformPoint),
+    nose: landmarks.nose.map(transformPoint),
+    jawline: landmarks.jawline.map(transformPoint),
+    leftEyebrow: landmarks.leftEyebrow.map(transformPoint),
+    rightEyebrow: landmarks.rightEyebrow.map(transformPoint)
+  };
+};

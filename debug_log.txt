@@ -1,0 +1,1932 @@
+StandardizationPanel.tsx:42 📋 標準化パネル: Object
+StandardizationPanel.tsx:42 📋 標準化パネル: Object
+ImagePreview.tsx:204 ✅ 画像読み込み成功: 900 x 1200
+ImagePreview.tsx:160 📐 元画像Canvas - Container size: Object
+ImagePreview.tsx:174 📐 元画像Canvas - Size calculation: Object
+ImagePreview.tsx:217 🎨 元画像Canvas設定: 445x593, scale: 0.49444444444444446
+ImagePreview.tsx:222 ✅ Canvas に画像を描画しました
+ImagePreview.tsx:226 🎯 統合ベースランドマークを描画: Object
+ImagePreview.tsx:268 ✅ 編集後Canvasに画像を描画
+useImageWarping.ts:197 ⏰ デバウンス完了 - 統合ワーピング処理開始
+useImageWarping.ts:97 🔄 統合ワーピング処理開始 Object
+ImagePreview.tsx:135 🎨 Fabric.js Canvas 初期化チェック: Object
+ImagePreview.tsx:143 ✅ Fabric.js Canvas 初期化実行 - サイズ: Object
+useImageWarping.ts:32 🎨 Canvas初期化開始: Object
+useImageWarping.ts:42 ✅ Canvas初期化成功: Object
+ImagePreview.tsx:262 🔄 編集後Canvas表示: 445x593 (標準化済み)
+StandardizationPanel.tsx:42 📋 標準化パネル: Object
+StandardizationPanel.tsx:42 📋 標準化パネル: Object
+adaptiveWarping.ts:258 🎨 適応的TPS変形開始: Object
+adaptiveWarping.ts:266 🔍 [仮説1検証] 変形モード判定: Object
+adaptiveWarping.ts:276 🔺 [Version 5.2.0] メッシュベース変形システムへ移行
+meshDeformation.ts:515 🚀 [Version 5.2.2] メッシュベース変形処理開始 - ハイブリッドレンダリング
+meshDeformation.ts:543 📏 ランドマーク座標スケール: Object
+meshDeformation.ts:44 🔄 ランドマーク変形開始
+meshDeformation.ts:51 📏 顔領域サイズ: Object
+meshDeformation.ts:97 ✅ ランドマーク変形完了
+meshDeformation.ts:553 🔍 変形パラメータ: Object
+meshDeformation.ts:285 🔺 メッシュ変形作成開始
+meshDeformation.ts:289 📍 元のランドマーク点数: 68
+delaunay.ts:278 🎭 顔最適化Delaunay三角形分割開始
+delaunay.ts:22 🔺 Delaunay三角形分割開始: 110点
+delaunay.ts:114 📊 三角形統計: 総数=221, フィルタ前=221, フィルタ後=176
+delaunay.ts:123 ✅ Delaunay三角形分割完了: 176個の三角形
+delaunay.ts:339 ⚠️ 低品質な三角形を検出: 0.05473963458476755
+optimizeTriangulation @ delaunay.ts:339
+delaunay.ts:339 ⚠️ 低品質な三角形を検出: 0.05897777973848867
+optimizeTriangulation @ delaunay.ts:339
+delaunay.ts:339 ⚠️ 低品質な三角形を検出: 0.058065542502257615
+optimizeTriangulation @ delaunay.ts:339
+delaunay.ts:339 ⚠️ 低品質な三角形を検出: 0.09834784234278894
+optimizeTriangulation @ delaunay.ts:339
+delaunay.ts:339 ⚠️ 低品質な三角形を検出: 0.06786536263815973
+optimizeTriangulation @ delaunay.ts:339
+delaunay.ts:339 ⚠️ 低品質な三角形を検出: 0.08668032644238957
+optimizeTriangulation @ delaunay.ts:339
+delaunay.ts:339 ⚠️ 低品質な三角形を検出: 0.09668782279103853
+optimizeTriangulation @ delaunay.ts:339
+delaunay.ts:339 ⚠️ 低品質な三角形を検出: 0.09011182064294046
+optimizeTriangulation @ delaunay.ts:339
+delaunay.ts:339 ⚠️ 低品質な三角形を検出: 0.0817759700810007
+optimizeTriangulation @ delaunay.ts:339
+delaunay.ts:339 ⚠️ 低品質な三角形を検出: 0.07853310546056971
+optimizeTriangulation @ delaunay.ts:339
+delaunay.ts:339 ⚠️ 低品質な三角形を検出: 0.0836607348817708
+optimizeTriangulation @ delaunay.ts:339
+delaunay.ts:339 ⚠️ 低品質な三角形を検出: 0.09702748204703382
+optimizeTriangulation @ delaunay.ts:339
+meshDeformation.ts:296 📐 ソースメッシュ: 頂点数=110, 三角形数=176
+meshDeformation.ts:300 📍 変形後のランドマーク点数: 68
+meshDeformation.ts:306 🔧 ポイント数統一: landmarks=68, boundary=42, total=110
+meshDeformation.ts:309 🔍 最初の5つの変形点: Array(5)
+meshDeformation.ts:345 🔺 三角形 0 の頂点: Object
+meshDeformation.ts:345 🔺 三角形 1 の頂点: Object
+meshDeformation.ts:345 🔺 三角形 2 の頂点: Object
+meshDeformation.ts:390 ✅ メッシュ変形作成完了: 176個の三角形ペア
+meshDeformation.ts:439 🎨 メッシュ変形適用開始 (hybridモード)
+meshDeformation.ts:469 🔀 ハイブリッドモードで実行
+hybridRenderer.ts:145 🎨 ハイブリッドレンダリング開始: 176個の三角形
+hybridRenderer.ts:146 📏 エッジ幅: 20ピクセル
+hybridRenderer.ts:158 ➡️ フェーズ1: フォワードマッピングで全体描画
+triangleRenderer.ts:67 🎨 三角形メッシュレンダリング開始: 176個の三角形
+triangleRenderer.ts:91 🔍 最初の三角形ペア: Object
+triangleRenderer.ts:146 🔺 三角形 0 の詳細: Object
+triangleRenderer.ts:116 📐 レンダリング進捗: 1% (1/176三角形, 2229ピクセル)
+triangleRenderer.ts:146 🔺 三角形 1 の詳細: Object
+triangleRenderer.ts:116 📐 レンダリング進捗: 1% (2/176三角形, 4614ピクセル)
+triangleRenderer.ts:146 🔺 三角形 2 の詳細: Object
+triangleRenderer.ts:116 📐 レンダリング進捗: 2% (3/176三角形, 4986ピクセル)
+triangleRenderer.ts:146 🔺 三角形 3 の詳細: Object
+triangleRenderer.ts:116 📐 レンダリング進捗: 2% (4/176三角形, 5147ピクセル)
+triangleRenderer.ts:146 🔺 三角形 4 の詳細: Object
+triangleRenderer.ts:116 📐 レンダリング進捗: 3% (5/176三角形, 5316ピクセル)
+triangleRenderer.ts:116 📐 レンダリング進捗: 28% (50/176三角形, 51500ピクセル)
+triangleRenderer.ts:116 📐 レンダリング進捗: 57% (100/176三角形, 83669ピクセル)
+triangleRenderer.ts:116 📐 レンダリング進捗: 85% (150/176三角形, 213784ピクセル)
+triangleRenderer.ts:124 ✅ 三角形メッシュレンダリング完了: 30.7ms, 総ピクセル数: 275576
+hybridRenderer.ts:172 🔲 エッジ領域: 39920ピクセル (15.1%)
+hybridRenderer.ts:181 🔄 フェーズ2: エッジ領域をバックワードマッピングで修正
+hybridRenderer.ts:249 📐 エッジ修正進捗: 8%
+hybridRenderer.ts:249 📐 エッジ修正進捗: 17%
+hybridRenderer.ts:249 📐 エッジ修正進捗: 25%
+hybridRenderer.ts:249 📐 エッジ修正進捗: 34%
+hybridRenderer.ts:249 📐 エッジ修正進捗: 42%
+hybridRenderer.ts:249 📐 エッジ修正進捗: 51%
+hybridRenderer.ts:249 📐 エッジ修正進捗: 59%
+hybridRenderer.ts:249 📐 エッジ修正進捗: 67%
+hybridRenderer.ts:249 📐 エッジ修正進捗: 76%
+hybridRenderer.ts:249 📐 エッジ修正進捗: 84%
+hybridRenderer.ts:249 📐 エッジ修正進捗: 93%
+hybridRenderer.ts:259 ✅ ハイブリッドレンダリング完了:
+hybridRenderer.ts:260    処理時間: 63.4ms
+hybridRenderer.ts:261    エッジピクセル処理: 38883/39920
+meshDeformation.ts:489 ✅ メッシュ変形適用完了: 63.6ms
+meshDeformation.ts:612 ✅ [Version 5.2.2] メッシュベース変形処理完了 (hybridモード)
+useImageWarping.ts:145 ✅ 統合ワーピング処理完了 Object
+StandardizationPanel.tsx:42 📋 標準化パネル: Object
+StandardizationPanel.tsx:42 📋 標準化パネル: Object
+ImagePreview.tsx:262 🔄 編集後Canvas表示: 445x593 (標準化済み)
+ImagePreview.tsx:268 ✅ 編集後Canvasに画像を描画
+ImagePreview.tsx:268 ✅ 編集後Canvasに画像を描画
+StandardizationPanel.tsx:42 📋 標準化パネル: Object
+StandardizationPanel.tsx:42 📋 標準化パネル: Object
+StandardizationPanel.tsx:52 🔄 標準化処理開始: Object
+StandardizationPanel.tsx:42 📋 標準化パネル: Object
+StandardizationPanel.tsx:42 📋 標準化パネル: Object
+canvasStandardizer.ts:39 🎯 アフィン変換ベース標準化実行開始: Object
+affineStandardizer.ts:175 🎯 アフィン変換ベース標準化開始: Object
+affineStandardizer.ts:120 🔧 アフィン変換計算（基準点固定版）: Object
+affineStandardizer.ts:216 ✅ アフィン変換ベース標準化完了: Object
+canvasStandardizer.ts:78 ✅ アフィン変換ベース標準化完了: Object
+StandardizationPanel.tsx:92 ✅ 標準化完了 & faceStore連携: Object
+StandardizationPanel.tsx:42 📋 標準化パネル: Object
+StandardizationPanel.tsx:42 📋 標準化パネル: Object
+useImageWarping.ts:202 🚫 デバウンスキャンセル
+useImageWarping.ts:184 🎛️ 統合パラメータ変更検出: Object
+useImageWarping.ts:193 ✅ 統合前提条件満たしている - ワーピング処理実行予定
+ImagePreview.tsx:197 🎨 統合ベース画像描画開始: Object
+ImagePreview.tsx:262 🔄 編集後Canvas表示: 445x593 (標準化済み)
+StandardizationPanel.tsx:42 📋 標準化パネル: Object
+StandardizationPanel.tsx:42 📋 標準化パネル: Object
+useImageWarping.ts:66 ✅ Current base image loaded to canvas: Object
+StandardizationPanel.tsx:42 📋 標準化パネル: Object
+StandardizationPanel.tsx:42 📋 標準化パネル: Object
+ImagePreview.tsx:204 ✅ 画像読み込み成功: 900 x 1200
+ImagePreview.tsx:160 📐 元画像Canvas - Container size: Object
+ImagePreview.tsx:174 📐 元画像Canvas - Size calculation: Object
+ImagePreview.tsx:217 🎨 元画像Canvas設定: 445x593, scale: 0.49444444444444446
+ImagePreview.tsx:222 ✅ Canvas に画像を描画しました
+ImagePreview.tsx:226 🎯 統合ベースランドマークを描画: Object
+ImagePreview.tsx:268 ✅ 編集後Canvasに画像を描画
+ImagePreview.tsx:135 🎨 Fabric.js Canvas 初期化チェック: Object
+ImagePreview.tsx:143 ✅ Fabric.js Canvas 初期化実行 - サイズ: Object
+useImageWarping.ts:32 🎨 Canvas初期化開始: Object
+useImageWarping.ts:42 ✅ Canvas初期化成功: Object
+ImagePreview.tsx:262 🔄 編集後Canvas表示: 445x593 (標準化済み)
+useImageWarping.ts:197 ⏰ デバウンス完了 - 統合ワーピング処理開始
+useImageWarping.ts:97 🔄 統合ワーピング処理開始 Object
+StandardizationPanel.tsx:42 📋 標準化パネル: Object
+StandardizationPanel.tsx:42 📋 標準化パネル: Object
+ImagePreview.tsx:268 ✅ 編集後Canvasに画像を描画
+adaptiveWarping.ts:258 🎨 適応的TPS変形開始: Object
+adaptiveWarping.ts:266 🔍 [仮説1検証] 変形モード判定: Object
+adaptiveWarping.ts:276 🔺 [Version 5.2.0] メッシュベース変形システムへ移行
+meshDeformation.ts:515 🚀 [Version 5.2.2] メッシュベース変形処理開始 - ハイブリッドレンダリング
+meshDeformation.ts:543 📏 ランドマーク座標スケール: Object
+meshDeformation.ts:44 🔄 ランドマーク変形開始
+meshDeformation.ts:51 📏 顔領域サイズ: Object
+meshDeformation.ts:97 ✅ ランドマーク変形完了
+meshDeformation.ts:553 🔍 変形パラメータ: Object
+meshDeformation.ts:285 🔺 メッシュ変形作成開始
+meshDeformation.ts:289 📍 元のランドマーク点数: 68
+delaunay.ts:278 🎭 顔最適化Delaunay三角形分割開始
+delaunay.ts:22 🔺 Delaunay三角形分割開始: 110点
+delaunay.ts:114 📊 三角形統計: 総数=221, フィルタ前=221, フィルタ後=176
+delaunay.ts:123 ✅ Delaunay三角形分割完了: 176個の三角形
+delaunay.ts:339 ⚠️ 低品質な三角形を検出: 0.05473963458476755
+optimizeTriangulation @ delaunay.ts:339
+delaunay.ts:339 ⚠️ 低品質な三角形を検出: 0.05897777973848854
+optimizeTriangulation @ delaunay.ts:339
+delaunay.ts:339 ⚠️ 低品質な三角形を検出: 0.058065542502257796
+optimizeTriangulation @ delaunay.ts:339
+delaunay.ts:339 ⚠️ 低品質な三角形を検出: 0.09834784234279073
+optimizeTriangulation @ delaunay.ts:339
+delaunay.ts:339 ⚠️ 低品質な三角形を検出: 0.06786536263815957
+optimizeTriangulation @ delaunay.ts:339
+delaunay.ts:339 ⚠️ 低品質な三角形を検出: 0.08668032644238946
+optimizeTriangulation @ delaunay.ts:339
+delaunay.ts:339 ⚠️ 低品質な三角形を検出: 0.07878043502566934
+optimizeTriangulation @ delaunay.ts:339
+delaunay.ts:339 ⚠️ 低品質な三角形を検出: 0.07144685167550954
+optimizeTriangulation @ delaunay.ts:339
+delaunay.ts:339 ⚠️ 低品質な三角形を検出: 0.06886688138227763
+optimizeTriangulation @ delaunay.ts:339
+delaunay.ts:339 ⚠️ 低品質な三角形を検出: 0.07337810143048366
+optimizeTriangulation @ delaunay.ts:339
+delaunay.ts:339 ⚠️ 低品質な三角形を検出: 0.08407535001759092
+optimizeTriangulation @ delaunay.ts:339
+delaunay.ts:339 ⚠️ 低品質な三角形を検出: 0.08574102040573074
+optimizeTriangulation @ delaunay.ts:339
+meshDeformation.ts:296 📐 ソースメッシュ: 頂点数=110, 三角形数=176
+meshDeformation.ts:300 📍 変形後のランドマーク点数: 68
+meshDeformation.ts:306 🔧 ポイント数統一: landmarks=68, boundary=42, total=110
+meshDeformation.ts:309 🔍 最初の5つの変形点: Array(5)
+meshDeformation.ts:345 🔺 三角形 0 の頂点: Object
+meshDeformation.ts:345 🔺 三角形 1 の頂点: Object
+meshDeformation.ts:345 🔺 三角形 2 の頂点: Object
+meshDeformation.ts:390 ✅ メッシュ変形作成完了: 176個の三角形ペア
+meshDeformation.ts:439 🎨 メッシュ変形適用開始 (hybridモード)
+meshDeformation.ts:469 🔀 ハイブリッドモードで実行
+hybridRenderer.ts:145 🎨 ハイブリッドレンダリング開始: 176個の三角形
+hybridRenderer.ts:146 📏 エッジ幅: 20ピクセル
+hybridRenderer.ts:158 ➡️ フェーズ1: フォワードマッピングで全体描画
+triangleRenderer.ts:67 🎨 三角形メッシュレンダリング開始: 176個の三角形
+triangleRenderer.ts:91 🔍 最初の三角形ペア: Object
+triangleRenderer.ts:146 🔺 三角形 0 の詳細: Object
+triangleRenderer.ts:116 📐 レンダリング進捗: 1% (1/176三角形, 2228ピクセル)
+triangleRenderer.ts:146 🔺 三角形 1 の詳細: Object
+triangleRenderer.ts:116 📐 レンダリング進捗: 1% (2/176三角形, 4612ピクセル)
+triangleRenderer.ts:146 🔺 三角形 2 の詳細: Object
+triangleRenderer.ts:116 📐 レンダリング進捗: 2% (3/176三角形, 4972ピクセル)
+triangleRenderer.ts:146 🔺 三角形 3 の詳細: Object
+triangleRenderer.ts:116 📐 レンダリング進捗: 2% (4/176三角形, 5130ピクセル)
+triangleRenderer.ts:146 🔺 三角形 4 の詳細: Object
+triangleRenderer.ts:116 📐 レンダリング進捗: 3% (5/176三角形, 5303ピクセル)
+triangleRenderer.ts:116 📐 レンダリング進捗: 28% (50/176三角形, 51505ピクセル)
+triangleRenderer.ts:116 📐 レンダリング進捗: 57% (100/176三角形, 83687ピクセル)
+triangleRenderer.ts:116 📐 レンダリング進捗: 85% (150/176三角形, 211519ピクセル)
+triangleRenderer.ts:124 ✅ 三角形メッシュレンダリング完了: 32.4ms, 総ピクセル数: 275721
+hybridRenderer.ts:172 🔲 エッジ領域: 39920ピクセル (15.1%)
+hybridRenderer.ts:181 🔄 フェーズ2: エッジ領域をバックワードマッピングで修正
+hybridRenderer.ts:249 📐 エッジ修正進捗: 8%
+hybridRenderer.ts:249 📐 エッジ修正進捗: 17%
+hybridRenderer.ts:249 📐 エッジ修正進捗: 25%
+hybridRenderer.ts:249 📐 エッジ修正進捗: 34%
+hybridRenderer.ts:249 📐 エッジ修正進捗: 42%
+hybridRenderer.ts:249 📐 エッジ修正進捗: 51%
+hybridRenderer.ts:249 📐 エッジ修正進捗: 59%
+hybridRenderer.ts:249 📐 エッジ修正進捗: 67%
+hybridRenderer.ts:249 📐 エッジ修正進捗: 76%
+hybridRenderer.ts:249 📐 エッジ修正進捗: 84%
+hybridRenderer.ts:249 📐 エッジ修正進捗: 93%
+hybridRenderer.ts:259 ✅ ハイブリッドレンダリング完了:
+hybridRenderer.ts:260    処理時間: 71.3ms
+hybridRenderer.ts:261    エッジピクセル処理: 38883/39920
+meshDeformation.ts:489 ✅ メッシュ変形適用完了: 71.4ms
+meshDeformation.ts:612 ✅ [Version 5.2.2] メッシュベース変形処理完了 (hybridモード)
+useImageWarping.ts:145 ✅ 統合ワーピング処理完了 Object
+StandardizationPanel.tsx:42 📋 標準化パネル: Object
+StandardizationPanel.tsx:42 📋 標準化パネル: Object
+ImagePreview.tsx:262 🔄 編集後Canvas表示: 445x593 (標準化済み)
+ImagePreview.tsx:268 ✅ 編集後Canvasに画像を描画
+StandardizationPanel.tsx:42 📋 標準化パネル: Object
+StandardizationPanel.tsx:42 📋 標準化パネル: Object
+StandardizationPanel.tsx:52 🔄 標準化処理開始: Object
+StandardizationPanel.tsx:42 📋 標準化パネル: Object
+StandardizationPanel.tsx:42 📋 標準化パネル: Object
+canvasStandardizer.ts:39 🎯 アフィン変換ベース標準化実行開始: Object
+affineStandardizer.ts:175 🎯 アフィン変換ベース標準化開始: Object
+affineStandardizer.ts:120 🔧 アフィン変換計算（基準点固定版）: Object
+affineStandardizer.ts:216 ✅ アフィン変換ベース標準化完了: Object
+canvasStandardizer.ts:78 ✅ アフィン変換ベース標準化完了: Object
+StandardizationPanel.tsx:92 ✅ 標準化完了 & faceStore連携: Object
+StandardizationPanel.tsx:42 📋 標準化パネル: Object
+StandardizationPanel.tsx:42 📋 標準化パネル: Object
+useImageWarping.ts:202 🚫 デバウンスキャンセル
+useImageWarping.ts:184 🎛️ 統合パラメータ変更検出: Object
+useImageWarping.ts:193 ✅ 統合前提条件満たしている - ワーピング処理実行予定
+ImagePreview.tsx:197 🎨 統合ベース画像描画開始: Object
+ImagePreview.tsx:262 🔄 編集後Canvas表示: 445x593 (標準化済み)
+StandardizationPanel.tsx:42 📋 標準化パネル: Object
+StandardizationPanel.tsx:42 📋 標準化パネル: Object
+useImageWarping.ts:66 ✅ Current base image loaded to canvas: Object
+StandardizationPanel.tsx:42 📋 標準化パネル: Object
+StandardizationPanel.tsx:42 📋 標準化パネル: Object
+ImagePreview.tsx:204 ✅ 画像読み込み成功: 900 x 1200
+ImagePreview.tsx:160 📐 元画像Canvas - Container size: Object
+ImagePreview.tsx:174 📐 元画像Canvas - Size calculation: Object
+ImagePreview.tsx:217 🎨 元画像Canvas設定: 445x593, scale: 0.49444444444444446
+ImagePreview.tsx:222 ✅ Canvas に画像を描画しました
+ImagePreview.tsx:226 🎯 統合ベースランドマークを描画: Object
+ImagePreview.tsx:268 ✅ 編集後Canvasに画像を描画
+ImagePreview.tsx:135 🎨 Fabric.js Canvas 初期化チェック: Object
+ImagePreview.tsx:143 ✅ Fabric.js Canvas 初期化実行 - サイズ: Object
+useImageWarping.ts:32 🎨 Canvas初期化開始: Object
+useImageWarping.ts:42 ✅ Canvas初期化成功: Object
+ImagePreview.tsx:262 🔄 編集後Canvas表示: 445x593 (標準化済み)
+useImageWarping.ts:197 ⏰ デバウンス完了 - 統合ワーピング処理開始
+useImageWarping.ts:97 🔄 統合ワーピング処理開始 Object
+StandardizationPanel.tsx:42 📋 標準化パネル: Object
+StandardizationPanel.tsx:42 📋 標準化パネル: Object
+ImagePreview.tsx:268 ✅ 編集後Canvasに画像を描画
+adaptiveWarping.ts:258 🎨 適応的TPS変形開始: Object
+adaptiveWarping.ts:266 🔍 [仮説1検証] 変形モード判定: Object
+adaptiveWarping.ts:276 🔺 [Version 5.2.0] メッシュベース変形システムへ移行
+meshDeformation.ts:515 🚀 [Version 5.2.2] メッシュベース変形処理開始 - ハイブリッドレンダリング
+meshDeformation.ts:543 📏 ランドマーク座標スケール: Object
+meshDeformation.ts:44 🔄 ランドマーク変形開始
+meshDeformation.ts:51 📏 顔領域サイズ: Object
+meshDeformation.ts:97 ✅ ランドマーク変形完了
+meshDeformation.ts:553 🔍 変形パラメータ: Object
+meshDeformation.ts:285 🔺 メッシュ変形作成開始
+meshDeformation.ts:289 📍 元のランドマーク点数: 68
+delaunay.ts:278 🎭 顔最適化Delaunay三角形分割開始
+delaunay.ts:22 🔺 Delaunay三角形分割開始: 110点
+delaunay.ts:114 📊 三角形統計: 総数=221, フィルタ前=221, フィルタ後=176
+delaunay.ts:123 ✅ Delaunay三角形分割完了: 176個の三角形
+delaunay.ts:339 ⚠️ 低品質な三角形を検出: 0.05473963458476755
+optimizeTriangulation @ delaunay.ts:339
+delaunay.ts:339 ⚠️ 低品質な三角形を検出: 0.058977779738488265
+optimizeTriangulation @ delaunay.ts:339
+delaunay.ts:339 ⚠️ 低品質な三角形を検出: 0.05806554250225806
+optimizeTriangulation @ delaunay.ts:339
+delaunay.ts:339 ⚠️ 低品質な三角形を検出: 0.0983478423427897
+optimizeTriangulation @ delaunay.ts:339
+delaunay.ts:339 ⚠️ 低品質な三角形を検出: 0.06786536263815957
+optimizeTriangulation @ delaunay.ts:339
+delaunay.ts:339 ⚠️ 低品質な三角形を検出: 0.08668032644238946
+optimizeTriangulation @ delaunay.ts:339
+delaunay.ts:339 ⚠️ 低品質な三角形を検出: 0.09425688801447557
+optimizeTriangulation @ delaunay.ts:339
+delaunay.ts:339 ⚠️ 低品質な三角形を検出: 0.09027048791454548
+optimizeTriangulation @ delaunay.ts:339
+delaunay.ts:339 ⚠️ 低品質な三角形を検出: 0.0961102010979978
+optimizeTriangulation @ delaunay.ts:339
+meshDeformation.ts:296 📐 ソースメッシュ: 頂点数=110, 三角形数=176
+meshDeformation.ts:300 📍 変形後のランドマーク点数: 68
+meshDeformation.ts:306 🔧 ポイント数統一: landmarks=68, boundary=42, total=110
+meshDeformation.ts:309 🔍 最初の5つの変形点: Array(5)
+meshDeformation.ts:345 🔺 三角形 0 の頂点: Object
+meshDeformation.ts:345 🔺 三角形 1 の頂点: Object
+meshDeformation.ts:345 🔺 三角形 2 の頂点: Object
+meshDeformation.ts:390 ✅ メッシュ変形作成完了: 176個の三角形ペア
+meshDeformation.ts:439 🎨 メッシュ変形適用開始 (hybridモード)
+meshDeformation.ts:469 🔀 ハイブリッドモードで実行
+hybridRenderer.ts:145 🎨 ハイブリッドレンダリング開始: 176個の三角形
+hybridRenderer.ts:146 📏 エッジ幅: 20ピクセル
+hybridRenderer.ts:158 ➡️ フェーズ1: フォワードマッピングで全体描画
+triangleRenderer.ts:67 🎨 三角形メッシュレンダリング開始: 176個の三角形
+triangleRenderer.ts:91 🔍 最初の三角形ペア: Object
+triangleRenderer.ts:146 🔺 三角形 0 の詳細: Object
+triangleRenderer.ts:116 📐 レンダリング進捗: 1% (1/176三角形, 2245ピクセル)
+triangleRenderer.ts:146 🔺 三角形 1 の詳細: Object
+triangleRenderer.ts:116 📐 レンダリング進捗: 1% (2/176三角形, 4627ピクセル)
+triangleRenderer.ts:146 🔺 三角形 2 の詳細: Object
+triangleRenderer.ts:116 📐 レンダリング進捗: 2% (3/176三角形, 4986ピクセル)
+triangleRenderer.ts:146 🔺 三角形 3 の詳細: Object
+triangleRenderer.ts:116 📐 レンダリング進捗: 2% (4/176三角形, 5144ピクセル)
+triangleRenderer.ts:146 🔺 三角形 4 の詳細: Object
+triangleRenderer.ts:116 📐 レンダリング進捗: 3% (5/176三角形, 5320ピクセル)
+triangleRenderer.ts:116 📐 レンダリング進捗: 28% (50/176三角形, 51467ピクセル)
+triangleRenderer.ts:116 📐 レンダリング進捗: 57% (100/176三角形, 83624ピクセル)
+triangleRenderer.ts:116 📐 レンダリング進捗: 85% (150/176三角形, 212983ピクセル)
+triangleRenderer.ts:124 ✅ 三角形メッシュレンダリング完了: 32.7ms, 総ピクセル数: 275612
+hybridRenderer.ts:172 🔲 エッジ領域: 39920ピクセル (15.1%)
+hybridRenderer.ts:181 🔄 フェーズ2: エッジ領域をバックワードマッピングで修正
+hybridRenderer.ts:249 📐 エッジ修正進捗: 8%
+hybridRenderer.ts:249 📐 エッジ修正進捗: 17%
+hybridRenderer.ts:249 📐 エッジ修正進捗: 25%
+hybridRenderer.ts:249 📐 エッジ修正進捗: 34%
+hybridRenderer.ts:249 📐 エッジ修正進捗: 42%
+hybridRenderer.ts:249 📐 エッジ修正進捗: 51%
+hybridRenderer.ts:249 📐 エッジ修正進捗: 59%
+hybridRenderer.ts:249 📐 エッジ修正進捗: 67%
+hybridRenderer.ts:249 📐 エッジ修正進捗: 76%
+hybridRenderer.ts:249 📐 エッジ修正進捗: 84%
+hybridRenderer.ts:249 📐 エッジ修正進捗: 93%
+hybridRenderer.ts:259 ✅ ハイブリッドレンダリング完了:
+hybridRenderer.ts:260    処理時間: 72.0ms
+hybridRenderer.ts:261    エッジピクセル処理: 38883/39920
+meshDeformation.ts:489 ✅ メッシュ変形適用完了: 72.0ms
+meshDeformation.ts:612 ✅ [Version 5.2.2] メッシュベース変形処理完了 (hybridモード)
+useImageWarping.ts:145 ✅ 統合ワーピング処理完了 Object
+StandardizationPanel.tsx:42 📋 標準化パネル: Object
+StandardizationPanel.tsx:42 📋 標準化パネル: Object
+ImagePreview.tsx:262 🔄 編集後Canvas表示: 445x593 (標準化済み)
+ImagePreview.tsx:268 ✅ 編集後Canvasに画像を描画
+StandardizationPanel.tsx:42 📋 標準化パネル: Object
+StandardizationPanel.tsx:42 📋 標準化パネル: Object
+StandardizationPanel.tsx:52 🔄 標準化処理開始: Object
+StandardizationPanel.tsx:42 📋 標準化パネル: Object
+StandardizationPanel.tsx:42 📋 標準化パネル: Object
+canvasStandardizer.ts:39 🎯 アフィン変換ベース標準化実行開始: Object
+affineStandardizer.ts:175 🎯 アフィン変換ベース標準化開始: Object
+affineStandardizer.ts:120 🔧 アフィン変換計算（基準点固定版）: Object
+affineStandardizer.ts:216 ✅ アフィン変換ベース標準化完了: Object
+canvasStandardizer.ts:78 ✅ アフィン変換ベース標準化完了: Object
+StandardizationPanel.tsx:92 ✅ 標準化完了 & faceStore連携: Object
+StandardizationPanel.tsx:42 📋 標準化パネル: Object
+StandardizationPanel.tsx:42 📋 標準化パネル: Object
+useImageWarping.ts:202 🚫 デバウンスキャンセル
+useImageWarping.ts:184 🎛️ 統合パラメータ変更検出: Object
+useImageWarping.ts:193 ✅ 統合前提条件満たしている - ワーピング処理実行予定
+ImagePreview.tsx:197 🎨 統合ベース画像描画開始: Object
+ImagePreview.tsx:262 🔄 編集後Canvas表示: 445x593 (標準化済み)
+StandardizationPanel.tsx:42 📋 標準化パネル: Object
+StandardizationPanel.tsx:42 📋 標準化パネル: Object
+useImageWarping.ts:66 ✅ Current base image loaded to canvas: Object
+StandardizationPanel.tsx:42 📋 標準化パネル: Object
+StandardizationPanel.tsx:42 📋 標準化パネル: Object
+ImagePreview.tsx:204 ✅ 画像読み込み成功: 900 x 1200
+ImagePreview.tsx:160 📐 元画像Canvas - Container size: Object
+ImagePreview.tsx:174 📐 元画像Canvas - Size calculation: Object
+ImagePreview.tsx:217 🎨 元画像Canvas設定: 445x593, scale: 0.49444444444444446
+ImagePreview.tsx:222 ✅ Canvas に画像を描画しました
+ImagePreview.tsx:226 🎯 統合ベースランドマークを描画: Object
+ImagePreview.tsx:268 ✅ 編集後Canvasに画像を描画
+useImageWarping.ts:197 ⏰ デバウンス完了 - 統合ワーピング処理開始
+useImageWarping.ts:97 🔄 統合ワーピング処理開始 Object
+ImagePreview.tsx:135 🎨 Fabric.js Canvas 初期化チェック: Object
+ImagePreview.tsx:143 ✅ Fabric.js Canvas 初期化実行 - サイズ: Object
+useImageWarping.ts:32 🎨 Canvas初期化開始: Object
+useImageWarping.ts:42 ✅ Canvas初期化成功: Object
+ImagePreview.tsx:262 🔄 編集後Canvas表示: 445x593 (標準化済み)
+StandardizationPanel.tsx:42 📋 標準化パネル: Object
+StandardizationPanel.tsx:42 📋 標準化パネル: Object
+adaptiveWarping.ts:258 🎨 適応的TPS変形開始: Object
+adaptiveWarping.ts:266 🔍 [仮説1検証] 変形モード判定: Object
+adaptiveWarping.ts:276 🔺 [Version 5.2.0] メッシュベース変形システムへ移行
+meshDeformation.ts:515 🚀 [Version 5.2.2] メッシュベース変形処理開始 - ハイブリッドレンダリング
+meshDeformation.ts:543 📏 ランドマーク座標スケール: Object
+meshDeformation.ts:44 🔄 ランドマーク変形開始
+meshDeformation.ts:51 📏 顔領域サイズ: Object
+meshDeformation.ts:97 ✅ ランドマーク変形完了
+meshDeformation.ts:553 🔍 変形パラメータ: Object
+meshDeformation.ts:285 🔺 メッシュ変形作成開始
+meshDeformation.ts:289 📍 元のランドマーク点数: 68
+delaunay.ts:278 🎭 顔最適化Delaunay三角形分割開始
+delaunay.ts:22 🔺 Delaunay三角形分割開始: 110点
+delaunay.ts:114 📊 三角形統計: 総数=221, フィルタ前=221, フィルタ後=176
+delaunay.ts:123 ✅ Delaunay三角形分割完了: 176個の三角形
+delaunay.ts:339 ⚠️ 低品質な三角形を検出: 0.05473963458476755
+optimizeTriangulation @ delaunay.ts:339
+delaunay.ts:339 ⚠️ 低品質な三角形を検出: 0.058977779738488605
+optimizeTriangulation @ delaunay.ts:339
+delaunay.ts:339 ⚠️ 低品質な三角形を検出: 0.05806554250225806
+optimizeTriangulation @ delaunay.ts:339
+delaunay.ts:339 ⚠️ 低品質な三角形を検出: 0.09834784234278984
+optimizeTriangulation @ delaunay.ts:339
+delaunay.ts:339 ⚠️ 低品質な三角形を検出: 0.06786536263815944
+optimizeTriangulation @ delaunay.ts:339
+delaunay.ts:339 ⚠️ 低品質な三角形を検出: 0.08668032644238957
+optimizeTriangulation @ delaunay.ts:339
+delaunay.ts:339 ⚠️ 低品質な三角形を検出: 0.09340101063840305
+optimizeTriangulation @ delaunay.ts:339
+delaunay.ts:339 ⚠️ 低品質な三角形を検出: 0.09106919184891793
+optimizeTriangulation @ delaunay.ts:339
+delaunay.ts:339 ⚠️ 低品質な三角形を検出: 0.09808836171792758
+optimizeTriangulation @ delaunay.ts:339
+meshDeformation.ts:296 📐 ソースメッシュ: 頂点数=110, 三角形数=176
+meshDeformation.ts:300 📍 変形後のランドマーク点数: 68
+meshDeformation.ts:306 🔧 ポイント数統一: landmarks=68, boundary=42, total=110
+meshDeformation.ts:309 🔍 最初の5つの変形点: Array(5)
+meshDeformation.ts:345 🔺 三角形 0 の頂点: Object
+meshDeformation.ts:345 🔺 三角形 1 の頂点: Object
+meshDeformation.ts:345 🔺 三角形 2 の頂点: Object
+meshDeformation.ts:390 ✅ メッシュ変形作成完了: 176個の三角形ペア
+meshDeformation.ts:439 🎨 メッシュ変形適用開始 (hybridモード)
+meshDeformation.ts:469 🔀 ハイブリッドモードで実行
+hybridRenderer.ts:145 🎨 ハイブリッドレンダリング開始: 176個の三角形
+hybridRenderer.ts:146 📏 エッジ幅: 20ピクセル
+hybridRenderer.ts:158 ➡️ フェーズ1: フォワードマッピングで全体描画
+triangleRenderer.ts:67 🎨 三角形メッシュレンダリング開始: 176個の三角形
+triangleRenderer.ts:91 🔍 最初の三角形ペア: Object
+triangleRenderer.ts:146 🔺 三角形 0 の詳細: Object
+triangleRenderer.ts:116 📐 レンダリング進捗: 1% (1/176三角形, 2228ピクセル)
+triangleRenderer.ts:146 🔺 三角形 1 の詳細: Object
+triangleRenderer.ts:116 📐 レンダリング進捗: 1% (2/176三角形, 4612ピクセル)
+triangleRenderer.ts:146 🔺 三角形 2 の詳細: Object
+triangleRenderer.ts:116 📐 レンダリング進捗: 2% (3/176三角形, 4974ピクセル)
+triangleRenderer.ts:146 🔺 三角形 3 の詳細: Object
+triangleRenderer.ts:116 📐 レンダリング進捗: 2% (4/176三角形, 5134ピクセル)
+triangleRenderer.ts:146 🔺 三角形 4 の詳細: Object
+triangleRenderer.ts:116 📐 レンダリング進捗: 3% (5/176三角形, 5308ピクセル)
+triangleRenderer.ts:116 📐 レンダリング進捗: 28% (50/176三角形, 51471ピクセル)
+triangleRenderer.ts:116 📐 レンダリング進捗: 57% (100/176三角形, 83633ピクセル)
+triangleRenderer.ts:116 📐 レンダリング進捗: 85% (150/176三角形, 220026ピクセル)
+triangleRenderer.ts:124 ✅ 三角形メッシュレンダリング完了: 34.7ms, 総ピクセル数: 275675
+hybridRenderer.ts:172 🔲 エッジ領域: 39920ピクセル (15.1%)
+hybridRenderer.ts:181 🔄 フェーズ2: エッジ領域をバックワードマッピングで修正
+hybridRenderer.ts:249 📐 エッジ修正進捗: 8%
+hybridRenderer.ts:249 📐 エッジ修正進捗: 17%
+hybridRenderer.ts:249 📐 エッジ修正進捗: 25%
+hybridRenderer.ts:249 📐 エッジ修正進捗: 34%
+hybridRenderer.ts:249 📐 エッジ修正進捗: 42%
+hybridRenderer.ts:249 📐 エッジ修正進捗: 51%
+hybridRenderer.ts:249 📐 エッジ修正進捗: 59%
+hybridRenderer.ts:249 📐 エッジ修正進捗: 67%
+hybridRenderer.ts:249 📐 エッジ修正進捗: 76%
+hybridRenderer.ts:249 📐 エッジ修正進捗: 84%
+hybridRenderer.ts:249 📐 エッジ修正進捗: 93%
+hybridRenderer.ts:259 ✅ ハイブリッドレンダリング完了:
+hybridRenderer.ts:260    処理時間: 75.5ms
+hybridRenderer.ts:261    エッジピクセル処理: 38883/39920
+meshDeformation.ts:489 ✅ メッシュ変形適用完了: 75.7ms
+meshDeformation.ts:612 ✅ [Version 5.2.2] メッシュベース変形処理完了 (hybridモード)
+useImageWarping.ts:145 ✅ 統合ワーピング処理完了 Object
+StandardizationPanel.tsx:42 📋 標準化パネル: Object
+StandardizationPanel.tsx:42 📋 標準化パネル: Object
+ImagePreview.tsx:262 🔄 編集後Canvas表示: 445x593 (標準化済み)
+ImagePreview.tsx:268 ✅ 編集後Canvasに画像を描画
+ImagePreview.tsx:268 ✅ 編集後Canvasに画像を描画
+StandardizationPanel.tsx:42 📋 標準化パネル: Object
+StandardizationPanel.tsx:42 📋 標準化パネル: Object
+StandardizationPanel.tsx:52 🔄 標準化処理開始: Object
+StandardizationPanel.tsx:42 📋 標準化パネル: Object
+StandardizationPanel.tsx:42 📋 標準化パネル: Object
+canvasStandardizer.ts:39 🎯 アフィン変換ベース標準化実行開始: Object
+affineStandardizer.ts:175 🎯 アフィン変換ベース標準化開始: Object
+affineStandardizer.ts:120 🔧 アフィン変換計算（基準点固定版）: Object
+affineStandardizer.ts:216 ✅ アフィン変換ベース標準化完了: Object
+canvasStandardizer.ts:78 ✅ アフィン変換ベース標準化完了: Object
+StandardizationPanel.tsx:92 ✅ 標準化完了 & faceStore連携: Object
+StandardizationPanel.tsx:42 📋 標準化パネル: Object
+StandardizationPanel.tsx:42 📋 標準化パネル: Object
+useImageWarping.ts:202 🚫 デバウンスキャンセル
+useImageWarping.ts:184 🎛️ 統合パラメータ変更検出: Object
+useImageWarping.ts:193 ✅ 統合前提条件満たしている - ワーピング処理実行予定
+ImagePreview.tsx:197 🎨 統合ベース画像描画開始: Object
+ImagePreview.tsx:262 🔄 編集後Canvas表示: 445x593 (標準化済み)
+StandardizationPanel.tsx:42 📋 標準化パネル: Object
+StandardizationPanel.tsx:42 📋 標準化パネル: Object
+useImageWarping.ts:66 ✅ Current base image loaded to canvas: Object
+StandardizationPanel.tsx:42 📋 標準化パネル: Object
+StandardizationPanel.tsx:42 📋 標準化パネル: Object
+ImagePreview.tsx:204 ✅ 画像読み込み成功: 900 x 1200
+ImagePreview.tsx:160 📐 元画像Canvas - Container size: Object
+ImagePreview.tsx:174 📐 元画像Canvas - Size calculation: Object
+ImagePreview.tsx:217 🎨 元画像Canvas設定: 445x593, scale: 0.49444444444444446
+ImagePreview.tsx:222 ✅ Canvas に画像を描画しました
+ImagePreview.tsx:226 🎯 統合ベースランドマークを描画: Object
+ImagePreview.tsx:268 ✅ 編集後Canvasに画像を描画
+ImagePreview.tsx:135 🎨 Fabric.js Canvas 初期化チェック: Object
+ImagePreview.tsx:143 ✅ Fabric.js Canvas 初期化実行 - サイズ: Object
+useImageWarping.ts:32 🎨 Canvas初期化開始: Object
+useImageWarping.ts:42 ✅ Canvas初期化成功: Object
+ImagePreview.tsx:262 🔄 編集後Canvas表示: 445x593 (標準化済み)
+useImageWarping.ts:197 ⏰ デバウンス完了 - 統合ワーピング処理開始
+useImageWarping.ts:97 🔄 統合ワーピング処理開始 Object
+StandardizationPanel.tsx:42 📋 標準化パネル: Object
+StandardizationPanel.tsx:42 📋 標準化パネル: Object
+ImagePreview.tsx:268 ✅ 編集後Canvasに画像を描画
+adaptiveWarping.ts:258 🎨 適応的TPS変形開始: Object
+adaptiveWarping.ts:266 🔍 [仮説1検証] 変形モード判定: Object
+adaptiveWarping.ts:276 🔺 [Version 5.2.0] メッシュベース変形システムへ移行
+meshDeformation.ts:515 🚀 [Version 5.2.2] メッシュベース変形処理開始 - ハイブリッドレンダリング
+meshDeformation.ts:543 📏 ランドマーク座標スケール: Object
+meshDeformation.ts:44 🔄 ランドマーク変形開始
+meshDeformation.ts:51 📏 顔領域サイズ: Object
+meshDeformation.ts:97 ✅ ランドマーク変形完了
+meshDeformation.ts:553 🔍 変形パラメータ: Object
+meshDeformation.ts:285 🔺 メッシュ変形作成開始
+meshDeformation.ts:289 📍 元のランドマーク点数: 68
+delaunay.ts:278 🎭 顔最適化Delaunay三角形分割開始
+delaunay.ts:22 🔺 Delaunay三角形分割開始: 110点
+delaunay.ts:114 📊 三角形統計: 総数=221, フィルタ前=221, フィルタ後=176
+delaunay.ts:123 ✅ Delaunay三角形分割完了: 176個の三角形
+delaunay.ts:339 ⚠️ 低品質な三角形を検出: 0.05473963458476635
+optimizeTriangulation @ delaunay.ts:339
+delaunay.ts:339 ⚠️ 低品質な三角形を検出: 0.05897777973848952
+optimizeTriangulation @ delaunay.ts:339
+delaunay.ts:339 ⚠️ 低品質な三角形を検出: 0.05806554250225764
+optimizeTriangulation @ delaunay.ts:339
+delaunay.ts:339 ⚠️ 低品質な三角形を検出: 0.09834784234278862
+optimizeTriangulation @ delaunay.ts:339
+delaunay.ts:339 ⚠️ 低品質な三角形を検出: 0.06786536263815983
+optimizeTriangulation @ delaunay.ts:339
+delaunay.ts:339 ⚠️ 低品質な三角形を検出: 0.08668032644238975
+optimizeTriangulation @ delaunay.ts:339
+delaunay.ts:339 ⚠️ 低品質な三角形を検出: 0.09389604303450426
+optimizeTriangulation @ delaunay.ts:339
+delaunay.ts:339 ⚠️ 低品質な三角形を検出: 0.08847310770051083
+optimizeTriangulation @ delaunay.ts:339
+delaunay.ts:339 ⚠️ 低品質な三角形を検出: 0.09667154560712816
+optimizeTriangulation @ delaunay.ts:339
+meshDeformation.ts:296 📐 ソースメッシュ: 頂点数=110, 三角形数=176
+meshDeformation.ts:300 📍 変形後のランドマーク点数: 68
+meshDeformation.ts:306 🔧 ポイント数統一: landmarks=68, boundary=42, total=110
+meshDeformation.ts:309 🔍 最初の5つの変形点: Array(5)
+meshDeformation.ts:345 🔺 三角形 0 の頂点: Object
+meshDeformation.ts:345 🔺 三角形 1 の頂点: Object
+meshDeformation.ts:345 🔺 三角形 2 の頂点: Object
+meshDeformation.ts:390 ✅ メッシュ変形作成完了: 176個の三角形ペア
+meshDeformation.ts:439 🎨 メッシュ変形適用開始 (hybridモード)
+meshDeformation.ts:469 🔀 ハイブリッドモードで実行
+hybridRenderer.ts:145 🎨 ハイブリッドレンダリング開始: 176個の三角形
+hybridRenderer.ts:146 📏 エッジ幅: 20ピクセル
+hybridRenderer.ts:158 ➡️ フェーズ1: フォワードマッピングで全体描画
+triangleRenderer.ts:67 🎨 三角形メッシュレンダリング開始: 176個の三角形
+triangleRenderer.ts:91 🔍 最初の三角形ペア: Object
+triangleRenderer.ts:146 🔺 三角形 0 の詳細: Object
+triangleRenderer.ts:116 📐 レンダリング進捗: 1% (1/176三角形, 2244ピクセル)
+triangleRenderer.ts:146 🔺 三角形 1 の詳細: Object
+triangleRenderer.ts:116 📐 レンダリング進捗: 1% (2/176三角形, 4629ピクセル)
+triangleRenderer.ts:146 🔺 三角形 2 の詳細: Object
+triangleRenderer.ts:116 📐 レンダリング進捗: 2% (3/176三角形, 4985ピクセル)
+triangleRenderer.ts:146 🔺 三角形 3 の詳細: Object
+triangleRenderer.ts:116 📐 レンダリング進捗: 2% (4/176三角形, 5144ピクセル)
+triangleRenderer.ts:146 🔺 三角形 4 の詳細: Object
+triangleRenderer.ts:116 📐 レンダリング進捗: 3% (5/176三角形, 5317ピクセル)
+triangleRenderer.ts:116 📐 レンダリング進捗: 28% (50/176三角形, 51508ピクセル)
+triangleRenderer.ts:116 📐 レンダリング進捗: 57% (100/176三角形, 83700ピクセル)
+triangleRenderer.ts:116 📐 レンダリング進捗: 85% (150/176三角形, 206753ピクセル)
+triangleRenderer.ts:124 ✅ 三角形メッシュレンダリング完了: 32.5ms, 総ピクセル数: 275598
+hybridRenderer.ts:172 🔲 エッジ領域: 39920ピクセル (15.1%)
+hybridRenderer.ts:181 🔄 フェーズ2: エッジ領域をバックワードマッピングで修正
+hybridRenderer.ts:249 📐 エッジ修正進捗: 8%
+hybridRenderer.ts:249 📐 エッジ修正進捗: 17%
+hybridRenderer.ts:249 📐 エッジ修正進捗: 25%
+hybridRenderer.ts:249 📐 エッジ修正進捗: 34%
+hybridRenderer.ts:249 📐 エッジ修正進捗: 42%
+hybridRenderer.ts:249 📐 エッジ修正進捗: 51%
+hybridRenderer.ts:249 📐 エッジ修正進捗: 59%
+hybridRenderer.ts:249 📐 エッジ修正進捗: 67%
+hybridRenderer.ts:249 📐 エッジ修正進捗: 76%
+hybridRenderer.ts:249 📐 エッジ修正進捗: 84%
+hybridRenderer.ts:249 📐 エッジ修正進捗: 93%
+hybridRenderer.ts:259 ✅ ハイブリッドレンダリング完了:
+hybridRenderer.ts:260    処理時間: 71.8ms
+hybridRenderer.ts:261    エッジピクセル処理: 38883/39920
+meshDeformation.ts:489 ✅ メッシュ変形適用完了: 72.0ms
+meshDeformation.ts:612 ✅ [Version 5.2.2] メッシュベース変形処理完了 (hybridモード)
+useImageWarping.ts:145 ✅ 統合ワーピング処理完了 Object
+StandardizationPanel.tsx:42 📋 標準化パネル: Object
+StandardizationPanel.tsx:42 📋 標準化パネル: Object
+ImagePreview.tsx:262 🔄 編集後Canvas表示: 445x593 (標準化済み)
+ImagePreview.tsx:268 ✅ 編集後Canvasに画像を描画
+StandardizationPanel.tsx:42 📋 標準化パネル: Object
+StandardizationPanel.tsx:42 📋 標準化パネル: Object
+StandardizationPanel.tsx:52 🔄 標準化処理開始: Object
+StandardizationPanel.tsx:42 📋 標準化パネル: Object
+StandardizationPanel.tsx:42 📋 標準化パネル: Object
+canvasStandardizer.ts:39 🎯 アフィン変換ベース標準化実行開始: Object
+affineStandardizer.ts:175 🎯 アフィン変換ベース標準化開始: Object
+affineStandardizer.ts:120 🔧 アフィン変換計算（基準点固定版）: Object
+affineStandardizer.ts:216 ✅ アフィン変換ベース標準化完了: Object
+canvasStandardizer.ts:78 ✅ アフィン変換ベース標準化完了: Object
+StandardizationPanel.tsx:92 ✅ 標準化完了 & faceStore連携: Object
+StandardizationPanel.tsx:42 📋 標準化パネル: Object
+StandardizationPanel.tsx:42 📋 標準化パネル: Object
+useImageWarping.ts:202 🚫 デバウンスキャンセル
+useImageWarping.ts:184 🎛️ 統合パラメータ変更検出: Object
+useImageWarping.ts:193 ✅ 統合前提条件満たしている - ワーピング処理実行予定
+ImagePreview.tsx:197 🎨 統合ベース画像描画開始: Object
+ImagePreview.tsx:262 🔄 編集後Canvas表示: 445x593 (標準化済み)
+StandardizationPanel.tsx:42 📋 標準化パネル: Object
+StandardizationPanel.tsx:42 📋 標準化パネル: Object
+useImageWarping.ts:66 ✅ Current base image loaded to canvas: Object
+StandardizationPanel.tsx:42 📋 標準化パネル: Object
+StandardizationPanel.tsx:42 📋 標準化パネル: Object
+ImagePreview.tsx:204 ✅ 画像読み込み成功: 900 x 1200
+ImagePreview.tsx:160 📐 元画像Canvas - Container size: Object
+ImagePreview.tsx:174 📐 元画像Canvas - Size calculation: Object
+ImagePreview.tsx:217 🎨 元画像Canvas設定: 445x593, scale: 0.49444444444444446
+ImagePreview.tsx:222 ✅ Canvas に画像を描画しました
+ImagePreview.tsx:226 🎯 統合ベースランドマークを描画: Object
+ImagePreview.tsx:268 ✅ 編集後Canvasに画像を描画
+ImagePreview.tsx:135 🎨 Fabric.js Canvas 初期化チェック: Object
+ImagePreview.tsx:143 ✅ Fabric.js Canvas 初期化実行 - サイズ: Object
+useImageWarping.ts:32 🎨 Canvas初期化開始: Object
+useImageWarping.ts:42 ✅ Canvas初期化成功: Object
+ImagePreview.tsx:262 🔄 編集後Canvas表示: 445x593 (標準化済み)
+ImagePreview.tsx:268 ✅ 編集後Canvasに画像を描画
+useImageWarping.ts:197 ⏰ デバウンス完了 - 統合ワーピング処理開始
+useImageWarping.ts:97 🔄 統合ワーピング処理開始 Object
+StandardizationPanel.tsx:42 📋 標準化パネル: Object
+StandardizationPanel.tsx:42 📋 標準化パネル: Object
+adaptiveWarping.ts:258 🎨 適応的TPS変形開始: Object
+adaptiveWarping.ts:266 🔍 [仮説1検証] 変形モード判定: Object
+adaptiveWarping.ts:276 🔺 [Version 5.2.0] メッシュベース変形システムへ移行
+meshDeformation.ts:515 🚀 [Version 5.2.2] メッシュベース変形処理開始 - ハイブリッドレンダリング
+meshDeformation.ts:543 📏 ランドマーク座標スケール: Object
+meshDeformation.ts:44 🔄 ランドマーク変形開始
+meshDeformation.ts:51 📏 顔領域サイズ: Object
+meshDeformation.ts:97 ✅ ランドマーク変形完了
+meshDeformation.ts:553 🔍 変形パラメータ: Object
+meshDeformation.ts:285 🔺 メッシュ変形作成開始
+meshDeformation.ts:289 📍 元のランドマーク点数: 68
+delaunay.ts:278 🎭 顔最適化Delaunay三角形分割開始
+delaunay.ts:22 🔺 Delaunay三角形分割開始: 110点
+delaunay.ts:114 📊 三角形統計: 総数=221, フィルタ前=221, フィルタ後=176
+delaunay.ts:123 ✅ Delaunay三角形分割完了: 176個の三角形
+delaunay.ts:339 ⚠️ 低品質な三角形を検出: 0.05473963458476635
+optimizeTriangulation @ delaunay.ts:339
+delaunay.ts:339 ⚠️ 低品質な三角形を検出: 0.05897777973848952
+optimizeTriangulation @ delaunay.ts:339
+delaunay.ts:339 ⚠️ 低品質な三角形を検出: 0.05806554250225772
+optimizeTriangulation @ delaunay.ts:339
+delaunay.ts:339 ⚠️ 低品質な三角形を検出: 0.0983478423427891
+optimizeTriangulation @ delaunay.ts:339
+delaunay.ts:339 ⚠️ 低品質な三角形を検出: 0.06786536263815973
+optimizeTriangulation @ delaunay.ts:339
+delaunay.ts:339 ⚠️ 低品質な三角形を検出: 0.08668032644238957
+optimizeTriangulation @ delaunay.ts:339
+delaunay.ts:339 ⚠️ 低品質な三角形を検出: 0.09198260618855328
+optimizeTriangulation @ delaunay.ts:339
+delaunay.ts:339 ⚠️ 低品質な三角形を検出: 0.08939534398240419
+optimizeTriangulation @ delaunay.ts:339
+delaunay.ts:339 ⚠️ 低品質な三角形を検出: 0.09600864813890254
+optimizeTriangulation @ delaunay.ts:339
+delaunay.ts:339 ⚠️ 低品質な三角形を検出: 0.09711468729465088
+optimizeTriangulation @ delaunay.ts:339
+meshDeformation.ts:296 📐 ソースメッシュ: 頂点数=110, 三角形数=176
+meshDeformation.ts:300 📍 変形後のランドマーク点数: 68
+meshDeformation.ts:306 🔧 ポイント数統一: landmarks=68, boundary=42, total=110
+meshDeformation.ts:309 🔍 最初の5つの変形点: Array(5)
+meshDeformation.ts:345 🔺 三角形 0 の頂点: Object
+meshDeformation.ts:345 🔺 三角形 1 の頂点: Object
+meshDeformation.ts:345 🔺 三角形 2 の頂点: Object
+meshDeformation.ts:390 ✅ メッシュ変形作成完了: 176個の三角形ペア
+meshDeformation.ts:439 🎨 メッシュ変形適用開始 (hybridモード)
+meshDeformation.ts:469 🔀 ハイブリッドモードで実行
+hybridRenderer.ts:145 🎨 ハイブリッドレンダリング開始: 176個の三角形
+hybridRenderer.ts:146 📏 エッジ幅: 20ピクセル
+hybridRenderer.ts:158 ➡️ フェーズ1: フォワードマッピングで全体描画
+triangleRenderer.ts:67 🎨 三角形メッシュレンダリング開始: 176個の三角形
+triangleRenderer.ts:91 🔍 最初の三角形ペア: Object
+triangleRenderer.ts:146 🔺 三角形 0 の詳細: Object
+triangleRenderer.ts:116 📐 レンダリング進捗: 1% (1/176三角形, 2227ピクセル)
+triangleRenderer.ts:146 🔺 三角形 1 の詳細: Object
+triangleRenderer.ts:116 📐 レンダリング進捗: 1% (2/176三角形, 4612ピクセル)
+triangleRenderer.ts:146 🔺 三角形 2 の詳細: Object
+triangleRenderer.ts:116 📐 レンダリング進捗: 2% (3/176三角形, 4971ピクセル)
+triangleRenderer.ts:146 🔺 三角形 3 の詳細: Object
+triangleRenderer.ts:116 📐 レンダリング進捗: 2% (4/176三角形, 5129ピクセル)
+triangleRenderer.ts:146 🔺 三角形 4 の詳細: Object
+triangleRenderer.ts:116 📐 レンダリング進捗: 3% (5/176三角形, 5300ピクセル)
+triangleRenderer.ts:116 📐 レンダリング進捗: 28% (50/176三角形, 51488ピクセル)
+triangleRenderer.ts:116 📐 レンダリング進捗: 57% (100/176三角形, 83680ピクセル)
+triangleRenderer.ts:116 📐 レンダリング進捗: 85% (150/176三角形, 196919ピクセル)
+triangleRenderer.ts:124 ✅ 三角形メッシュレンダリング完了: 32.5ms, 総ピクセル数: 275499
+hybridRenderer.ts:172 🔲 エッジ領域: 39920ピクセル (15.1%)
+hybridRenderer.ts:181 🔄 フェーズ2: エッジ領域をバックワードマッピングで修正
+hybridRenderer.ts:249 📐 エッジ修正進捗: 8%
+hybridRenderer.ts:249 📐 エッジ修正進捗: 17%
+hybridRenderer.ts:249 📐 エッジ修正進捗: 25%
+hybridRenderer.ts:249 📐 エッジ修正進捗: 34%
+hybridRenderer.ts:249 📐 エッジ修正進捗: 42%
+hybridRenderer.ts:249 📐 エッジ修正進捗: 51%
+hybridRenderer.ts:249 📐 エッジ修正進捗: 59%
+hybridRenderer.ts:249 📐 エッジ修正進捗: 67%
+hybridRenderer.ts:249 📐 エッジ修正進捗: 76%
+hybridRenderer.ts:249 📐 エッジ修正進捗: 84%
+hybridRenderer.ts:249 📐 エッジ修正進捗: 93%
+hybridRenderer.ts:259 ✅ ハイブリッドレンダリング完了:
+hybridRenderer.ts:260    処理時間: 71.9ms
+hybridRenderer.ts:261    エッジピクセル処理: 38883/39920
+meshDeformation.ts:489 ✅ メッシュ変形適用完了: 72.0ms
+meshDeformation.ts:612 ✅ [Version 5.2.2] メッシュベース変形処理完了 (hybridモード)
+useImageWarping.ts:145 ✅ 統合ワーピング処理完了 Object
+StandardizationPanel.tsx:42 📋 標準化パネル: Object
+StandardizationPanel.tsx:42 📋 標準化パネル: Object
+ImagePreview.tsx:262 🔄 編集後Canvas表示: 445x593 (標準化済み)
+ImagePreview.tsx:268 ✅ 編集後Canvasに画像を描画
+StandardizationPanel.tsx:42 📋 標準化パネル: Object
+StandardizationPanel.tsx:42 📋 標準化パネル: Object
+StandardizationPanel.tsx:52 🔄 標準化処理開始: Object
+StandardizationPanel.tsx:42 📋 標準化パネル: Object
+StandardizationPanel.tsx:42 📋 標準化パネル: Object
+canvasStandardizer.ts:39 🎯 アフィン変換ベース標準化実行開始: Object
+affineStandardizer.ts:175 🎯 アフィン変換ベース標準化開始: Object
+affineStandardizer.ts:120 🔧 アフィン変換計算（基準点固定版）: Object
+affineStandardizer.ts:216 ✅ アフィン変換ベース標準化完了: Object
+canvasStandardizer.ts:78 ✅ アフィン変換ベース標準化完了: Object
+StandardizationPanel.tsx:92 ✅ 標準化完了 & faceStore連携: Object
+StandardizationPanel.tsx:42 📋 標準化パネル: Object
+StandardizationPanel.tsx:42 📋 標準化パネル: Object
+useImageWarping.ts:202 🚫 デバウンスキャンセル
+useImageWarping.ts:184 🎛️ 統合パラメータ変更検出: Object
+useImageWarping.ts:193 ✅ 統合前提条件満たしている - ワーピング処理実行予定
+ImagePreview.tsx:197 🎨 統合ベース画像描画開始: Object
+ImagePreview.tsx:262 🔄 編集後Canvas表示: 445x593 (標準化済み)
+StandardizationPanel.tsx:42 📋 標準化パネル: Object
+StandardizationPanel.tsx:42 📋 標準化パネル: Object
+useImageWarping.ts:66 ✅ Current base image loaded to canvas: Object
+StandardizationPanel.tsx:42 📋 標準化パネル: Object
+StandardizationPanel.tsx:42 📋 標準化パネル: Object
+ImagePreview.tsx:204 ✅ 画像読み込み成功: 900 x 1200
+ImagePreview.tsx:160 📐 元画像Canvas - Container size: Object
+ImagePreview.tsx:174 📐 元画像Canvas - Size calculation: Object
+ImagePreview.tsx:217 🎨 元画像Canvas設定: 445x593, scale: 0.49444444444444446
+ImagePreview.tsx:222 ✅ Canvas に画像を描画しました
+ImagePreview.tsx:226 🎯 統合ベースランドマークを描画: Object
+ImagePreview.tsx:268 ✅ 編集後Canvasに画像を描画
+ImagePreview.tsx:135 🎨 Fabric.js Canvas 初期化チェック: Object
+ImagePreview.tsx:143 ✅ Fabric.js Canvas 初期化実行 - サイズ: Object
+useImageWarping.ts:32 🎨 Canvas初期化開始: Object
+useImageWarping.ts:42 ✅ Canvas初期化成功: Object
+ImagePreview.tsx:262 🔄 編集後Canvas表示: 445x593 (標準化済み)
+useImageWarping.ts:197 ⏰ デバウンス完了 - 統合ワーピング処理開始
+useImageWarping.ts:97 🔄 統合ワーピング処理開始 Object
+StandardizationPanel.tsx:42 📋 標準化パネル: Object
+StandardizationPanel.tsx:42 📋 標準化パネル: Object
+ImagePreview.tsx:268 ✅ 編集後Canvasに画像を描画
+adaptiveWarping.ts:258 🎨 適応的TPS変形開始: Object
+adaptiveWarping.ts:266 🔍 [仮説1検証] 変形モード判定: Object
+adaptiveWarping.ts:276 🔺 [Version 5.2.0] メッシュベース変形システムへ移行
+meshDeformation.ts:515 🚀 [Version 5.2.2] メッシュベース変形処理開始 - ハイブリッドレンダリング
+meshDeformation.ts:543 📏 ランドマーク座標スケール: Object
+meshDeformation.ts:44 🔄 ランドマーク変形開始
+meshDeformation.ts:51 📏 顔領域サイズ: Object
+meshDeformation.ts:97 ✅ ランドマーク変形完了
+meshDeformation.ts:553 🔍 変形パラメータ: Object
+meshDeformation.ts:285 🔺 メッシュ変形作成開始
+meshDeformation.ts:289 📍 元のランドマーク点数: 68
+delaunay.ts:278 🎭 顔最適化Delaunay三角形分割開始
+delaunay.ts:22 🔺 Delaunay三角形分割開始: 110点
+delaunay.ts:114 📊 三角形統計: 総数=221, フィルタ前=221, フィルタ後=176
+delaunay.ts:123 ✅ Delaunay三角形分割完了: 176個の三角形
+delaunay.ts:339 ⚠️ 低品質な三角形を検出: 0.05473963458476755
+optimizeTriangulation @ delaunay.ts:339
+delaunay.ts:339 ⚠️ 低品質な三角形を検出: 0.058977779738488605
+optimizeTriangulation @ delaunay.ts:339
+delaunay.ts:339 ⚠️ 低品質な三角形を検出: 0.05806554250225873
+optimizeTriangulation @ delaunay.ts:339
+delaunay.ts:339 ⚠️ 低品質な三角形を検出: 0.09834784234279048
+optimizeTriangulation @ delaunay.ts:339
+delaunay.ts:339 ⚠️ 低品質な三角形を検出: 0.06786536263815944
+optimizeTriangulation @ delaunay.ts:339
+delaunay.ts:339 ⚠️ 低品質な三角形を検出: 0.08668032644238957
+optimizeTriangulation @ delaunay.ts:339
+delaunay.ts:339 ⚠️ 低品質な三角形を検出: 0.09423886588933998
+optimizeTriangulation @ delaunay.ts:339
+delaunay.ts:339 ⚠️ 低品質な三角形を検出: 0.08971555072581998
+optimizeTriangulation @ delaunay.ts:339
+delaunay.ts:339 ⚠️ 低品質な三角形を検出: 0.0961404841725519
+optimizeTriangulation @ delaunay.ts:339
+meshDeformation.ts:296 📐 ソースメッシュ: 頂点数=110, 三角形数=176
+meshDeformation.ts:300 📍 変形後のランドマーク点数: 68
+meshDeformation.ts:306 🔧 ポイント数統一: landmarks=68, boundary=42, total=110
+meshDeformation.ts:309 🔍 最初の5つの変形点: Array(5)
+meshDeformation.ts:345 🔺 三角形 0 の頂点: Object
+meshDeformation.ts:345 🔺 三角形 1 の頂点: Object
+meshDeformation.ts:345 🔺 三角形 2 の頂点: Object
+meshDeformation.ts:390 ✅ メッシュ変形作成完了: 176個の三角形ペア
+meshDeformation.ts:439 🎨 メッシュ変形適用開始 (hybridモード)
+meshDeformation.ts:469 🔀 ハイブリッドモードで実行
+hybridRenderer.ts:145 🎨 ハイブリッドレンダリング開始: 176個の三角形
+hybridRenderer.ts:146 📏 エッジ幅: 20ピクセル
+hybridRenderer.ts:158 ➡️ フェーズ1: フォワードマッピングで全体描画
+triangleRenderer.ts:67 🎨 三角形メッシュレンダリング開始: 176個の三角形
+triangleRenderer.ts:91 🔍 最初の三角形ペア: Object
+triangleRenderer.ts:146 🔺 三角形 0 の詳細: Object
+triangleRenderer.ts:116 📐 レンダリング進捗: 1% (1/176三角形, 2237ピクセル)
+triangleRenderer.ts:146 🔺 三角形 1 の詳細: Object
+triangleRenderer.ts:116 📐 レンダリング進捗: 1% (2/176三角形, 4623ピクセル)
+triangleRenderer.ts:146 🔺 三角形 2 の詳細: Object
+triangleRenderer.ts:116 📐 レンダリング進捗: 2% (3/176三角形, 4987ピクセル)
+triangleRenderer.ts:146 🔺 三角形 3 の詳細: Object
+triangleRenderer.ts:116 📐 レンダリング進捗: 2% (4/176三角形, 5146ピクセル)
+triangleRenderer.ts:146 🔺 三角形 4 の詳細: Object
+triangleRenderer.ts:116 📐 レンダリング進捗: 3% (5/176三角形, 5317ピクセル)
+triangleRenderer.ts:116 📐 レンダリング進捗: 28% (50/176三角形, 51547ピクセル)
+triangleRenderer.ts:116 📐 レンダリング進捗: 57% (100/176三角形, 83764ピクセル)
+triangleRenderer.ts:116 📐 レンダリング進捗: 85% (150/176三角形, 210800ピクセル)
+triangleRenderer.ts:124 ✅ 三角形メッシュレンダリング完了: 33.8ms, 総ピクセル数: 275762
+hybridRenderer.ts:172 🔲 エッジ領域: 39920ピクセル (15.1%)
+hybridRenderer.ts:181 🔄 フェーズ2: エッジ領域をバックワードマッピングで修正
+hybridRenderer.ts:249 📐 エッジ修正進捗: 8%
+hybridRenderer.ts:249 📐 エッジ修正進捗: 17%
+hybridRenderer.ts:249 📐 エッジ修正進捗: 25%
+hybridRenderer.ts:249 📐 エッジ修正進捗: 34%
+hybridRenderer.ts:249 📐 エッジ修正進捗: 42%
+hybridRenderer.ts:249 📐 エッジ修正進捗: 51%
+hybridRenderer.ts:249 📐 エッジ修正進捗: 59%
+hybridRenderer.ts:249 📐 エッジ修正進捗: 67%
+hybridRenderer.ts:249 📐 エッジ修正進捗: 76%
+hybridRenderer.ts:249 📐 エッジ修正進捗: 84%
+hybridRenderer.ts:249 📐 エッジ修正進捗: 93%
+hybridRenderer.ts:259 ✅ ハイブリッドレンダリング完了:
+hybridRenderer.ts:260    処理時間: 73.0ms
+hybridRenderer.ts:261    エッジピクセル処理: 38883/39920
+meshDeformation.ts:489 ✅ メッシュ変形適用完了: 73.2ms
+meshDeformation.ts:612 ✅ [Version 5.2.2] メッシュベース変形処理完了 (hybridモード)
+useImageWarping.ts:145 ✅ 統合ワーピング処理完了 Object
+StandardizationPanel.tsx:42 📋 標準化パネル: Object
+StandardizationPanel.tsx:42 📋 標準化パネル: Object
+ImagePreview.tsx:262 🔄 編集後Canvas表示: 445x593 (標準化済み)
+ImagePreview.tsx:268 ✅ 編集後Canvasに画像を描画
+StandardizationPanel.tsx:42 📋 標準化パネル: Object
+StandardizationPanel.tsx:42 📋 標準化パネル: Object
+StandardizationPanel.tsx:42 📋 標準化パネル: Object
+StandardizationPanel.tsx:42 📋 標準化パネル: Object
+StandardizationPanel.tsx:42 📋 標準化パネル: Object
+StandardizationPanel.tsx:42 📋 標準化パネル: Object
+StandardizationPanel.tsx:52 🔄 標準化処理開始: Object
+StandardizationPanel.tsx:42 📋 標準化パネル: Object
+StandardizationPanel.tsx:42 📋 標準化パネル: Object
+canvasStandardizer.ts:39 🎯 アフィン変換ベース標準化実行開始: Object
+affineStandardizer.ts:175 🎯 アフィン変換ベース標準化開始: Object
+affineStandardizer.ts:120 🔧 アフィン変換計算（基準点固定版）: Object
+affineStandardizer.ts:216 ✅ アフィン変換ベース標準化完了: Object
+canvasStandardizer.ts:78 ✅ アフィン変換ベース標準化完了: Object
+StandardizationPanel.tsx:92 ✅ 標準化完了 & faceStore連携: Object
+StandardizationPanel.tsx:42 📋 標準化パネル: Object
+StandardizationPanel.tsx:42 📋 標準化パネル: Object
+useImageWarping.ts:202 🚫 デバウンスキャンセル
+useImageWarping.ts:184 🎛️ 統合パラメータ変更検出: Object
+useImageWarping.ts:193 ✅ 統合前提条件満たしている - ワーピング処理実行予定
+ImagePreview.tsx:197 🎨 統合ベース画像描画開始: Object
+ImagePreview.tsx:262 🔄 編集後Canvas表示: 445x593 (標準化済み)
+StandardizationPanel.tsx:42 📋 標準化パネル: Object
+StandardizationPanel.tsx:42 📋 標準化パネル: Object
+useImageWarping.ts:66 ✅ Current base image loaded to canvas: Object
+StandardizationPanel.tsx:42 📋 標準化パネル: Object
+StandardizationPanel.tsx:42 📋 標準化パネル: Object
+ImagePreview.tsx:204 ✅ 画像読み込み成功: 900 x 1200
+ImagePreview.tsx:160 📐 元画像Canvas - Container size: Object
+ImagePreview.tsx:174 📐 元画像Canvas - Size calculation: Object
+ImagePreview.tsx:217 🎨 元画像Canvas設定: 445x593, scale: 0.49444444444444446
+ImagePreview.tsx:222 ✅ Canvas に画像を描画しました
+ImagePreview.tsx:226 🎯 統合ベースランドマークを描画: Object
+ImagePreview.tsx:268 ✅ 編集後Canvasに画像を描画
+ImagePreview.tsx:135 🎨 Fabric.js Canvas 初期化チェック: Object
+ImagePreview.tsx:143 ✅ Fabric.js Canvas 初期化実行 - サイズ: Object
+useImageWarping.ts:32 🎨 Canvas初期化開始: Object
+useImageWarping.ts:42 ✅ Canvas初期化成功: Object
+ImagePreview.tsx:262 🔄 編集後Canvas表示: 445x593 (標準化済み)
+ImagePreview.tsx:268 ✅ 編集後Canvasに画像を描画
+useImageWarping.ts:197 ⏰ デバウンス完了 - 統合ワーピング処理開始
+useImageWarping.ts:97 🔄 統合ワーピング処理開始 Object
+StandardizationPanel.tsx:42 📋 標準化パネル: Object
+StandardizationPanel.tsx:42 📋 標準化パネル: Object
+adaptiveWarping.ts:258 🎨 適応的TPS変形開始: Object
+adaptiveWarping.ts:266 🔍 [仮説1検証] 変形モード判定: Object
+adaptiveWarping.ts:276 🔺 [Version 5.2.0] メッシュベース変形システムへ移行
+meshDeformation.ts:515 🚀 [Version 5.2.2] メッシュベース変形処理開始 - ハイブリッドレンダリング
+meshDeformation.ts:543 📏 ランドマーク座標スケール: Object
+meshDeformation.ts:44 🔄 ランドマーク変形開始
+meshDeformation.ts:51 📏 顔領域サイズ: Object
+meshDeformation.ts:97 ✅ ランドマーク変形完了
+meshDeformation.ts:553 🔍 変形パラメータ: Object
+meshDeformation.ts:285 🔺 メッシュ変形作成開始
+meshDeformation.ts:289 📍 元のランドマーク点数: 68
+delaunay.ts:278 🎭 顔最適化Delaunay三角形分割開始
+delaunay.ts:22 🔺 Delaunay三角形分割開始: 110点
+delaunay.ts:114 📊 三角形統計: 総数=221, フィルタ前=221, フィルタ後=176
+delaunay.ts:123 ✅ Delaunay三角形分割完了: 176個の三角形
+delaunay.ts:339 ⚠️ 低品質な三角形を検出: 0.05473963458476755
+optimizeTriangulation @ delaunay.ts:339
+delaunay.ts:339 ⚠️ 低品質な三角形を検出: 0.058977779738488265
+optimizeTriangulation @ delaunay.ts:339
+delaunay.ts:339 ⚠️ 低品質な三角形を検出: 0.05806554250225806
+optimizeTriangulation @ delaunay.ts:339
+delaunay.ts:339 ⚠️ 低品質な三角形を検出: 0.0983478423427897
+optimizeTriangulation @ delaunay.ts:339
+delaunay.ts:339 ⚠️ 低品質な三角形を検出: 0.06786536263815957
+optimizeTriangulation @ delaunay.ts:339
+delaunay.ts:339 ⚠️ 低品質な三角形を検出: 0.08668032644238946
+optimizeTriangulation @ delaunay.ts:339
+delaunay.ts:339 ⚠️ 低品質な三角形を検出: 0.09425688801447557
+optimizeTriangulation @ delaunay.ts:339
+delaunay.ts:339 ⚠️ 低品質な三角形を検出: 0.09027048791454548
+optimizeTriangulation @ delaunay.ts:339
+delaunay.ts:339 ⚠️ 低品質な三角形を検出: 0.0961102010979978
+optimizeTriangulation @ delaunay.ts:339
+meshDeformation.ts:296 📐 ソースメッシュ: 頂点数=110, 三角形数=176
+meshDeformation.ts:300 📍 変形後のランドマーク点数: 68
+meshDeformation.ts:306 🔧 ポイント数統一: landmarks=68, boundary=42, total=110
+meshDeformation.ts:309 🔍 最初の5つの変形点: Array(5)
+meshDeformation.ts:345 🔺 三角形 0 の頂点: Object
+meshDeformation.ts:345 🔺 三角形 1 の頂点: Object
+meshDeformation.ts:345 🔺 三角形 2 の頂点: Object
+meshDeformation.ts:390 ✅ メッシュ変形作成完了: 176個の三角形ペア
+meshDeformation.ts:439 🎨 メッシュ変形適用開始 (hybridモード)
+meshDeformation.ts:469 🔀 ハイブリッドモードで実行
+hybridRenderer.ts:145 🎨 ハイブリッドレンダリング開始: 176個の三角形
+hybridRenderer.ts:146 📏 エッジ幅: 20ピクセル
+hybridRenderer.ts:158 ➡️ フェーズ1: フォワードマッピングで全体描画
+triangleRenderer.ts:67 🎨 三角形メッシュレンダリング開始: 176個の三角形
+triangleRenderer.ts:91 🔍 最初の三角形ペア: Object
+triangleRenderer.ts:146 🔺 三角形 0 の詳細: Object
+triangleRenderer.ts:116 📐 レンダリング進捗: 1% (1/176三角形, 2245ピクセル)
+triangleRenderer.ts:146 🔺 三角形 1 の詳細: Object
+triangleRenderer.ts:116 📐 レンダリング進捗: 1% (2/176三角形, 4627ピクセル)
+triangleRenderer.ts:146 🔺 三角形 2 の詳細: Object
+triangleRenderer.ts:116 📐 レンダリング進捗: 2% (3/176三角形, 4986ピクセル)
+triangleRenderer.ts:146 🔺 三角形 3 の詳細: Object
+triangleRenderer.ts:116 📐 レンダリング進捗: 2% (4/176三角形, 5144ピクセル)
+triangleRenderer.ts:146 🔺 三角形 4 の詳細: Object
+triangleRenderer.ts:116 📐 レンダリング進捗: 3% (5/176三角形, 5320ピクセル)
+triangleRenderer.ts:116 📐 レンダリング進捗: 28% (50/176三角形, 51467ピクセル)
+triangleRenderer.ts:116 📐 レンダリング進捗: 57% (100/176三角形, 83624ピクセル)
+triangleRenderer.ts:116 📐 レンダリング進捗: 85% (150/176三角形, 212983ピクセル)
+triangleRenderer.ts:124 ✅ 三角形メッシュレンダリング完了: 32.4ms, 総ピクセル数: 275612
+hybridRenderer.ts:172 🔲 エッジ領域: 39920ピクセル (15.1%)
+hybridRenderer.ts:181 🔄 フェーズ2: エッジ領域をバックワードマッピングで修正
+hybridRenderer.ts:249 📐 エッジ修正進捗: 8%
+hybridRenderer.ts:249 📐 エッジ修正進捗: 17%
+hybridRenderer.ts:249 📐 エッジ修正進捗: 25%
+hybridRenderer.ts:249 📐 エッジ修正進捗: 34%
+hybridRenderer.ts:249 📐 エッジ修正進捗: 42%
+hybridRenderer.ts:249 📐 エッジ修正進捗: 51%
+hybridRenderer.ts:249 📐 エッジ修正進捗: 59%
+hybridRenderer.ts:249 📐 エッジ修正進捗: 67%
+hybridRenderer.ts:249 📐 エッジ修正進捗: 76%
+hybridRenderer.ts:249 📐 エッジ修正進捗: 84%
+hybridRenderer.ts:249 📐 エッジ修正進捗: 93%
+hybridRenderer.ts:259 ✅ ハイブリッドレンダリング完了:
+hybridRenderer.ts:260    処理時間: 71.4ms
+hybridRenderer.ts:261    エッジピクセル処理: 38883/39920
+meshDeformation.ts:489 ✅ メッシュ変形適用完了: 71.4ms
+meshDeformation.ts:612 ✅ [Version 5.2.2] メッシュベース変形処理完了 (hybridモード)
+useImageWarping.ts:145 ✅ 統合ワーピング処理完了 Object
+StandardizationPanel.tsx:42 📋 標準化パネル: Object
+StandardizationPanel.tsx:42 📋 標準化パネル: Object
+ImagePreview.tsx:262 🔄 編集後Canvas表示: 445x593 (標準化済み)
+ImagePreview.tsx:268 ✅ 編集後Canvasに画像を描画
+useImageWarping.ts:202 🚫 デバウンスキャンセル
+useImageWarping.ts:184 🎛️ 統合パラメータ変更検出: Object
+useImageWarping.ts:193 ✅ 統合前提条件満たしている - ワーピング処理実行予定
+useImageWarping.ts:202 🚫 デバウンスキャンセル
+useImageWarping.ts:184 🎛️ 統合パラメータ変更検出: Object
+useImageWarping.ts:193 ✅ 統合前提条件満たしている - ワーピング処理実行予定
+useImageWarping.ts:197 ⏰ デバウンス完了 - 統合ワーピング処理開始
+useImageWarping.ts:97 🔄 統合ワーピング処理開始 Object
+adaptiveWarping.ts:258 🎨 適応的TPS変形開始: Object
+adaptiveWarping.ts:266 🔍 [仮説1検証] 変形モード判定: Object
+adaptiveWarping.ts:276 🔺 [Version 5.2.0] メッシュベース変形システムへ移行
+meshDeformation.ts:515 🚀 [Version 5.2.2] メッシュベース変形処理開始 - ハイブリッドレンダリング
+meshDeformation.ts:543 📏 ランドマーク座標スケール: Object
+meshDeformation.ts:44 🔄 ランドマーク変形開始
+meshDeformation.ts:51 📏 顔領域サイズ: Object
+meshDeformation.ts:97 ✅ ランドマーク変形完了
+meshDeformation.ts:553 🔍 変形パラメータ: Object
+meshDeformation.ts:285 🔺 メッシュ変形作成開始
+meshDeformation.ts:289 📍 元のランドマーク点数: 68
+delaunay.ts:278 🎭 顔最適化Delaunay三角形分割開始
+delaunay.ts:22 🔺 Delaunay三角形分割開始: 110点
+delaunay.ts:114 📊 三角形統計: 総数=221, フィルタ前=221, フィルタ後=176
+delaunay.ts:123 ✅ Delaunay三角形分割完了: 176個の三角形
+delaunay.ts:339 ⚠️ 低品質な三角形を検出: 0.05473963458476755
+optimizeTriangulation @ delaunay.ts:339
+delaunay.ts:339 ⚠️ 低品質な三角形を検出: 0.058977779738488265
+optimizeTriangulation @ delaunay.ts:339
+delaunay.ts:339 ⚠️ 低品質な三角形を検出: 0.05806554250225806
+optimizeTriangulation @ delaunay.ts:339
+delaunay.ts:339 ⚠️ 低品質な三角形を検出: 0.0983478423427897
+optimizeTriangulation @ delaunay.ts:339
+delaunay.ts:339 ⚠️ 低品質な三角形を検出: 0.06786536263815957
+optimizeTriangulation @ delaunay.ts:339
+delaunay.ts:339 ⚠️ 低品質な三角形を検出: 0.08668032644238946
+optimizeTriangulation @ delaunay.ts:339
+delaunay.ts:339 ⚠️ 低品質な三角形を検出: 0.09425688801447557
+optimizeTriangulation @ delaunay.ts:339
+delaunay.ts:339 ⚠️ 低品質な三角形を検出: 0.09027048791454548
+optimizeTriangulation @ delaunay.ts:339
+delaunay.ts:339 ⚠️ 低品質な三角形を検出: 0.0961102010979978
+optimizeTriangulation @ delaunay.ts:339
+meshDeformation.ts:296 📐 ソースメッシュ: 頂点数=110, 三角形数=176
+meshDeformation.ts:300 📍 変形後のランドマーク点数: 68
+meshDeformation.ts:306 🔧 ポイント数統一: landmarks=68, boundary=42, total=110
+meshDeformation.ts:309 🔍 最初の5つの変形点: Array(5)
+meshDeformation.ts:345 🔺 三角形 0 の頂点: Object
+meshDeformation.ts:345 🔺 三角形 1 の頂点: Object
+meshDeformation.ts:345 🔺 三角形 2 の頂点: Object
+meshDeformation.ts:390 ✅ メッシュ変形作成完了: 176個の三角形ペア
+meshDeformation.ts:439 🎨 メッシュ変形適用開始 (hybridモード)
+meshDeformation.ts:469 🔀 ハイブリッドモードで実行
+hybridRenderer.ts:145 🎨 ハイブリッドレンダリング開始: 176個の三角形
+hybridRenderer.ts:146 📏 エッジ幅: 20ピクセル
+hybridRenderer.ts:158 ➡️ フェーズ1: フォワードマッピングで全体描画
+triangleRenderer.ts:67 🎨 三角形メッシュレンダリング開始: 176個の三角形
+triangleRenderer.ts:91 🔍 最初の三角形ペア: Object
+triangleRenderer.ts:146 🔺 三角形 0 の詳細: Object
+triangleRenderer.ts:116 📐 レンダリング進捗: 1% (1/176三角形, 2245ピクセル)
+triangleRenderer.ts:146 🔺 三角形 1 の詳細: Object
+triangleRenderer.ts:116 📐 レンダリング進捗: 1% (2/176三角形, 4627ピクセル)
+triangleRenderer.ts:146 🔺 三角形 2 の詳細: Object
+triangleRenderer.ts:116 📐 レンダリング進捗: 2% (3/176三角形, 4986ピクセル)
+triangleRenderer.ts:146 🔺 三角形 3 の詳細: Object
+triangleRenderer.ts:116 📐 レンダリング進捗: 2% (4/176三角形, 5144ピクセル)
+triangleRenderer.ts:146 🔺 三角形 4 の詳細: Object
+triangleRenderer.ts:116 📐 レンダリング進捗: 3% (5/176三角形, 5320ピクセル)
+triangleRenderer.ts:116 📐 レンダリング進捗: 28% (50/176三角形, 53261ピクセル)
+triangleRenderer.ts:116 📐 レンダリング進捗: 57% (100/176三角形, 85418ピクセル)
+triangleRenderer.ts:116 📐 レンダリング進捗: 85% (150/176三角形, 214777ピクセル)
+triangleRenderer.ts:124 ✅ 三角形メッシュレンダリング完了: 44.1ms, 総ピクセル数: 277406
+hybridRenderer.ts:172 🔲 エッジ領域: 39920ピクセル (15.1%)
+hybridRenderer.ts:181 🔄 フェーズ2: エッジ領域をバックワードマッピングで修正
+hybridRenderer.ts:249 📐 エッジ修正進捗: 8%
+hybridRenderer.ts:249 📐 エッジ修正進捗: 17%
+hybridRenderer.ts:249 📐 エッジ修正進捗: 25%
+hybridRenderer.ts:249 📐 エッジ修正進捗: 34%
+hybridRenderer.ts:249 📐 エッジ修正進捗: 42%
+hybridRenderer.ts:249 📐 エッジ修正進捗: 51%
+hybridRenderer.ts:249 📐 エッジ修正進捗: 59%
+hybridRenderer.ts:249 📐 エッジ修正進捗: 67%
+hybridRenderer.ts:249 📐 エッジ修正進捗: 76%
+hybridRenderer.ts:249 📐 エッジ修正進捗: 84%
+hybridRenderer.ts:249 📐 エッジ修正進捗: 93%
+hybridRenderer.ts:259 ✅ ハイブリッドレンダリング完了:
+hybridRenderer.ts:260    処理時間: 83.7ms
+hybridRenderer.ts:261    エッジピクセル処理: 38883/39920
+meshDeformation.ts:489 ✅ メッシュ変形適用完了: 83.8ms
+meshDeformation.ts:612 ✅ [Version 5.2.2] メッシュベース変形処理完了 (hybridモード)
+useImageWarping.ts:145 ✅ 統合ワーピング処理完了 Object
+ImagePreview.tsx:262 🔄 編集後Canvas表示: 445x593 (標準化済み)
+ImagePreview.tsx:268 ✅ 編集後Canvasに画像を描画
+useImageWarping.ts:202 🚫 デバウンスキャンセル
+useImageWarping.ts:184 🎛️ 統合パラメータ変更検出: {faceParams: {…}, hasBaseImage: true, hasBaseLandmarks: true, canvasManager: true, isStandardized: true}
+useImageWarping.ts:193 ✅ 統合前提条件満たしている - ワーピング処理実行予定
+useImageWarping.ts:197 ⏰ デバウンス完了 - 統合ワーピング処理開始
+useImageWarping.ts:97 🔄 統合ワーピング処理開始 {faceParams: {…}, quality: 'medium', renderMode: 'hybrid', isStandardized: true}
+adaptiveWarping.ts:258 🎨 適応的TPS変形開始: {quality: 'medium', mode: 'mesh', canvasWidth: 445, canvasHeight: 593}
+adaptiveWarping.ts:266 🔍 [仮説1検証] 変形モード判定: {deformationMode: 'mesh', isIndependent: false, willUseIndependentSystem: false}
+adaptiveWarping.ts:276 🔺 [Version 5.2.0] メッシュベース変形システムへ移行
+meshDeformation.ts:515 🚀 [Version 5.2.2] メッシュベース変形処理開始 - ハイブリッドレンダリング
+meshDeformation.ts:543 📏 ランドマーク座標スケール: {originalScale: '900x1200', canvasScale: '445x593', imageScale: {…}}
+meshDeformation.ts:44 🔄 ランドマーク変形開始
+meshDeformation.ts:51 📏 顔領域サイズ: {width: 325.6865581284607, height: 310.5364966188084}
+meshDeformation.ts:97 ✅ ランドマーク変形完了
+meshDeformation.ts:553 🔍 変形パラメータ: {leftEye: {…}, rightEye: {…}, mouth: {…}, nose: {…}}
+meshDeformation.ts:285 🔺 メッシュ変形作成開始
+meshDeformation.ts:289 📍 元のランドマーク点数: 68
+delaunay.ts:278 🎭 顔最適化Delaunay三角形分割開始
+delaunay.ts:22 🔺 Delaunay三角形分割開始: 110点
+delaunay.ts:114 📊 三角形統計: 総数=221, フィルタ前=221, フィルタ後=176
+delaunay.ts:123 ✅ Delaunay三角形分割完了: 176個の三角形
+delaunay.ts:339 ⚠️ 低品質な三角形を検出: 0.05473963458476755
+optimizeTriangulation @ delaunay.ts:339
+createFaceOptimizedTriangulation @ delaunay.ts:288
+createMeshDeformation @ meshDeformation.ts:291
+performMeshBasedDeformation @ meshDeformation.ts:561
+applyAdaptiveTPSWarping @ adaptiveWarping.ts:279
+（匿名） @ useImageWarping.ts:132
+await in （匿名）
+（匿名） @ useImageWarping.ts:198
+setTimeout
+（匿名） @ useImageWarping.ts:196
+react-stack-bottom-frame @ react-dom_client.js?v=a769d409:17478
+runWithFiberInDEV @ react-dom_client.js?v=a769d409:1485
+commitHookEffectListMount @ react-dom_client.js?v=a769d409:8460
+commitHookPassiveMountEffects @ react-dom_client.js?v=a769d409:8518
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9887
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9899
+flushPassiveEffects @ react-dom_client.js?v=a769d409:11302
+flushPendingEffects @ react-dom_client.js?v=a769d409:11276
+flushSpawnedWork @ react-dom_client.js?v=a769d409:11250
+commitRoot @ react-dom_client.js?v=a769d409:11081
+commitRootWhenReady @ react-dom_client.js?v=a769d409:10512
+performWorkOnRoot @ react-dom_client.js?v=a769d409:10457
+performSyncWorkOnRoot @ react-dom_client.js?v=a769d409:11635
+flushSyncWorkAcrossRoots_impl @ react-dom_client.js?v=a769d409:11536
+processRootScheduleInMicrotask @ react-dom_client.js?v=a769d409:11558
+（匿名） @ react-dom_client.js?v=a769d409:11649
+delaunay.ts:339 ⚠️ 低品質な三角形を検出: 0.058977779738488265
+optimizeTriangulation @ delaunay.ts:339
+createFaceOptimizedTriangulation @ delaunay.ts:288
+createMeshDeformation @ meshDeformation.ts:291
+performMeshBasedDeformation @ meshDeformation.ts:561
+applyAdaptiveTPSWarping @ adaptiveWarping.ts:279
+（匿名） @ useImageWarping.ts:132
+await in （匿名）
+（匿名） @ useImageWarping.ts:198
+setTimeout
+（匿名） @ useImageWarping.ts:196
+react-stack-bottom-frame @ react-dom_client.js?v=a769d409:17478
+runWithFiberInDEV @ react-dom_client.js?v=a769d409:1485
+commitHookEffectListMount @ react-dom_client.js?v=a769d409:8460
+commitHookPassiveMountEffects @ react-dom_client.js?v=a769d409:8518
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9887
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9899
+flushPassiveEffects @ react-dom_client.js?v=a769d409:11302
+flushPendingEffects @ react-dom_client.js?v=a769d409:11276
+flushSpawnedWork @ react-dom_client.js?v=a769d409:11250
+commitRoot @ react-dom_client.js?v=a769d409:11081
+commitRootWhenReady @ react-dom_client.js?v=a769d409:10512
+performWorkOnRoot @ react-dom_client.js?v=a769d409:10457
+performSyncWorkOnRoot @ react-dom_client.js?v=a769d409:11635
+flushSyncWorkAcrossRoots_impl @ react-dom_client.js?v=a769d409:11536
+processRootScheduleInMicrotask @ react-dom_client.js?v=a769d409:11558
+（匿名） @ react-dom_client.js?v=a769d409:11649
+delaunay.ts:339 ⚠️ 低品質な三角形を検出: 0.05806554250225806
+optimizeTriangulation @ delaunay.ts:339
+createFaceOptimizedTriangulation @ delaunay.ts:288
+createMeshDeformation @ meshDeformation.ts:291
+performMeshBasedDeformation @ meshDeformation.ts:561
+applyAdaptiveTPSWarping @ adaptiveWarping.ts:279
+（匿名） @ useImageWarping.ts:132
+await in （匿名）
+（匿名） @ useImageWarping.ts:198
+setTimeout
+（匿名） @ useImageWarping.ts:196
+react-stack-bottom-frame @ react-dom_client.js?v=a769d409:17478
+runWithFiberInDEV @ react-dom_client.js?v=a769d409:1485
+commitHookEffectListMount @ react-dom_client.js?v=a769d409:8460
+commitHookPassiveMountEffects @ react-dom_client.js?v=a769d409:8518
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9887
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9899
+flushPassiveEffects @ react-dom_client.js?v=a769d409:11302
+flushPendingEffects @ react-dom_client.js?v=a769d409:11276
+flushSpawnedWork @ react-dom_client.js?v=a769d409:11250
+commitRoot @ react-dom_client.js?v=a769d409:11081
+commitRootWhenReady @ react-dom_client.js?v=a769d409:10512
+performWorkOnRoot @ react-dom_client.js?v=a769d409:10457
+performSyncWorkOnRoot @ react-dom_client.js?v=a769d409:11635
+flushSyncWorkAcrossRoots_impl @ react-dom_client.js?v=a769d409:11536
+processRootScheduleInMicrotask @ react-dom_client.js?v=a769d409:11558
+（匿名） @ react-dom_client.js?v=a769d409:11649
+delaunay.ts:339 ⚠️ 低品質な三角形を検出: 0.0983478423427897
+optimizeTriangulation @ delaunay.ts:339
+createFaceOptimizedTriangulation @ delaunay.ts:288
+createMeshDeformation @ meshDeformation.ts:291
+performMeshBasedDeformation @ meshDeformation.ts:561
+applyAdaptiveTPSWarping @ adaptiveWarping.ts:279
+（匿名） @ useImageWarping.ts:132
+await in （匿名）
+（匿名） @ useImageWarping.ts:198
+setTimeout
+（匿名） @ useImageWarping.ts:196
+react-stack-bottom-frame @ react-dom_client.js?v=a769d409:17478
+runWithFiberInDEV @ react-dom_client.js?v=a769d409:1485
+commitHookEffectListMount @ react-dom_client.js?v=a769d409:8460
+commitHookPassiveMountEffects @ react-dom_client.js?v=a769d409:8518
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9887
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9899
+flushPassiveEffects @ react-dom_client.js?v=a769d409:11302
+flushPendingEffects @ react-dom_client.js?v=a769d409:11276
+flushSpawnedWork @ react-dom_client.js?v=a769d409:11250
+commitRoot @ react-dom_client.js?v=a769d409:11081
+commitRootWhenReady @ react-dom_client.js?v=a769d409:10512
+performWorkOnRoot @ react-dom_client.js?v=a769d409:10457
+performSyncWorkOnRoot @ react-dom_client.js?v=a769d409:11635
+flushSyncWorkAcrossRoots_impl @ react-dom_client.js?v=a769d409:11536
+processRootScheduleInMicrotask @ react-dom_client.js?v=a769d409:11558
+（匿名） @ react-dom_client.js?v=a769d409:11649
+delaunay.ts:339 ⚠️ 低品質な三角形を検出: 0.06786536263815957
+optimizeTriangulation @ delaunay.ts:339
+createFaceOptimizedTriangulation @ delaunay.ts:288
+createMeshDeformation @ meshDeformation.ts:291
+performMeshBasedDeformation @ meshDeformation.ts:561
+applyAdaptiveTPSWarping @ adaptiveWarping.ts:279
+（匿名） @ useImageWarping.ts:132
+await in （匿名）
+（匿名） @ useImageWarping.ts:198
+setTimeout
+（匿名） @ useImageWarping.ts:196
+react-stack-bottom-frame @ react-dom_client.js?v=a769d409:17478
+runWithFiberInDEV @ react-dom_client.js?v=a769d409:1485
+commitHookEffectListMount @ react-dom_client.js?v=a769d409:8460
+commitHookPassiveMountEffects @ react-dom_client.js?v=a769d409:8518
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9887
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9899
+flushPassiveEffects @ react-dom_client.js?v=a769d409:11302
+flushPendingEffects @ react-dom_client.js?v=a769d409:11276
+flushSpawnedWork @ react-dom_client.js?v=a769d409:11250
+commitRoot @ react-dom_client.js?v=a769d409:11081
+commitRootWhenReady @ react-dom_client.js?v=a769d409:10512
+performWorkOnRoot @ react-dom_client.js?v=a769d409:10457
+performSyncWorkOnRoot @ react-dom_client.js?v=a769d409:11635
+flushSyncWorkAcrossRoots_impl @ react-dom_client.js?v=a769d409:11536
+processRootScheduleInMicrotask @ react-dom_client.js?v=a769d409:11558
+（匿名） @ react-dom_client.js?v=a769d409:11649
+delaunay.ts:339 ⚠️ 低品質な三角形を検出: 0.08668032644238946
+optimizeTriangulation @ delaunay.ts:339
+createFaceOptimizedTriangulation @ delaunay.ts:288
+createMeshDeformation @ meshDeformation.ts:291
+performMeshBasedDeformation @ meshDeformation.ts:561
+applyAdaptiveTPSWarping @ adaptiveWarping.ts:279
+（匿名） @ useImageWarping.ts:132
+await in （匿名）
+（匿名） @ useImageWarping.ts:198
+setTimeout
+（匿名） @ useImageWarping.ts:196
+react-stack-bottom-frame @ react-dom_client.js?v=a769d409:17478
+runWithFiberInDEV @ react-dom_client.js?v=a769d409:1485
+commitHookEffectListMount @ react-dom_client.js?v=a769d409:8460
+commitHookPassiveMountEffects @ react-dom_client.js?v=a769d409:8518
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9887
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9899
+flushPassiveEffects @ react-dom_client.js?v=a769d409:11302
+flushPendingEffects @ react-dom_client.js?v=a769d409:11276
+flushSpawnedWork @ react-dom_client.js?v=a769d409:11250
+commitRoot @ react-dom_client.js?v=a769d409:11081
+commitRootWhenReady @ react-dom_client.js?v=a769d409:10512
+performWorkOnRoot @ react-dom_client.js?v=a769d409:10457
+performSyncWorkOnRoot @ react-dom_client.js?v=a769d409:11635
+flushSyncWorkAcrossRoots_impl @ react-dom_client.js?v=a769d409:11536
+processRootScheduleInMicrotask @ react-dom_client.js?v=a769d409:11558
+（匿名） @ react-dom_client.js?v=a769d409:11649
+delaunay.ts:339 ⚠️ 低品質な三角形を検出: 0.09425688801447557
+optimizeTriangulation @ delaunay.ts:339
+createFaceOptimizedTriangulation @ delaunay.ts:288
+createMeshDeformation @ meshDeformation.ts:291
+performMeshBasedDeformation @ meshDeformation.ts:561
+applyAdaptiveTPSWarping @ adaptiveWarping.ts:279
+（匿名） @ useImageWarping.ts:132
+await in （匿名）
+（匿名） @ useImageWarping.ts:198
+setTimeout
+（匿名） @ useImageWarping.ts:196
+react-stack-bottom-frame @ react-dom_client.js?v=a769d409:17478
+runWithFiberInDEV @ react-dom_client.js?v=a769d409:1485
+commitHookEffectListMount @ react-dom_client.js?v=a769d409:8460
+commitHookPassiveMountEffects @ react-dom_client.js?v=a769d409:8518
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9887
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9899
+flushPassiveEffects @ react-dom_client.js?v=a769d409:11302
+flushPendingEffects @ react-dom_client.js?v=a769d409:11276
+flushSpawnedWork @ react-dom_client.js?v=a769d409:11250
+commitRoot @ react-dom_client.js?v=a769d409:11081
+commitRootWhenReady @ react-dom_client.js?v=a769d409:10512
+performWorkOnRoot @ react-dom_client.js?v=a769d409:10457
+performSyncWorkOnRoot @ react-dom_client.js?v=a769d409:11635
+flushSyncWorkAcrossRoots_impl @ react-dom_client.js?v=a769d409:11536
+processRootScheduleInMicrotask @ react-dom_client.js?v=a769d409:11558
+（匿名） @ react-dom_client.js?v=a769d409:11649
+delaunay.ts:339 ⚠️ 低品質な三角形を検出: 0.09027048791454548
+optimizeTriangulation @ delaunay.ts:339
+createFaceOptimizedTriangulation @ delaunay.ts:288
+createMeshDeformation @ meshDeformation.ts:291
+performMeshBasedDeformation @ meshDeformation.ts:561
+applyAdaptiveTPSWarping @ adaptiveWarping.ts:279
+（匿名） @ useImageWarping.ts:132
+await in （匿名）
+（匿名） @ useImageWarping.ts:198
+setTimeout
+（匿名） @ useImageWarping.ts:196
+react-stack-bottom-frame @ react-dom_client.js?v=a769d409:17478
+runWithFiberInDEV @ react-dom_client.js?v=a769d409:1485
+commitHookEffectListMount @ react-dom_client.js?v=a769d409:8460
+commitHookPassiveMountEffects @ react-dom_client.js?v=a769d409:8518
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9887
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9899
+flushPassiveEffects @ react-dom_client.js?v=a769d409:11302
+flushPendingEffects @ react-dom_client.js?v=a769d409:11276
+flushSpawnedWork @ react-dom_client.js?v=a769d409:11250
+commitRoot @ react-dom_client.js?v=a769d409:11081
+commitRootWhenReady @ react-dom_client.js?v=a769d409:10512
+performWorkOnRoot @ react-dom_client.js?v=a769d409:10457
+performSyncWorkOnRoot @ react-dom_client.js?v=a769d409:11635
+flushSyncWorkAcrossRoots_impl @ react-dom_client.js?v=a769d409:11536
+processRootScheduleInMicrotask @ react-dom_client.js?v=a769d409:11558
+（匿名） @ react-dom_client.js?v=a769d409:11649
+delaunay.ts:339 ⚠️ 低品質な三角形を検出: 0.0961102010979978
+optimizeTriangulation @ delaunay.ts:339
+createFaceOptimizedTriangulation @ delaunay.ts:288
+createMeshDeformation @ meshDeformation.ts:291
+performMeshBasedDeformation @ meshDeformation.ts:561
+applyAdaptiveTPSWarping @ adaptiveWarping.ts:279
+（匿名） @ useImageWarping.ts:132
+await in （匿名）
+（匿名） @ useImageWarping.ts:198
+setTimeout
+（匿名） @ useImageWarping.ts:196
+react-stack-bottom-frame @ react-dom_client.js?v=a769d409:17478
+runWithFiberInDEV @ react-dom_client.js?v=a769d409:1485
+commitHookEffectListMount @ react-dom_client.js?v=a769d409:8460
+commitHookPassiveMountEffects @ react-dom_client.js?v=a769d409:8518
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9887
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a769d409:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a769d409:9899
+flushPassiveEffects @ react-dom_client.js?v=a769d409:11302
+flushPendingEffects @ react-dom_client.js?v=a769d409:11276
+flushSpawnedWork @ react-dom_client.js?v=a769d409:11250
+commitRoot @ react-dom_client.js?v=a769d409:11081
+commitRootWhenReady @ react-dom_client.js?v=a769d409:10512
+performWorkOnRoot @ react-dom_client.js?v=a769d409:10457
+performSyncWorkOnRoot @ react-dom_client.js?v=a769d409:11635
+flushSyncWorkAcrossRoots_impl @ react-dom_client.js?v=a769d409:11536
+processRootScheduleInMicrotask @ react-dom_client.js?v=a769d409:11558
+（匿名） @ react-dom_client.js?v=a769d409:11649
+meshDeformation.ts:296 📐 ソースメッシュ: 頂点数=110, 三角形数=176
+meshDeformation.ts:300 📍 変形後のランドマーク点数: 68
+meshDeformation.ts:306 🔧 ポイント数統一: landmarks=68, boundary=42, total=110
+meshDeformation.ts:309 🔍 最初の5つの変形点: (5) ['Point 0: (54.81, 220.23)', 'Point 1: (58.31, 265.67)', 'Point 2: (65.83, 308.80)', 'Point 3: (73.11, 345.99)', 'Point 4: (86.00, 387.58)']
+meshDeformation.ts:345 🔺 三角形 0 の頂点: {v0: '(266.26, 187.00)', v1: '(180.68, 186.21)', v2: '(223.01, 236.83)'}
+meshDeformation.ts:345 🔺 三角形 1 の頂点: {v0: '(65.83, 308.80)', v1: '(73.11, 345.99)', v2: '(195.20, 335.35)'}
+meshDeformation.ts:345 🔺 三角形 2 の頂点: {v0: '(222.43, 322.10)', v1: '(222.85, 296.70)', v2: '(195.20, 335.35)'}
+meshDeformation.ts:390 ✅ メッシュ変形作成完了: 176個の三角形ペア
+meshDeformation.ts:439 🎨 メッシュ変形適用開始 (hybridモード)
+meshDeformation.ts:469 🔀 ハイブリッドモードで実行
+hybridRenderer.ts:145 🎨 ハイブリッドレンダリング開始: 176個の三角形
+hybridRenderer.ts:146 📏 エッジ幅: 20ピクセル
+hybridRenderer.ts:158 ➡️ フェーズ1: フォワードマッピングで全体描画
+triangleRenderer.ts:67 🎨 三角形メッシュレンダリング開始: 176個の三角形
+triangleRenderer.ts:91 🔍 最初の三角形ペア: {source: Array(3), target: Array(3), transform: {…}}
+triangleRenderer.ts:146 🔺 三角形 0 の詳細: {境界: {…}, 頂点: {…}, 面積: 2149.419761345305, 画面内: true}
+triangleRenderer.ts:116 📐 レンダリング進捗: 1% (1/176三角形, 2245ピクセル)
+triangleRenderer.ts:146 🔺 三角形 1 の詳細: {境界: {…}, 頂点: {…}, 面積: 2309.273680584097, 画面内: true}
+triangleRenderer.ts:116 📐 レンダリング進捗: 1% (2/176三角形, 4627ピクセル)
+triangleRenderer.ts:146 🔺 三角形 2 の詳細: {境界: {…}, 頂点: {…}, 面積: 343.0735574728783, 画面内: true}
+triangleRenderer.ts:116 📐 レンダリング進捗: 2% (3/176三角形, 4986ピクセル)
+triangleRenderer.ts:146 🔺 三角形 3 の詳細: {境界: {…}, 頂点: {…}, 面積: 149.7674681901242, 画面内: true}
+triangleRenderer.ts:116 📐 レンダリング進捗: 2% (4/176三角形, 5144ピクセル)
+triangleRenderer.ts:146 🔺 三角形 4 の詳細: {境界: {…}, 頂点: {…}, 面積: 162.1266241519818, 画面内: true}
+triangleRenderer.ts:116 📐 レンダリング進捗: 3% (5/176三角形, 5320ピクセル)
+triangleRenderer.ts:116 📐 レンダリング進捗: 28% (50/176三角形, 56443ピクセル)
+triangleRenderer.ts:116 📐 レンダリング進捗: 57% (100/176三角形, 88600ピクセル)
+triangleRenderer.ts:116 📐 レンダリング進捗: 85% (150/176三角形, 217959ピクセル)
+triangleRenderer.ts:124 ✅ 三角形メッシュレンダリング完了: 46.9ms, 総ピクセル数: 280588
+hybridRenderer.ts:172 🔲 エッジ領域: 39920ピクセル (15.1%)
+hybridRenderer.ts:181 🔄 フェーズ2: エッジ領域をバックワードマッピングで修正
+hybridRenderer.ts:249 📐 エッジ修正進捗: 8%
+hybridRenderer.ts:249 📐 エッジ修正進捗: 17%
+hybridRenderer.ts:249 📐 エッジ修正進捗: 25%
+hybridRenderer.ts:249 📐 エッジ修正進捗: 34%
+hybridRenderer.ts:249 📐 エッジ修正進捗: 42%
+hybridRenderer.ts:249 📐 エッジ修正進捗: 51%
+hybridRenderer.ts:249 📐 エッジ修正進捗: 59%
+hybridRenderer.ts:249 📐 エッジ修正進捗: 67%
+hybridRenderer.ts:249 📐 エッジ修正進捗: 76%
+hybridRenderer.ts:249 📐 エッジ修正進捗: 84%
+hybridRenderer.ts:249 📐 エッジ修正進捗: 93%
+hybridRenderer.ts:259 ✅ ハイブリッドレンダリング完了:
+hybridRenderer.ts:260    処理時間: 88.1ms
+hybridRenderer.ts:261    エッジピクセル処理: 38883/39920
+meshDeformation.ts:489 ✅ メッシュ変形適用完了: 88.5ms
+meshDeformation.ts:612 ✅ [Version 5.2.2] メッシュベース変形処理完了 (hybridモード)
+useImageWarping.ts:145 ✅ 統合ワーピング処理完了 {quality: 'medium', renderMode: 'hybrid', isStandardized: true}
+ImagePreview.tsx:262 🔄 編集後Canvas表示: 445x593 (標準化済み)
+ImagePreview.tsx:268 ✅ 編集後Canvasに画像を描画

@@ -9,6 +9,7 @@ import {
   Button,
 } from '@mui/material';
 import { useFaceStore } from '../../stores/faceStore';
+import { useStandardizationStore } from '../../stores/standardizationStore';
 import { useImageWarping } from '../../hooks/useImageWarping';
 import { useFaceDetection } from '../../hooks/useFaceDetection';
 import SaveButton from './SaveButton';
@@ -20,12 +21,19 @@ const ImagePreview: React.FC = () => {
     originalImage, 
     processedImageUrl,
     isProcessing, 
-    faceDetection,
     setRenderMode,
     setOriginalImage,
     setError,
-    setLoading
+    setLoading,
+    // 🚀 統合ベースデータを使用
+    currentBaseImageUrl,
+    currentBaseLandmarks,
+    isStandardized
   } = useFaceStore();
+  
+  const { 
+    standardizedImageUrl
+  } = useStandardizationStore();
   
   const originalCanvasRef = useRef<HTMLCanvasElement>(null);
   const fabricCanvasRef = useRef<HTMLCanvasElement>(null);
@@ -172,10 +180,10 @@ const ImagePreview: React.FC = () => {
     return result;
   }, []);
 
-  // 元画像を Canvas に描画
+  // 🚀 統合ベース画像を Canvas に描画
   useEffect(() => {
-    if (!originalImage || !originalCanvasRef.current) {
-      console.log('⚠️ 画像またはCanvasが利用できません');
+    if (!currentBaseImageUrl || !originalCanvasRef.current) {
+      console.log('⚠️ ベース画像またはCanvasが利用できません');
       return;
     }
 
@@ -186,7 +194,10 @@ const ImagePreview: React.FC = () => {
       return;
     }
 
-    console.log('🎨 画像描画開始:', originalImage.url);
+    console.log('🎨 統合ベース画像描画開始:', { 
+      url: currentBaseImageUrl,
+      isStandardized 
+    });
     const img = new Image();
     
     img.onload = () => {
@@ -211,9 +222,9 @@ const ImagePreview: React.FC = () => {
       console.log('✅ Canvas に画像を描画しました');
       
       // 顔検出結果がある場合、特徴点を描画（表示フラグがオンの時のみ）
-      if (faceDetection && faceDetection.isDetected && showLandmarks) {
-        console.log('🎯 顔検出結果を描画');
-        drawLandmarks(ctx, faceDetection.landmarks, scale);
+      if (currentBaseLandmarks && showLandmarks) {
+        console.log('🎯 統合ベースランドマークを描画:', { isStandardized });
+        drawLandmarks(ctx, currentBaseLandmarks, scale);
       }
       
       setImageLoaded(true);
@@ -224,8 +235,8 @@ const ImagePreview: React.FC = () => {
       setImageLoaded(false);
     };
     
-    img.src = originalImage.url;
-  }, [originalImage, faceDetection, showLandmarks, calculateCanvasSize]);
+    img.src = currentBaseImageUrl;
+  }, [currentBaseImageUrl, currentBaseLandmarks, showLandmarks, calculateCanvasSize, isStandardized]);
 
   // 重複処理を削除 - useImageWarpingフックでワーピング処理を一本化
   // このuseEffectは削除され、すべてのワーピング処理はuseImageWarpingフックで管理されます
@@ -243,11 +254,12 @@ const ImagePreview: React.FC = () => {
       const ctx = canvas.getContext('2d');
       if (!ctx) return;
       
-      // ワーピング結果があればそれを、なければ元画像を表示
-      const imageUrl = processedImageUrl || (originalImage?.url);
+      // ワーピング結果、標準化結果、元画像の順で表示（最新処理結果を優先）
+      const imageUrl = processedImageUrl || standardizedImageUrl || (originalImage?.url);
       
       if (imageUrl) {
-        console.log(`🔄 編集後Canvas表示: ${canvasSize.width}x${canvasSize.height}`, processedImageUrl ? '(ワーピング済み)' : '(元画像)');
+        const displayType = processedImageUrl ? '(ワーピング済み)' : standardizedImageUrl ? '(標準化済み)' : '(元画像)';
+        console.log(`🔄 編集後Canvas表示: ${canvasSize.width}x${canvasSize.height}`, displayType);
         
         const img = new Image();
         img.onload = () => {
@@ -265,7 +277,7 @@ const ImagePreview: React.FC = () => {
         img.src = imageUrl;
       }
     }
-  }, [canvasSize, originalImage, processedImageUrl]);
+  }, [canvasSize, originalImage, processedImageUrl, standardizedImageUrl]);
 
   // 特徴点を描画する関数
   const drawLandmarks = (
@@ -335,9 +347,26 @@ const ImagePreview: React.FC = () => {
         {/* 元画像 */}
         <Paper elevation={2} sx={{ p: 2, flex: 1, display: 'flex', flexDirection: 'column', height: '100%' }}>
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
-            <Typography variant="subtitle1" sx={{ flexShrink: 0 }}>
-              元画像
-            </Typography>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <Typography variant="subtitle1" sx={{ flexShrink: 0 }}>
+                {isStandardized ? 'ベース画像' : '元画像'}
+              </Typography>
+              {isStandardized && (
+                <Typography 
+                  variant="caption" 
+                  sx={{ 
+                    bgcolor: 'primary.main', 
+                    color: 'white', 
+                    px: 1, 
+                    py: 0.25, 
+                    borderRadius: 1,
+                    fontSize: '0.65rem'
+                  }}
+                >
+                  標準化済み
+                </Typography>
+              )}
+            </Box>
             
             <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
               <Button

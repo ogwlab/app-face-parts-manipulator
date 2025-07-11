@@ -14,12 +14,14 @@ export interface UseImageWarpingReturn {
 export const useImageWarping = (quality: 'fast' | 'medium' | 'high' = 'high'): UseImageWarpingReturn => {
   const {
     originalImage,
-    faceDetection,
     faceParams,
     renderMode,
     setProcessedImageUrl,
     setProcessing,
     setError,
+    // 🚀 新機能: 統合ベースデータを使用
+    currentBaseImageUrl,
+    currentBaseLandmarks,
   } = useFaceStore();
 
   const isProcessingRef = useRef(false);
@@ -50,18 +52,20 @@ export const useImageWarping = (quality: 'fast' | 'medium' | 'high' = 'high'): U
     }
   }, [setError]);
 
-  // 画像読み込み
-  const loadOriginalImage = useCallback(async () => {
-    if (!originalImage || !canvasManager.canvas) return;
+  // 🚀 統合画像読み込み（標準化対応）
+  const loadCurrentBaseImage = useCallback(async () => {
+    if (!currentBaseImageUrl || !canvasManager.canvas) return;
 
     try {
       setProcessing(true);
       setError(null);
 
-      // Canvas managerに画像を読み込む
-      await canvasManager.loadImage(originalImage.url);
+      // Canvas managerに現在のベース画像を読み込む
+      await canvasManager.loadImage(currentBaseImageUrl);
       
-      console.log('✅ Original image loaded to canvas');
+      console.log('✅ Current base image loaded to canvas:', { 
+        isStandardized: currentBaseImageUrl !== originalImage?.url 
+      });
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : '画像読み込みエラー';
       setError(errorMessage);
@@ -69,17 +73,19 @@ export const useImageWarping = (quality: 'fast' | 'medium' | 'high' = 'high'): U
     } finally {
       setProcessing(false);
     }
-  }, [originalImage, setProcessing, setError]);
+  }, [currentBaseImageUrl, originalImage, setProcessing, setError]);
 
-  // 画像処理（ワーピング適用）
+  // 🚀 統合画像処理（標準化対応）
   const processImage = useCallback(async (quality: 'fast' | 'medium' | 'high' = 'high') => {
     if (
-      !originalImage ||
-      !faceDetection ||
-      !faceDetection.landmarks ||
+      !currentBaseImageUrl ||
+      !currentBaseLandmarks ||
       isProcessingRef.current
     ) {
-      console.log('⚠️ ワーピング処理スキップ - 前提条件不足');
+      console.log('⚠️ ワーピング処理スキップ - 前提条件不足:', {
+        hasBaseImage: !!currentBaseImageUrl,
+        hasBaseLandmarks: !!currentBaseLandmarks
+      });
       return;
     }
 
@@ -88,16 +94,21 @@ export const useImageWarping = (quality: 'fast' | 'medium' | 'high' = 'high'): U
       setProcessing(true);
       setError(null);
 
-      console.log('🔄 ワーピング処理開始', { faceParams, quality, renderMode });
+      console.log('🔄 統合ワーピング処理開始', { 
+        faceParams, 
+        quality, 
+        renderMode,
+        isStandardized: currentBaseImageUrl !== originalImage?.url
+      });
 
-      // 元画像を読み込む
+      // 現在のベース画像を読み込む
       const img = new Image();
       img.crossOrigin = 'anonymous';
       
       await new Promise<void>((resolve, reject) => {
         img.onload = () => resolve();
         img.onerror = () => reject(new Error('画像の読み込みに失敗'));
-        img.src = originalImage.url;
+        img.src = currentBaseImageUrl;
       });
 
       // Canvas サイズを取得
@@ -120,7 +131,7 @@ export const useImageWarping = (quality: 'fast' | 'medium' | 'high' = 'high'): U
       
       const warpedCanvas = applyAdaptiveTPSWarping(
         img,
-        faceDetection.landmarks,
+        currentBaseLandmarks,
         faceParams,
         canvasWidth,
         canvasHeight,
@@ -131,16 +142,20 @@ export const useImageWarping = (quality: 'fast' | 'medium' | 'high' = 'high'): U
       const processedDataURL = warpedCanvas.toDataURL('image/png');
       setProcessedImageUrl(processedDataURL);
 
-      console.log('✅ ワーピング処理完了', { quality, renderMode });
+      console.log('✅ 統合ワーピング処理完了', { 
+        quality, 
+        renderMode, 
+        isStandardized: currentBaseImageUrl !== originalImage?.url 
+      });
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : '画像処理エラー';
       setError(errorMessage);
-      console.error('❌ ワーピング処理失敗:', error);
+      console.error('❌ 統合ワーピング処理失敗:', error);
     } finally {
       isProcessingRef.current = false;
       setProcessing(false);
     }
-  }, [originalImage, faceDetection, faceParams, renderMode, setProcessedImageUrl, setProcessing, setError]);
+  }, [currentBaseImageUrl, currentBaseLandmarks, faceParams, renderMode, originalImage, setProcessedImageUrl, setProcessing, setError]);
 
   // 画像エクスポート
   const exportImage = useCallback((): string | null => {
@@ -154,32 +169,32 @@ export const useImageWarping = (quality: 'fast' | 'medium' | 'high' = 'high'): U
     }
   }, [setError]);
 
-  // 元画像が変更された時の処理
+  // 🚀 統合ベース画像が変更された時の処理
   useEffect(() => {
-    if (originalImage) {
-      loadOriginalImage();
+    if (currentBaseImageUrl) {
+      loadCurrentBaseImage();
     } else {
       // 画像がクリアされた場合
       setProcessedImageUrl(null);
     }
-  }, [originalImage, loadOriginalImage, setProcessedImageUrl]);
+  }, [currentBaseImageUrl, loadCurrentBaseImage, setProcessedImageUrl]);
 
-  // 顔パラメータが変更された時の処理（デバウンス付き）
+  // 🚀 統合パラメータ変更処理（標準化対応）
   useEffect(() => {
-    console.log('🎛️ パラメータ変更検出 - 詳細ログ:', {
+    console.log('🎛️ 統合パラメータ変更検出:', {
       faceParams,
-      hasOriginalImage: !!originalImage,
-      hasFaceDetection: !!faceDetection,
-      hasLandmarks: !!(faceDetection && faceDetection.landmarks),
-      canvasManager: !!canvasManager.canvas
+      hasBaseImage: !!currentBaseImageUrl,
+      hasBaseLandmarks: !!currentBaseLandmarks,
+      canvasManager: !!canvasManager.canvas,
+      isStandardized: currentBaseImageUrl !== originalImage?.url
     });
 
-    if (originalImage && faceDetection && faceDetection.landmarks) {
-      console.log('✅ 前提条件満たしている - ワーピング処理実行予定');
+    if (currentBaseImageUrl && currentBaseLandmarks) {
+      console.log('✅ 統合前提条件満たしている - ワーピング処理実行予定');
       
       // 少し遅延を入れてUIの応答性を保つ
       const timeoutId = setTimeout(() => {
-        console.log('⏰ デバウンス完了 - ワーピング処理開始');
+        console.log('⏰ デバウンス完了 - 統合ワーピング処理開始');
         processImage(quality);
       }, 100);
 
@@ -188,9 +203,9 @@ export const useImageWarping = (quality: 'fast' | 'medium' | 'high' = 'high'): U
         clearTimeout(timeoutId);
       };
     } else {
-      console.log('❌ 前提条件不足 - ワーピング処理スキップ');
+      console.log('❌ 統合前提条件不足 - ワーピング処理スキップ');
     }
-  }, [faceParams, renderMode, processImage, faceDetection, originalImage, quality]);
+  }, [faceParams, renderMode, processImage, currentBaseImageUrl, currentBaseLandmarks, originalImage, quality]);
 
   // クリーンアップ
   useEffect(() => {
