@@ -1,5 +1,84 @@
 # 開発ログ
 
+## Version 7.0.0 Production Deployment (2025-07-11) - 顔標準化機能 完全公開
+
+### 🎯 デプロイ成功記録
+
+#### 1. Version 7.0.0 新機能概要
+- **顔画像標準化システム**: 眼間距離ベースのアフィン変換正規化
+- **設定保存・復元システム**: LocalStorageベースの自動パラメータ管理
+- **UI/UX改善**: スクロール問題修正、設定ボタン最適配置
+- **統合ワークフロー**: 標準化→パーツ操作のシームレス連携
+
+#### 2. デプロイ準備プロセス ✅
+1. **ブランチ管理**:
+   - `feature/face-standardization-background-removal` → `main` マージ
+   - リモートリポジトリ同期完了
+   
+2. **ビルドテスト**:
+   - `npm run build` 成功確認
+   - dist/フォルダ内容検証（HTML/CSS/JS/モデルファイル）
+   
+3. **デプロイ設定準備**:
+   - `.env.deploy` 作成（ogwlab.xsrv.jp設定）
+   - `.htaccess` テンプレートから自動生成
+
+#### 3. デプロイ実行 ✅
+- **方法**: rsyncベースデプロイ（過去実績通り）
+- **サーバー**: ogwlab.xsrv.jp（ポート10022）
+- **認証**: SSH鍵 `~/.ssh/ogwlab_nopass.key`
+- **実行コマンド**: 
+  ```bash
+  rsync -avz --progress --delete -e "ssh -i ~/.ssh/ogwlab_nopass.key -p 10022" \
+    dist/ ogwlab@ogwlab.xsrv.jp:~/ogwlab.org/public_html/face-parts-manipulator/
+  ```
+- **転送結果**: 13ファイル、3.1MB、高速転送成功
+
+#### 4. 問題解決 ✅
+**問題**: 初期.htaccess設定でHTTP 500エラー発生
+- **原因**: 複雑なセキュリティ設定がサーバー環境と非互換
+- **解決**: 簡素化した.htaccess設定に変更
+  - SPAルーティング対応維持
+  - 基本的なセキュリティヘッダー設定
+  - CORS設定（face-api.jsモデルファイル用）
+  - キャッシュ設定最適化
+
+#### 5. デプロイ検証 ✅
+- **アクセス確認**: HTTP 200 OK レスポンス
+- **セキュリティヘッダー**: X-Content-Type-Options, X-Frame-Options 設定済み
+- **キャッシュ制御**: 適切なExpires/Cache-Controlヘッダー
+- **CORS設定**: モデルファイル読み込み対応
+
+### 🌐 公開情報
+- **URL**: https://ogwlab.org/face-parts-manipulator/
+- **Version**: 7.0.0
+- **デプロイ日時**: 2025-07-11
+- **ステータス**: プロダクション運用開始
+
+### 📝 技術的学習事項
+1. **SSH認証**: `~/.ssh/ogwlab_nopass.key` の使用が必須
+2. **.htaccess最適化**: 複雑設定よりシンプル設定が安定
+3. **rsyncデプロイ**: 過去実績システムの再現性高い
+4. **face-api.js制約**: Vercel非対応、自前サーバー必須
+
+### 🔄 次回デプロイ用コマンド参考
+```bash
+# 1. ビルド
+npm run build
+
+# 2. .htaccess生成（オプション）
+source deploy/utils.sh && generate_htaccess "/face-parts-manipulator/"
+
+# 3. デプロイ実行
+rsync -avz --progress --delete -e "ssh -i ~/.ssh/ogwlab_nopass.key -p 10022" \
+  dist/ ogwlab@ogwlab.xsrv.jp:~/ogwlab.org/public_html/face-parts-manipulator/
+
+# 4. 動作確認
+curl -I https://ogwlab.org/face-parts-manipulator/
+```
+
+---
+
 ## Version 6.1.0 Rollback (2025-07-08) - Vercel公開断念・安定版復帰
 
 ### 🎯 主な変更内容
