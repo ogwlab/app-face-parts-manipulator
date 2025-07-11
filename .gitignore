@@ -6,6 +6,7 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
+debug_log.txt
 
 node_modules
 dist
@@ -28,6 +29,7 @@ dist-ssr
 .env.local
 .env.production
 .env.development
+.env.deploy
 !.env.example
 
 # Vercel
