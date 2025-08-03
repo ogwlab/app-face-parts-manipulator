@@ -116,8 +116,8 @@ export function renderTriangleMeshBackward(
   console.log(`🎨 バックワードマッピングレンダリング開始: ${trianglePairs.length}個の三角形`);
   const startTime = performance.now();
   
-  const sourceCtx = sourceCanvas.getContext('2d');
-  const targetCtx = targetCanvas.getContext('2d');
+  const sourceCtx = sourceCanvas.getContext('2d', { willReadFrequently: true });
+  const targetCtx = targetCanvas.getContext('2d', { willReadFrequently: true });
   
   if (!sourceCtx || !targetCtx) {
     console.error('Canvas context取得エラー');

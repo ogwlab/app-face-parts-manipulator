@@ -7,6 +7,7 @@ import {
 } from '@mui/material';
 import ControlPanel from './panels/ControlPanel';
 import StandardizationPanel from './panels/StandardizationPanel';
+import ContourControls from './panels/ContourControls';
 import SettingsButtons from './ui/SettingsButtons';
 
 interface TabPanelProps {
@@ -51,6 +52,7 @@ const TopLevelTabs: React.FC = () => {
         <Tabs value={value} onChange={handleChange} aria-label="top level tabs">
           <Tab label="🎨 標準化" id="top-level-tab-0" aria-controls="top-level-tabpanel-0" />
           <Tab label="✏️ パーツ操作" id="top-level-tab-1" aria-controls="top-level-tabpanel-1" />
+          <Tab label="🔷 輪郭操作" id="top-level-tab-2" aria-controls="top-level-tabpanel-2" />
         </Tabs>
       </Box>
       
@@ -60,6 +62,9 @@ const TopLevelTabs: React.FC = () => {
         </TabPanel>
         <TabPanel value={value} index={1}>
           <ControlPanel />
+        </TabPanel>
+        <TabPanel value={value} index={2}>
+          <ContourControls />
         </TabPanel>
       </Box>
     </Paper>

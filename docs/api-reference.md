@@ -129,12 +129,60 @@ import ControlPanel from '@/components/panels/ControlPanel';
 
 **タブ構成**
 - Tab 0: 目の調整 (EyeControls)
-- Tab 1: 口の調整 (MouthControls)
+- Tab 1: 口の調整 (MouthControls)  
 - Tab 2: 鼻の調整 (NoseControls)
+- Tab 3: 🆕 輪郭の調整 (ContourControls)
 
 ---
 
-### 1.6 RenderModeSelector
+### 1.6 ContourControls
+
+**インポート**
+```typescript
+import ContourControls from '@/components/panels/ContourControls';
+```
+
+**使用例**
+```tsx
+<ContourControls />
+```
+
+**Props**: なし（Zustandストアを直接使用）
+
+**機能**
+- 顔の輪郭形状制御
+- 5つのパラメータスライダー
+- リアルタイムプレビュー
+- 個別・全体リセット機能
+
+**パラメータ詳細**
+```typescript
+interface ContourParams {
+  roundness: number;      // -1.0〜1.0 (負: 角張り, 正: 丸み)
+  jawWidth: number;       // 0.7〜1.3 (顎の幅)
+  cheekFullness: number;  // 0.7〜1.3 (頬の膨らみ)
+  chinHeight: number;     // 0.8〜1.2 (顎の長さ)
+  smoothness: number;     // 0.0〜1.0 (輪郭の滑らかさ)
+}
+```
+
+**ストアアクション**
+```typescript
+const { updateContourParams } = useFaceStore();
+
+// 個別パラメータ更新
+updateContourParams({ roundness: 0.5 });
+
+// 複数パラメータ更新
+updateContourParams({ 
+  jawWidth: 1.2, 
+  cheekFullness: 0.8 
+});
+```
+
+---
+
+### 1.7 RenderModeSelector
 
 **インポート**
 ```typescript
@@ -395,6 +443,7 @@ interface FaceParams {
   rightEye: EyeParams;
   mouth: MouthParams;
   nose: NoseParams;
+  contour: ContourParams; // 🆕 輪郭パラメータ
 }
 
 // 目のパラメータ
@@ -418,6 +467,15 @@ interface NoseParams {
   height: number;    // 0.3-3.0
   positionX: number; // -40 to +40
   positionY: number; // -40 to +40
+}
+
+// 🆕 輪郭のパラメータ
+interface ContourParams {
+  roundness: number;      // -1.0〜1.0 (負: 角張り, 正: 丸み)
+  jawWidth: number;       // 0.7〜1.3 (顎の幅)
+  cheekFullness: number;  // 0.7〜1.3 (頬の膨らみ)
+  chinHeight: number;     // 0.8〜1.2 (顎の長さ)
+  smoothness: number;     // 0.0〜1.0 (輪郭の滑らかさ)
 }
 ```
 

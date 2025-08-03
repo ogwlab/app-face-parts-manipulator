@@ -10,6 +10,8 @@ import { calculateAffineTransform } from './affineTransform';
 import { renderTriangleMesh, drawMeshEdges } from './triangleRenderer';
 import { renderTriangleMeshBackward } from './backwardRenderer';
 import { renderTriangleMeshHybrid } from './hybridRenderer';
+import { generateContourControlPoints } from '../contourDeformation';
+import type { ContourParams } from '../../../types/face';
 
 /**
  * 特徴点ベース変形用の拡張されたメッシュ変形オプション
@@ -35,6 +37,19 @@ export interface FeatureBasedMeshResult {
 }
 
 /**
+ * 輪郭パラメータに変更があるかチェック
+ */
+function isContourChangeDetected(contour: ContourParams): boolean {
+  return (
+    contour.roundness !== 0 ||
+    contour.jawWidth !== 1.0 ||
+    contour.cheekFullness !== 1.0 ||
+    contour.chinHeight !== 1.0 ||
+    contour.smoothness !== 0.5
+  );
+}
+
+/**
  * 顔パラメータに基づいてランドマークを変形
  */
 export function deformLandmarks(
@@ -53,6 +68,12 @@ export function deformLandmarks(
   // 左目の変形
   if (faceParams.leftEye) {
     const leftEyeCenter = calculatePartCenter(landmarks.leftEye);
+    console.log('👁️ 左目変形適用:', {
+      size: faceParams.leftEye.size,
+      positionX: faceParams.leftEye.positionX,
+      positionY: faceParams.leftEye.positionY,
+      center: leftEyeCenter
+    });
     deformEye(
       deformed.leftEye,
       leftEyeCenter,
@@ -64,6 +85,12 @@ export function deformLandmarks(
   // 右目の変形
   if (faceParams.rightEye) {
     const rightEyeCenter = calculatePartCenter(landmarks.rightEye);
+    console.log('👁️ 右目変形適用:', {
+      size: faceParams.rightEye.size,
+      positionX: faceParams.rightEye.positionX,
+      positionY: faceParams.rightEye.positionY,
+      center: rightEyeCenter
+    });
     deformEye(
       deformed.rightEye,
       rightEyeCenter,
@@ -75,6 +102,13 @@ export function deformLandmarks(
   // 口の変形
   if (faceParams.mouth) {
     const mouthCenter = calculatePartCenter(landmarks.mouth);
+    console.log('👄 口変形適用:', {
+      width: faceParams.mouth.width,
+      height: faceParams.mouth.height,
+      positionX: faceParams.mouth.positionX,
+      positionY: faceParams.mouth.positionY,
+      center: mouthCenter
+    });
     deformMouth(
       deformed.mouth,
       mouthCenter,
@@ -86,12 +120,40 @@ export function deformLandmarks(
   // 鼻の変形
   if (faceParams.nose) {
     const noseCenter = calculatePartCenter(landmarks.nose);
+    console.log('👃 鼻変形適用:', {
+      width: faceParams.nose.width,
+      height: faceParams.nose.height,
+      positionX: faceParams.nose.positionX,
+      positionY: faceParams.nose.positionY,
+      center: noseCenter
+    });
     deformNose(
       deformed.nose,
       noseCenter,
       faceParams.nose,
       faceBounds
     );
+  }
+  
+  // 輪郭の変形（条件付き有効化）
+  if (faceParams.contour && isContourChangeDetected(faceParams.contour)) {
+    console.log('🔷 輪郭変形開始:', {
+      roundness: faceParams.contour.roundness,
+      jawWidth: faceParams.contour.jawWidth,
+      cheekFullness: faceParams.contour.cheekFullness,
+      chinHeight: faceParams.contour.chinHeight
+    });
+    
+    const contourControlPoints = generateContourControlPoints(landmarks, faceParams.contour);
+    
+    // jawlineを変形
+    for (let i = 0; i < deformed.jawline.length; i++) {
+      deformed.jawline[i] = contourControlPoints.target[i];
+    }
+    
+    console.log('🔷 輪郭変形適用完了:', {
+      controlPointsCount: contourControlPoints.original.length
+    });
   }
   
   console.log('✅ ランドマーク変形完了');
@@ -514,6 +576,15 @@ export function performMeshBasedDeformation(
 ): HTMLCanvasElement {
   console.log('🚀 [Version 5.2.2] メッシュベース変形処理開始 - ハイブリッドレンダリング');
   
+  // 受信パラメータのログ
+  console.log('📥 受信したパラメータ:', {
+    leftEye: faceParams.leftEye,
+    rightEye: faceParams.rightEye,
+    mouth: faceParams.mouth,
+    nose: faceParams.nose,
+    contour: faceParams.contour
+  });
+  
   // デバッグモードのログ
   if (debugOptions.enabled) {
     console.log('🐛 デバッグモード有効', debugOptions);
@@ -767,6 +838,13 @@ const generatePseudoFaceParams = (
       height: 1.0,
       positionX: 0,
       positionY: 0
+    },
+    contour: {
+      roundness: 0,
+      jawWidth: 1.0,
+      cheekFullness: 1.0,
+      chinHeight: 1.0,
+      smoothness: 0.5
     }
   };
 };

@@ -19,18 +19,20 @@
 
 ### 1.1 プロジェクト基本情報
 - **プロジェクト名**: Face Parts Manipulator
-- **バージョン**: 6.1.0
-- **目的**: 顔画像の各パーツ（目・口・鼻）を個別に拡大・縮小・移動する
-- **対象ユーザー**: 一般ユーザー、写真編集愛好者
+- **バージョン**: 7.0.1
+- **目的**: 顔画像の各パーツ（目・口・鼻・輪郭）を個別に拡大・縮小・移動・変形する
+- **対象ユーザー**: 一般ユーザー、写真編集愛好者、デジタルアート制作者
 
 ### 1.2 主要機能
 1. **顔検出**: face-api.jsによる68点顔特徴点検出
 2. **画像変形**: Triangle Mesh Forward Mappingによる自然な変形
-3. **リアルタイムプレビュー**: パラメータ変更の即時反映
-4. **画像保存**: PNG/JPG形式でのエクスポート
-5. **高度なファイル名生成**: 日付先頭 + 元ファイル名 + 全変形記録システム
-5. **統合品質設定**: 高速プレビュー/バランス/最高品質の3モード
-6. **UI最適化**: 直感的で簡潔なユーザーインターフェース
+3. **パーツ操作**: 目・口・鼻の拡大・縮小・移動
+4. **🆕 輪郭操作**: 顔の輪郭形状（丸み・角張り、顎の幅、頬の膨らみ、顎の長さ、滑らかさ）の調整
+5. **リアルタイムプレビュー**: パラメータ変更の即時反映
+6. **画像保存**: PNG/JPG形式でのエクスポート
+7. **高度なファイル名生成**: 日付先頭 + 元ファイル名 + 全変形記録システム
+8. **統合品質設定**: 高速プレビュー/バランス/最高品質の3モード
+9. **UI最適化**: 直感的で簡潔なユーザーインターフェース
 
 ### 1.3 動作要件
 - **ブラウザ**: Chrome 90+, Firefox 88+, Safari 14+
@@ -360,6 +362,7 @@ interface FaceStore {
   updateEyeParams: (eye: 'left' | 'right', params: Partial<EyeParams>) => void;
   updateMouthParams: (params: Partial<MouthParams>) => void;
   updateNoseParams: (params: Partial<NoseParams>) => void;
+  updateContourParams: (params: Partial<ContourParams>) => void; // 🆕 輪郭パラメータ更新
   resetParams: () => void;
   resetAll: () => void;
 }
@@ -381,7 +384,100 @@ updateEyeParams: (eye, params) => set((state) => ({
 
 ---
 
-## 9. UIコンポーネント
+## 9. 輪郭操作システム
+
+### 9.1 輪郭パラメータ定義
+**ファイル**: `src/types/face.ts`
+
+```typescript
+export interface ContourParams {
+  roundness: number;      // -1.0〜1.0 (負: 角張り, 正: 丸み)
+  jawWidth: number;       // 0.7〜1.3 (顎の幅)
+  cheekFullness: number;  // 0.7〜1.3 (頬の膨らみ)
+  chinHeight: number;     // 0.8〜1.2 (顎の長さ)
+  smoothness: number;     // 0.0〜1.0 (輪郭の滑らかさ)
+}
+```
+
+### 9.2 輪郭変形アルゴリズム
+**ファイル**: `src/features/image-warping/contourDeformation.ts`
+
+#### 9.2.1 制御点生成プロセス
+1. **Jawline分析**: 68点ランドマークの0-16番（顎の輪郭線）を基準とする
+2. **領域分類**: 
+   - 下顎部 (index 3-13): 主に丸み・角張り、顎の長さに影響
+   - 側面部 (index 0-4, 12-16): 主に顎の幅に影響
+   - 頬部 (index 1-3, 13-15): 主に頬の膨らみに影響
+
+#### 9.2.2 変形計算
+```typescript
+// 1. roundness: 丸み⇔角張り
+if (params.roundness !== 0) {
+  if (isLowerJaw) {
+    const roundnessEffect = params.roundness * 0.1;
+    dx += relX * roundnessEffect;
+    // 丸みの場合は顎先を少し上げる
+    if (params.roundness > 0 && (index === 8 || index === 9)) {
+      dy -= faceHeight * params.roundness * 0.02;
+    }
+  }
+}
+
+// 2. jawWidth: 顎の幅
+if (params.jawWidth !== 1.0 && isSideJaw) {
+  const widthEffect = (params.jawWidth - 1.0);
+  dx += relX * widthEffect * 0.5;
+}
+
+// 3. cheekFullness: 頬の膨らみ
+if (params.cheekFullness !== 1.0 && isCheekArea) {
+  const fullnessEffect = (params.cheekFullness - 1.0);
+  dx += Math.sign(relX) * faceWidth * fullnessEffect * 0.1;
+  dy += faceHeight * fullnessEffect * 0.02;
+}
+
+// 4. chinHeight: 顎の長さ
+if (params.chinHeight !== 1.0 && isLowerJaw) {
+  const heightEffect = (params.chinHeight - 1.0);
+  const centerRatio = 1 - Math.abs(lowerJawRatio - 0.5) * 2;
+  dy += faceHeight * heightEffect * centerRatio * 0.15;
+}
+```
+
+#### 9.2.3 平滑化処理
+```typescript
+// smoothnessパラメータによる後処理
+if (params.smoothness > 0) {
+  const iterations = Math.round(params.smoothness * 5);
+  // 3点重み付き平均による輪郭線平滑化
+  for (let iter = 0; iter < iterations; iter++) {
+    // 隣接点との重み付き平均計算
+  }
+}
+```
+
+### 9.3 メッシュベース統合
+**ファイル**: `src/features/image-warping/forwardMapping/meshDeformation.ts`
+
+輪郭変形は既存のメッシュベース変形システムに統合されており、以下の流れで処理される：
+
+1. **ランドマーク変形**: `deformLandmarks()`関数で輪郭パラメータを適用
+2. **条件付き実行**: `isContourChangeDetected()`で変更検知
+3. **制御点生成**: `generateContourControlPoints()`で変形制御点を生成
+4. **Jawline更新**: 変形後の制御点でjawlineを直接更新
+5. **メッシュ生成**: 更新されたランドマークで三角形メッシュを構築
+
+### 9.4 UIコンポーネント
+**ファイル**: `src/components/panels/ContourControls.tsx`
+
+- **トップレベルタブ**: "🔷 輪郭操作"として独立したタブ
+- **5つのパラメータ制御**: ParameterControlコンポーネントを使用
+- **リセット機能**: 個別パラメータと全体リセット
+- **リアルタイム更新**: パラメータ変更の即座反映
+
+---
+
+## 10. UIコンポーネント
 
 ### 9.1 ParameterControl
 **共通スライダーコンポーネント**

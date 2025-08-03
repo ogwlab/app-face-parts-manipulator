@@ -30,8 +30,8 @@ export function renderTriangle(
   targetTriangle: Triangle,
   _transform: AffineTransform
 ): void {
-  const sourceCtx = sourceCanvas.getContext('2d');
-  const targetCtx = targetCanvas.getContext('2d');
+  const sourceCtx = sourceCanvas.getContext('2d', { willReadFrequently: true });
+  const targetCtx = targetCanvas.getContext('2d', { willReadFrequently: true });
   
   if (!sourceCtx || !targetCtx) {
     console.error('Canvas context取得エラー');
@@ -70,8 +70,8 @@ export function renderTriangleMesh(
   // デバッグ用カウンターをリセット
   renderedTriangleCount = 0;
   
-  const sourceCtx = sourceCanvas.getContext('2d');
-  const targetCtx = targetCanvas.getContext('2d');
+  const sourceCtx = sourceCanvas.getContext('2d', { willReadFrequently: true });
+  const targetCtx = targetCanvas.getContext('2d', { willReadFrequently: true });
   
   if (!sourceCtx || !targetCtx) {
     console.error('Canvas context取得エラー');
@@ -339,7 +339,7 @@ export function drawTriangleEdges(
   color: string = 'red',
   lineWidth: number = 1
 ): void {
-  const ctx = canvas.getContext('2d');
+  const ctx = canvas.getContext('2d', { willReadFrequently: true });
   if (!ctx) return;
   
   ctx.strokeStyle = color;
@@ -364,7 +364,7 @@ export function drawMeshEdges(
   color: string = 'rgba(255, 0, 0, 0.3)',
   lineWidth: number = 0.5
 ): void {
-  const ctx = canvas.getContext('2d');
+  const ctx = canvas.getContext('2d', { willReadFrequently: true });
   if (!ctx) return;
   
   ctx.save();

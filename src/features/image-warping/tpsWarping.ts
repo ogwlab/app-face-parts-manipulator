@@ -1,4 +1,5 @@
 import type { Point, FaceParams, FaceLandmarks, EyeParams, MouthParams, NoseParams } from '../../types/face';
+import { generateContourControlPoints } from './contourDeformation';
 
 /**
  * Thin Plate Spline (TPS) による高品質特徴点ベース変形
@@ -414,6 +415,29 @@ export function generateTPSControlPoints(
         influenceRadius
       });
     });
+  }
+
+  // 輪郭の制御点を生成（contourパラメータが変更されている場合）
+  if (faceParams.contour && 
+      (faceParams.contour.roundness !== 0 || 
+       faceParams.contour.jawWidth !== 1.0 || 
+       faceParams.contour.cheekFullness !== 1.0 || 
+       faceParams.contour.chinHeight !== 1.0)) {
+    
+    const contourPoints = generateContourControlPoints(landmarks, faceParams.contour);
+    
+    // jawlineの各点に対して制御点を追加
+    for (let i = 0; i < contourPoints.original.length; i++) {
+      controlPoints.push({
+        original: scalePoint(contourPoints.original[i]),
+        target: scalePoint(contourPoints.target[i]),
+        weight: 1.0,
+        partType: 'mouth', // 既存のpartTypeを使用（contourは未定義なので）
+        influenceRadius: 80
+      });
+    }
+    
+    console.log(`🔷 輪郭制御点追加: ${contourPoints.original.length}個`);
   }
 
   // 安定化のために周辺固定点を追加（実際のCanvasサイズを渡す）

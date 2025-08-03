@@ -331,13 +331,23 @@ export function generateBoundaryPoints(width: number, height: number): Point[] {
  */
 function optimizeTriangulation(mesh: TriangleMesh): void {
   // 非常に細長い三角形を検出して改善する
+  let lowQualityCount = 0;
+  
   for (const triangle of mesh.triangles) {
     const quality = calculateTriangleQuality(triangle);
-    if (quality < 0.1) { // 品質が低い三角形
+    if (quality < 0.05) { // 閾値を0.1→0.05に変更（より深刻な場合のみ）
+      lowQualityCount++;
       // TODO: エッジフリップなどの最適化手法を適用
-      // 現在は警告のみ
-      console.warn('⚠️ 低品質な三角形を検出:', quality);
+      // 大量ログ防止：最初の3個のみ警告
+      if (lowQualityCount <= 3) {
+        console.warn('⚠️ 低品質な三角形を検出:', quality);
+      }
     }
+  }
+  
+  // 概要ログのみ出力
+  if (lowQualityCount > 3) {
+    console.warn(`⚠️ 低品質三角形: ${lowQualityCount}個検出（詳細ログは最初の3個のみ表示）`);
   }
 }
 

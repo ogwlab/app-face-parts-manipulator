@@ -4,9 +4,10 @@
 
 1. [画像変形アルゴリズムの詳細](#1-画像変形アルゴリズムの詳細)
 2. [制御点生成アルゴリズム](#2-制御点生成アルゴリズム)
-3. [座標変換の数学的詳細](#3-座標変換の数学的詳細)
-4. [パフォーマンス最適化技術](#4-パフォーマンス最適化技術)
-5. [エッジケースの処理](#5-エッジケースの処理)
+3. [🆕 輪郭操作アルゴリズム](#3-輪郭操作アルゴリズム)
+4. [座標変換の数学的詳細](#4-座標変換の数学的詳細)
+5. [パフォーマンス最適化技術](#5-パフォーマンス最適化技術)
+6. [エッジケースの処理](#6-エッジケースの処理)
 
 ---
 
@@ -329,9 +330,266 @@ function computeTPSWeights(
 
 ---
 
-## 3. 座標変換の数学的詳細
+## 3. 🆕 輪郭操作アルゴリズム
 
-### 3.1 バリセントリック座標
+### 3.1 Jawline-based制御点生成
+
+#### 基本原理
+顔の輪郭操作は68点ランドマークのJawline（0-16番）を基準とし、解剖学的に自然な変形を実現します。
+
+#### 制御点生成プロセス
+```typescript
+// src/features/image-warping/contourDeformation.ts
+export function generateContourControlPoints(
+  landmarks: FaceLandmarks,
+  params: ContourParams
+): { original: Point[]; target: Point[] } {
+  
+  const jawline = landmarks.jawline; // 0-16番の17点
+  const faceCenter = calculateFaceCenter(landmarks);
+  const faceBounds = calculateFaceBounds(landmarks);
+  
+  const originalPoints: Point[] = [];
+  const targetPoints: Point[] = [];
+  
+  jawline.forEach((point, index) => {
+    // 1. 領域分類による処理分岐
+    const region = classifyJawlineRegion(index);
+    
+    // 2. 変形計算の実行
+    const transformedPoint = calculatePointTransformation(
+      point, index, region, params, faceCenter, faceBounds
+    );
+    
+    originalPoints.push(point);
+    targetPoints.push(transformedPoint);
+  });
+  
+  // 3. 平滑化処理の適用
+  if (params.smoothness > 0) {
+    applySmoothness(targetPoints, params.smoothness);
+  }
+  
+  return { original: originalPoints, target: targetPoints };
+}
+```
+
+### 3.2 領域別変形計算
+
+#### 領域分類システム
+```typescript
+function classifyJawlineRegion(index: number): JawlineRegion {
+  if (index >= 3 && index <= 13) {
+    return 'lowerJaw';    // 下顎部（丸み・角張り、顎の長さ）
+  } else if (index <= 4 || index >= 12) {
+    return 'sideJaw';     // 側面部（顎の幅）
+  } else {
+    return 'cheekArea';   // 頬部（頬の膨らみ）
+  }
+}
+```
+
+#### パラメータ別変形計算
+```typescript
+function calculatePointTransformation(
+  point: Point,
+  index: number,
+  region: JawlineRegion,
+  params: ContourParams,
+  faceCenter: Point,
+  faceBounds: FaceBounds
+): Point {
+  
+  let dx = 0;
+  let dy = 0;
+  
+  // 基準座標の計算
+  const relX = (point.x - faceCenter.x) / faceBounds.width;
+  const relY = (point.y - faceCenter.y) / faceBounds.height;
+  
+  // 1. roundness: 丸み⇔角張り (-1.0〜1.0)
+  if (params.roundness !== 0 && region === 'lowerJaw') {
+    const roundnessEffect = params.roundness * 0.1;
+    dx += relX * roundnessEffect * faceBounds.width;
+    
+    // 顎先の特別処理（丸みの場合は少し上げる）
+    if (params.roundness > 0 && (index === 8 || index === 9)) {
+      dy -= faceBounds.height * params.roundness * 0.02;
+    }
+  }
+  
+  // 2. jawWidth: 顎の幅 (0.7〜1.3)
+  if (params.jawWidth !== 1.0 && region === 'sideJaw') {
+    const widthEffect = (params.jawWidth - 1.0);
+    dx += relX * widthEffect * faceBounds.width * 0.5;
+  }
+  
+  // 3. cheekFullness: 頬の膨らみ (0.7〜1.3)
+  if (params.cheekFullness !== 1.0 && region === 'cheekArea') {
+    const fullnessEffect = (params.cheekFullness - 1.0);
+    dx += Math.sign(relX) * faceBounds.width * fullnessEffect * 0.1;
+    dy += faceBounds.height * fullnessEffect * 0.02;
+  }
+  
+  // 4. chinHeight: 顎の長さ (0.8〜1.2)
+  if (params.chinHeight !== 1.0 && region === 'lowerJaw') {
+    const heightEffect = (params.chinHeight - 1.0);
+    const lowerJawRatio = (index - 3) / 10; // 0.0〜1.0
+    const centerRatio = 1 - Math.abs(lowerJawRatio - 0.5) * 2;
+    dy += faceBounds.height * heightEffect * centerRatio * 0.15;
+  }
+  
+  return {
+    x: point.x + dx,
+    y: point.y + dy
+  };
+}
+```
+
+### 3.3 平滑化アルゴリズム
+
+#### 3点重み付き平均による平滑化
+```typescript
+function applySmoothness(points: Point[], smoothness: number): void {
+  const iterations = Math.round(smoothness * 5); // 最大5回反復
+  
+  for (let iter = 0; iter < iterations; iter++) {
+    const smoothedPoints = [...points];
+    
+    for (let i = 1; i < points.length - 1; i++) {
+      const prev = points[i - 1];
+      const curr = points[i];
+      const next = points[i + 1];
+      
+      // 重み付き平均（中心重み0.5、隣接各0.25）
+      smoothedPoints[i] = {
+        x: prev.x * 0.25 + curr.x * 0.5 + next.x * 0.25,
+        y: prev.y * 0.25 + curr.y * 0.5 + next.y * 0.25
+      };
+    }
+    
+    // 結果を元配列にコピー（参照を維持）
+    for (let i = 0; i < points.length; i++) {
+      points[i].x = smoothedPoints[i].x;
+      points[i].y = smoothedPoints[i].y;
+    }
+  }
+}
+```
+
+### 3.4 メッシュ統合システム
+
+#### 条件付き輪郭処理
+```typescript
+// src/features/image-warping/forwardMapping/meshDeformation.ts
+function isContourChangeDetected(contour: ContourParams): boolean {
+  return (
+    contour.roundness !== 0 ||
+    contour.jawWidth !== 1.0 ||
+    contour.cheekFullness !== 1.0 ||
+    contour.chinHeight !== 1.0 ||
+    contour.smoothness !== 0.5
+  );
+}
+
+function deformLandmarks(
+  landmarks: FaceLandmarks,
+  faceParams: FaceParams
+): Point[] {
+  const deformedLandmarks = [...landmarks.all];
+  
+  // 輪郭処理の条件付き実行
+  if (isContourChangeDetected(faceParams.contour)) {
+    console.log('🔷 輪郭変形を実行:', faceParams.contour);
+    
+    const contourResult = generateContourControlPoints(
+      landmarks,
+      faceParams.contour
+    );
+    
+    // Jawline（0-16番）を直接更新
+    contourResult.target.forEach((point, i) => {
+      if (i < 17) { // Jawlineの範囲内
+        deformedLandmarks[i] = point;
+      }
+    });
+  }
+  
+  // 他のパーツ処理...
+  
+  return deformedLandmarks;
+}
+```
+
+#### デバッグログシステム
+```typescript
+function logContourDeformation(params: ContourParams): void {
+  console.log('🔷 輪郭操作アルゴリズム実行:');
+  
+  if (params.roundness !== 0) {
+    console.log(`  • 丸み: ${params.roundness > 0 ? '丸く' : '角張り'} (${params.roundness})`);
+  }
+  
+  if (params.jawWidth !== 1.0) {
+    console.log(`  • 顎の幅: ${params.jawWidth * 100}%`);
+  }
+  
+  if (params.cheekFullness !== 1.0) {
+    console.log(`  • 頬の膨らみ: ${params.cheekFullness * 100}%`);
+  }
+  
+  if (params.chinHeight !== 1.0) {
+    console.log(`  • 顎の長さ: ${params.chinHeight * 100}%`);
+  }
+  
+  if (params.smoothness !== 0.5) {
+    console.log(`  • 滑らかさ: ${params.smoothness * 100}%`);
+  }
+}
+```
+
+### 3.5 パフォーマンス最適化
+
+#### 計算量削減
+```typescript
+// ランドマーク変形の最適化
+function optimizedContourDeformation(landmarks: FaceLandmarks): void {
+  // 1. 一度だけ計算する共通値
+  const faceCenter = calculateFaceCenter(landmarks);
+  const faceBounds = calculateFaceBounds(landmarks);
+  
+  // 2. Jawlineのみ処理（68点中17点のみ）
+  const jawlineOnly = landmarks.jawline;
+  
+  // 3. 必要時のみ平滑化実行
+  if (params.smoothness > 0) {
+    applySmoothness(targetPoints, params.smoothness);
+  }
+}
+```
+
+#### メモリ効率
+```typescript
+// 既存配列の in-place 更新
+function updateLandmarksInPlace(
+  deformedLandmarks: Point[],
+  contourResult: { target: Point[] }
+): void {
+  // 新しい配列を作らずに既存要素を更新
+  contourResult.target.forEach((point, i) => {
+    if (i < 17) {
+      deformedLandmarks[i].x = point.x;
+      deformedLandmarks[i].y = point.y;
+    }
+  });
+}
+```
+
+---
+
+## 4. 座標変換の数学的詳細
+
+### 4.1 バリセントリック座標
 
 #### 定義と計算
 ```typescript
@@ -387,7 +645,7 @@ function transformPoint(
 }
 ```
 
-### 3.2 座標系のスケーリング
+### 4.2 座標系のスケーリング
 
 #### Canvas座標への変換
 ```typescript
@@ -411,9 +669,9 @@ function scaleLandmarksToCanvas(
 
 ---
 
-## 4. パフォーマンス最適化技術
+## 5. パフォーマンス最適化技術
 
-### 4.1 バウンディングボックス最適化
+### 5.1 バウンディングボックス最適化
 
 ```typescript
 // src/features/image-warping/forwardMapping/hybridRenderer.ts
@@ -432,7 +690,7 @@ function calculateTriangleBounds(triangle: Triangle): {
 }
 ```
 
-### 4.2 スキャンライン最適化
+### 5.2 スキャンライン最適化
 
 ```typescript
 // src/features/image-warping/forwardMapping/triangleRenderer.ts
@@ -474,7 +732,7 @@ function getScanlineIntersections(
 }
 ```
 
-### 4.3 キャッシュ戦略
+### 5.3 キャッシュ戦略
 
 ```typescript
 // アフィン変換のキャッシュ
@@ -497,9 +755,9 @@ function getCachedTransform(
 
 ---
 
-## 5. エッジケースの処理
+## 6. エッジケースの処理
 
-### 5.1 退化三角形の処理
+### 6.1 退化三角形の処理
 
 ```typescript
 function isDegenerate(triangle: Triangle): boolean {
@@ -515,7 +773,7 @@ function isDegenerate(triangle: Triangle): boolean {
 }
 ```
 
-### 5.2 境界処理
+### 6.2 境界処理
 
 ```typescript
 function handleBoundaryPixels(
@@ -546,7 +804,7 @@ function handleBoundaryPixels(
 }
 ```
 
-### 5.3 数値安定性
+### 6.3 数値安定性
 
 ```typescript
 // 浮動小数点誤差の対策
@@ -587,4 +845,4 @@ function safeNormalize(vector: { x: number; y: number }): { x: number; y: number
 
 ---
 
-最終更新日: 2025年1月4日
+最終更新日: 2025年08月04日
