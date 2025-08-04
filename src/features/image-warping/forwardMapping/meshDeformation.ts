@@ -844,7 +844,8 @@ const generatePseudoFaceParams = (
       jawWidth: 1.0,
       cheekFullness: 1.0,
       chinHeight: 1.0,
-      smoothness: 0.5
+      smoothness: 0.5,
+      fixMenton: false
     }
   };
 };

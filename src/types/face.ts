@@ -46,6 +46,7 @@ export interface ContourParams {
   cheekFullness: number;  // 0.7〜1.3 (頬の膨らみ)
   chinHeight: number;     // 0.8〜1.2 (顎の長さ)
   smoothness: number;     // 0.0〜1.0 (輪郭の滑らかさ)
+  fixMenton?: boolean;    // 顎先（メントン）を固定するかどうか
 }
 
 export interface FaceParams {
@@ -83,6 +84,7 @@ export const defaultContourParams: ContourParams = {
   cheekFullness: 1.0, // デフォルトは変更なし
   chinHeight: 1.0,    // デフォルトは変更なし
   smoothness: 0.5,    // 中程度の滑らかさ
+  fixMenton: false,   // デフォルトは固定しない
 };
 
 export const defaultFaceParams: FaceParams = {

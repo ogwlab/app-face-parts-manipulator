@@ -26,6 +26,7 @@ export function generateContourControlPoints(
   
   // 解剖学的参照点を検出
   const anatomicalPoints = detectAnatomicalPoints(jawline);
+  const mentonIndex = jawline.findIndex(p => p === anatomicalPoints.menton);
   
   // アーク長を計算（輪郭線に沿った距離）
   const originalArcLengths = calculateArcLengths(jawline);
@@ -74,7 +75,13 @@ export function generateContourControlPoints(
           
           // ガウシアン重み付けで滑らかな遷移
           const sigma = faceWidth * 0.2;
-          const weight = gaussianWeight(distToMenton, sigma);
+          let weight = gaussianWeight(distToMenton, sigma);
+          
+          // メントン固定時は重み付けを反転
+          if (params.fixMenton) {
+            weight = 1 - weight; // 遠いほど変形量大
+          }
+          
           dx *= weight;
           dy *= weight;
         } else {
@@ -130,8 +137,8 @@ export function generateContourControlPoints(
       dy += faceHeight * fullnessEffect * 0.02;
     }
     
-    // 4. chinHeight: 顎の長さ
-    if (params.chinHeight !== 1.0 && isLowerJaw) {
+    // 4. chinHeight: 顎の長さ（メントン固定時は無効）
+    if (params.chinHeight !== 1.0 && isLowerJaw && !params.fixMenton) {
       const heightEffect = (params.chinHeight - 1.0);
       // 顎下部のY座標を調整
       const lowerJawRatio = (index - 3) / 10; // 0〜1の範囲
@@ -147,8 +154,42 @@ export function generateContourControlPoints(
     };
   });
   
+  // メントン固定処理
+  if (params.fixMenton && mentonIndex >= 0) {
+    // メントンの位置を元に戻す
+    target[mentonIndex] = { ...original[mentonIndex] };
+    
+    // 隣接点の変形量を段階的に減衰
+    const decayRange = 2;
+    for (let i = 1; i <= decayRange; i++) {
+      const decay = 1 - (i / (decayRange + 1)); // 1 → 0.67 → 0.33
+      
+      // 左側
+      if (mentonIndex - i >= 0) {
+        const leftIdx = mentonIndex - i;
+        const dx = target[leftIdx].x - original[leftIdx].x;
+        const dy = target[leftIdx].y - original[leftIdx].y;
+        target[leftIdx] = {
+          x: original[leftIdx].x + dx * decay,
+          y: original[leftIdx].y + dy * decay
+        };
+      }
+      
+      // 右側
+      if (mentonIndex + i < target.length) {
+        const rightIdx = mentonIndex + i;
+        const dx = target[rightIdx].x - original[rightIdx].x;
+        const dy = target[rightIdx].y - original[rightIdx].y;
+        target[rightIdx] = {
+          x: original[rightIdx].x + dx * decay,
+          y: original[rightIdx].y + dy * decay
+        };
+      }
+    }
+  }
+  
   // アーク長を保持する調整（オプション）
-  if (params.faceShape !== 0) {
+  if (params.faceShape !== 0 && !params.fixMenton) {
     preserveArcLength(target, originalArcLengths);
   }
   

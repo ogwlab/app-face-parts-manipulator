@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Typography, Button, Card, CardContent } from '@mui/material';
+import { Box, Typography, Button, Card, CardContent, FormControlLabel, Checkbox } from '@mui/material';
 import ParameterControl from '../ui/ParameterControl';
 import { useFaceStore } from '../../stores/faceStore';
 import { PARAM_LIMITS, defaultContourParams } from '../../types/face';
@@ -8,7 +8,7 @@ const ContourControls: React.FC = () => {
   const { faceParams, updateContourParams } = useFaceStore();
   const params = faceParams.contour;
 
-  const handleChange = (field: keyof typeof params) => (value: number) => {
+  const handleChange = (field: keyof typeof params) => (value: number | boolean) => {
     updateContourParams({ [field]: value });
   };
 
@@ -88,6 +88,7 @@ const ContourControls: React.FC = () => {
               unit=""
               onReset={() => handleChange('chinHeight')(defaultContourParams.chinHeight)}
               parameterType="size"
+              disabled={params.fixMenton}
             />
 
             <ParameterControl
@@ -101,6 +102,28 @@ const ContourControls: React.FC = () => {
               onReset={() => handleChange('smoothness')(defaultContourParams.smoothness)}
               parameterType="size"
             />
+            
+            <Box sx={{ mt: 2, mb: 1 }}>
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={params.fixMenton || false}
+                    onChange={(e) => handleChange('fixMenton')(e.target.checked)}
+                    size="small"
+                  />
+                }
+                label={
+                  <Typography variant="body2">
+                    顎先を固定
+                    {params.fixMenton && (
+                      <Typography variant="caption" color="text.secondary" component="span" sx={{ ml: 1 }}>
+                        （顎の長さ調整は無効）
+                      </Typography>
+                    )}
+                  </Typography>
+                }
+              />
+            </Box>
           </Box>
         </CardContent>
       </Card>

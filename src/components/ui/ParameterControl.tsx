@@ -20,6 +20,7 @@ interface ParameterControlProps {
   resetOnly?: boolean;
   resetLabel?: string;
   parameterType?: 'size' | 'position';
+  disabled?: boolean;
 }
 
 const ParameterControl: React.FC<ParameterControlProps> = ({
@@ -34,6 +35,7 @@ const ParameterControl: React.FC<ParameterControlProps> = ({
   resetOnly = false,
   resetLabel = "🔄",
   parameterType = 'position',
+  disabled = false,
 }) => {
   const handleSliderChange = (_event: Event, newValue: number | number[]) => {
     if (typeof newValue === 'number') {
@@ -109,6 +111,7 @@ const ParameterControl: React.FC<ParameterControlProps> = ({
         <IconButton
           size="small"
           onClick={onReset}
+          disabled={disabled}
           sx={{ 
             fontSize: '0.8rem', 
             minWidth: 'auto',
@@ -130,6 +133,7 @@ const ParameterControl: React.FC<ParameterControlProps> = ({
             max={max}
             step={step}
             size="small"
+            disabled={disabled}
             valueLabelDisplay="auto"
             valueLabelFormat={(val) => `${getDisplayValue(val)}${getDisplayUnit()}`}
           />
@@ -141,6 +145,7 @@ const ParameterControl: React.FC<ParameterControlProps> = ({
           type="number"
           value={parameterType === 'size' ? displayValue.toString() : value.toFixed(2)}
           onChange={handleInputChange}
+          disabled={disabled}
           inputProps={{
             min: parameterType === 'size' ? getDisplayValue(min) : min,
             max: parameterType === 'size' ? getDisplayValue(max) : max,
