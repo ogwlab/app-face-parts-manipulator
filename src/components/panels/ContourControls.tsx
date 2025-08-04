@@ -37,17 +37,22 @@ const ContourControls: React.FC = () => {
           </Box>
 
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-            <ParameterControl
-              label="丸み・角張り"
-              value={params.roundness}
-              onChange={handleChange('roundness')}
-              min={PARAM_LIMITS.contour.roundness.min}
-              max={PARAM_LIMITS.contour.roundness.max}
-              step={PARAM_LIMITS.contour.roundness.step}
-              unit=""
-              onReset={() => handleChange('roundness')(defaultContourParams.roundness)}
-              parameterType="size"
-            />
+            <Box>
+              <ParameterControl
+                label="顔の形状"
+                value={params.faceShape}
+                onChange={handleChange('faceShape')}
+                min={PARAM_LIMITS.contour.faceShape.min}
+                max={PARAM_LIMITS.contour.faceShape.max}
+                step={PARAM_LIMITS.contour.faceShape.step}
+                unit=""
+                onReset={() => handleChange('faceShape')(defaultContourParams.faceShape)}
+                parameterType="size"
+              />
+              <Typography variant="caption" color="text.secondary" sx={{ ml: 2 }}>
+                負の値: 四角い顔 / 正の値: 丸い顔
+              </Typography>
+            </Box>
 
             <ParameterControl
               label="顎の幅"

@@ -12,7 +12,7 @@ export interface SavedSettings {
 // ローカルストレージキー
 const STORAGE_KEY = 'face-app-settings';
 const BACKUP_KEY = 'face-app-settings-backup';
-const CURRENT_VERSION = '1.0.0';
+const CURRENT_VERSION = '1.1.0'; // Version bump for faceShape migration
 
 /**
  * 設定をLocalStorageに保存
@@ -48,6 +48,23 @@ export const saveSettingsToStorage = (
 };
 
 /**
+ * 設定のマイグレーション（roundness → faceShape）
+ */
+const migrateSettings = (settings: any): SavedSettings => {
+  // contourパラメータのマイグレーション
+  if (settings.faceParams?.contour && 'roundness' in settings.faceParams.contour) {
+    console.log('📦 設定をマイグレーション: roundness → faceShape');
+    settings.faceParams.contour.faceShape = settings.faceParams.contour.roundness;
+    delete settings.faceParams.contour.roundness;
+  }
+  
+  // バージョンを更新
+  settings.version = CURRENT_VERSION;
+  
+  return settings as SavedSettings;
+};
+
+/**
  * 設定をLocalStorageから読み込み
  */
 export const loadSettingsFromStorage = (): SavedSettings | null => {
@@ -58,13 +75,22 @@ export const loadSettingsFromStorage = (): SavedSettings | null => {
       return null;
     }
 
-    const settings: SavedSettings = JSON.parse(settingsJson);
+    let settings: SavedSettings = JSON.parse(settingsJson);
     
-    // バージョンチェック
+    // バージョンチェックとマイグレーション
     if (settings.version !== CURRENT_VERSION) {
-      console.warn('⚠️ 設定のバージョンが異なります。無視します。', 
+      console.warn('⚠️ 設定のバージョンが異なります。マイグレーションを試みます。', 
         { saved: settings.version, current: CURRENT_VERSION });
-      return null;
+      
+      // 古いバージョンの設定をマイグレーション
+      if (settings.version === '1.0.0') {
+        settings = migrateSettings(settings);
+        // マイグレーション後の設定を保存
+        saveSettingsToStorage(settings.faceParams, settings.qualityMode, settings.standardizationEnabled);
+      } else {
+        // 未知のバージョンは無視
+        return null;
+      }
     }
 
     // データ整合性チェック
@@ -92,7 +118,12 @@ const loadSettingsFromBackup = (): SavedSettings | null => {
       return null;
     }
 
-    const settings: SavedSettings = JSON.parse(backupJson);
+    let settings: SavedSettings = JSON.parse(backupJson);
+    
+    // バージョンチェックとマイグレーション
+    if (settings.version !== CURRENT_VERSION && settings.version === '1.0.0') {
+      settings = migrateSettings(settings);
+    }
     
     if (!isValidSettings(settings)) {
       console.error('❌ バックアップ設定も破損しています。');
@@ -102,7 +133,7 @@ const loadSettingsFromBackup = (): SavedSettings | null => {
     console.log('✅ バックアップ設定を読み込みました:', settings);
     
     // メイン設定を復旧
-    localStorage.setItem(STORAGE_KEY, backupJson);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
     
     return settings;
   } catch (error) {

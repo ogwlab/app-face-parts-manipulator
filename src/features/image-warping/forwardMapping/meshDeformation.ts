@@ -41,7 +41,7 @@ export interface FeatureBasedMeshResult {
  */
 function isContourChangeDetected(contour: ContourParams): boolean {
   return (
-    contour.roundness !== 0 ||
+    contour.faceShape !== 0 ||
     contour.jawWidth !== 1.0 ||
     contour.cheekFullness !== 1.0 ||
     contour.chinHeight !== 1.0 ||
@@ -138,7 +138,7 @@ export function deformLandmarks(
   // 輪郭の変形（条件付き有効化）
   if (faceParams.contour && isContourChangeDetected(faceParams.contour)) {
     console.log('🔷 輪郭変形開始:', {
-      roundness: faceParams.contour.roundness,
+      faceShape: faceParams.contour.faceShape,
       jawWidth: faceParams.contour.jawWidth,
       cheekFullness: faceParams.contour.cheekFullness,
       chinHeight: faceParams.contour.chinHeight
@@ -840,7 +840,7 @@ const generatePseudoFaceParams = (
       positionY: 0
     },
     contour: {
-      roundness: 0,
+      faceShape: 0,
       jawWidth: 1.0,
       cheekFullness: 1.0,
       chinHeight: 1.0,

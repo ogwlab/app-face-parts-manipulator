@@ -41,7 +41,7 @@ export interface NoseParams {
 // 全体の顔パラメータ
 // 輪郭操作パラメータ
 export interface ContourParams {
-  roundness: number;      // -1.0〜1.0 (負: 角張り, 正: 丸み)
+  faceShape: number;      // -1.0〜1.0 (負: 四角い, 正: 丸い)
   jawWidth: number;       // 0.7〜1.3 (顎の幅)
   cheekFullness: number;  // 0.7〜1.3 (頬の膨らみ)
   chinHeight: number;     // 0.8〜1.2 (顎の長さ)
@@ -78,7 +78,7 @@ export const defaultNoseParams: NoseParams = {
 };
 
 export const defaultContourParams: ContourParams = {
-  roundness: 0,       // デフォルトは元の輪郭形状
+  faceShape: 0,       // デフォルトは元の輪郭形状
   jawWidth: 1.0,      // デフォルトは変更なし
   cheekFullness: 1.0, // デフォルトは変更なし
   chinHeight: 1.0,    // デフォルトは変更なし
@@ -147,7 +147,7 @@ export const PARAM_LIMITS = {
     positionY: { min: -25, max: 25, step: 0.1 },      // ±25%（顔領域縦幅に対する比率）
   },
   contour: {
-    roundness: { min: -1.0, max: 1.0, step: 0.01 },     // 角張り⇔丸み
+    faceShape: { min: -1.0, max: 1.0, step: 0.01 },     // 角張り⇔丸み
     jawWidth: { min: 0.7, max: 1.3, step: 0.01 },       // 顎の幅
     cheekFullness: { min: 0.7, max: 1.3, step: 0.01 },  // 頬の膨らみ
     chinHeight: { min: 0.8, max: 1.2, step: 0.01 },     // 顎の長さ

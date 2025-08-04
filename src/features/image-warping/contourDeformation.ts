@@ -1,6 +1,7 @@
 /**
  * 顔輪郭変形アルゴリズム
  * jawline（顎の輪郭）を基準に、丸み⇔角張りを連続的に調整
+ * Version 7.0.2 - 改善された顔形状制御
  */
 
 import type { Point, ContourParams, FaceLandmarks } from '../../types/face';
@@ -23,6 +24,12 @@ export function generateContourControlPoints(
   const faceWidth = bounds.maxX - bounds.minX;
   const faceHeight = bounds.maxY - bounds.minY;
   
+  // 解剖学的参照点を検出
+  const anatomicalPoints = detectAnatomicalPoints(jawline);
+  
+  // アーク長を計算（輪郭線に沿った距離）
+  const originalArcLengths = calculateArcLengths(jawline);
+  
   // 元の制御点（jawlineそのもの）
   const original = [...jawline];
   
@@ -37,31 +44,74 @@ export function generateContourControlPoints(
     const isSideJaw = index >= 0 && index <= 4 || index >= 12 && index <= 16;
     const isCheekArea = index >= 1 && index <= 3 || index >= 13 && index <= 15;
     
+    // 解剖学的参照点からの距離を計算
+    const distToMenton = distance(point, anatomicalPoints.menton);
+    const distToLeftGonion = distance(point, anatomicalPoints.leftGonion);
+    const distToRightGonion = distance(point, anatomicalPoints.rightGonion);
+    
     // 各パラメータの影響を計算
     let dx = 0;
     let dy = 0;
     
-    // 1. roundness: 丸み⇔角張り
-    if (params.roundness !== 0) {
+    // 1. faceShape: 丸み⇔角張り（改善版）
+    if (params.faceShape !== 0) {
+      // V軸投影アプローチを使用
+      const aspectRatio = faceHeight / faceWidth; // 実際の顔のアスペクト比を使用
+      
       if (isLowerJaw) {
-        // 顎下部は横方向に変形（角張り→狭く、丸み→広く）
-        const roundnessEffect = params.roundness * 0.1; // -0.1〜0.1
-        dx += relX * roundnessEffect;
-        
-        // 丸みの場合は顎先を少し上げる
-        if (params.roundness > 0 && (index === 8 || index === 9)) {
-          dy -= faceHeight * params.roundness * 0.02;
+        // 顎下部の変形
+        if (params.faceShape > 0) {
+          // 丸い顔: 楕円形に近づける
+          const angle = Math.atan2(relY, relX);
+          const targetRadius = Math.sqrt(relX * relX + relY * relY);
+          
+          // 楕円の方程式を使用（実際のアスペクト比を考慮）
+          const ellipseX = jawCenter.x + Math.cos(angle) * targetRadius * (1 + params.faceShape * 0.1);
+          const ellipseY = jawCenter.y + Math.sin(angle) * targetRadius * aspectRatio * (1 + params.faceShape * 0.05);
+          
+          dx = ellipseX - point.x;
+          dy = ellipseY - point.y;
+          
+          // ガウシアン重み付けで滑らかな遷移
+          const sigma = faceWidth * 0.2;
+          const weight = gaussianWeight(distToMenton, sigma);
+          dx *= weight;
+          dy *= weight;
+        } else {
+          // 四角い顔: V軸に向かって投影
+          const squareEffect = -params.faceShape; // 正の値に変換
+          
+          // 顎先から顎角への方向ベクトル
+          const toLeftGonion = {
+            x: anatomicalPoints.leftGonion.x - anatomicalPoints.menton.x,
+            y: anatomicalPoints.leftGonion.y - anatomicalPoints.menton.y
+          };
+          const toRightGonion = {
+            x: anatomicalPoints.rightGonion.x - anatomicalPoints.menton.x,
+            y: anatomicalPoints.rightGonion.y - anatomicalPoints.menton.y
+          };
+          
+          // どちらの顎角に近いか判定
+          const isLeftSide = relX < 0;
+          const targetDirection = isLeftSide ? toLeftGonion : toRightGonion;
+          
+          // V軸方向への投影
+          const projectionStrength = squareEffect * 0.15;
+          dx += targetDirection.x * projectionStrength;
+          dy += targetDirection.y * projectionStrength * 0.7; // Y方向は控えめに
         }
       }
       
       if (isSideJaw) {
-        // サイドは角度を調整（角張り→直線的、丸み→曲線的）
+        // サイドの処理（ガウシアン重み付け）
         const angle = Math.atan2(relY, relX);
-        const roundnessEffect = params.roundness * 0.15;
+        const faceShapeEffect = params.faceShape * 0.12;
         
-        // 角張りの場合は外側に、丸みの場合は内側に
-        dx += Math.cos(angle) * faceWidth * roundnessEffect * 0.5;
-        dy += Math.sin(angle) * faceHeight * roundnessEffect * 0.3;
+        // 解剖学的参照点への近さに基づいて重み付け
+        const gonionWeight = Math.min(distToLeftGonion, distToRightGonion) < faceWidth * 0.3 ? 1.2 : 1.0;
+        
+        dx += Math.cos(angle) * faceWidth * faceShapeEffect * 0.5 * gonionWeight;
+        dy += Math.sin(angle) * faceHeight * faceShapeEffect * 0.3 * gonionWeight;
       }
     }
     
@@ -97,12 +147,109 @@ export function generateContourControlPoints(
     };
   });
   
+  // アーク長を保持する調整（オプション）
+  if (params.faceShape !== 0) {
+    preserveArcLength(target, originalArcLengths);
+  }
+  
   // smoothnessパラメータによる平滑化
   if (params.smoothness > 0) {
     smoothContour(target, params.smoothness);
   }
   
   return { original, target };
+}
+
+/**
+ * 解剖学的参照点を検出
+ */
+interface AnatomicalPoints {
+  menton: Point;        // 顎先（メントン）
+  leftGonion: Point;   // 左顎角（ゴニオン）
+  rightGonion: Point;  // 右顎角（ゴニオン）
+}
+
+function detectAnatomicalPoints(jawline: Point[]): AnatomicalPoints {
+  // メントン: jawlineの中央付近で最も下にある点
+  const mentonIndex = 8; // 通常インデックス8が顎先
+  const menton = jawline[mentonIndex];
+  
+  // ゴニオン: 顎角の検出（曲率が大きく変化する点）
+  // 簡易的にインデックスで指定（より精密には曲率計算が必要）
+  const leftGonionIndex = 3;
+  const rightGonionIndex = 13;
+  
+  return {
+    menton,
+    leftGonion: jawline[leftGonionIndex],
+    rightGonion: jawline[rightGonionIndex]
+  };
+}
+
+/**
+ * jawlineのアーク長を計算
+ */
+function calculateArcLengths(points: Point[]): number[] {
+  const arcLengths: number[] = [0];
+  
+  for (let i = 1; i < points.length; i++) {
+    const dist = distance(points[i-1], points[i]);
+    arcLengths.push(arcLengths[i-1] + dist);
+  }
+  
+  return arcLengths;
+}
+
+/**
+ * 2点間の距離を計算
+ */
+function distance(p1: Point, p2: Point): number {
+  const dx = p2.x - p1.x;
+  const dy = p2.y - p1.y;
+  return Math.sqrt(dx * dx + dy * dy);
+}
+
+/**
+ * ガウシアン重み付け関数
+ */
+function gaussianWeight(distance: number, sigma: number): number {
+  return Math.exp(-(distance * distance) / (2 * sigma * sigma));
+}
+
+/**
+ * アーク長を保持するように点を調整
+ */
+function preserveArcLength(points: Point[], originalArcLengths: number[]): void {
+  if (points.length !== originalArcLengths.length) return;
+  
+  // 各点を調整
+  for (let i = 1; i < points.length - 1; i++) {
+    const targetArcLength = originalArcLengths[i];
+    
+    // 前の点からの方向ベクトル
+    const prevPoint = points[i - 1];
+    const currentPoint = points[i];
+    const direction = {
+      x: currentPoint.x - prevPoint.x,
+      y: currentPoint.y - prevPoint.y
+    };
+    
+    // 方向を正規化
+    const dirLength = Math.sqrt(direction.x * direction.x + direction.y * direction.y);
+    if (dirLength > 0) {
+      direction.x /= dirLength;
+      direction.y /= dirLength;
+      
+      // 目標距離
+      const targetDistance = targetArcLength - originalArcLengths[i - 1];
+      
+      // 新しい位置
+      points[i] = {
+        x: prevPoint.x + direction.x * targetDistance,
+        y: prevPoint.y + direction.y * targetDistance
+      };
+    }
+  }
 }
 
 /**

@@ -419,7 +419,7 @@ export function generateTPSControlPoints(
 
   // 輪郭の制御点を生成（contourパラメータが変更されている場合）
   if (faceParams.contour && 
-      (faceParams.contour.roundness !== 0 || 
+      (faceParams.contour.faceShape !== 0 || 
        faceParams.contour.jawWidth !== 1.0 || 
        faceParams.contour.cheekFullness !== 1.0 || 
        faceParams.contour.chinHeight !== 1.0)) {
