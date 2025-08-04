@@ -330,12 +330,12 @@ function computeTPSWeights(
 
 ---
 
-## 3. 🆕 輪郭操作アルゴリズム
+## 3. 🆕 輪郭操作アルゴリズム (Version 7.0.2 改善版)
 
 ### 3.1 Jawline-based制御点生成
 
 #### 基本原理
-顔の輪郭操作は68点ランドマークのJawline（0-16番）を基準とし、解剖学的に自然な変形を実現します。
+顔の輪郭操作は68点ランドマークのJawline（0-16番）を基準とし、解剖学的に自然な変形を実現します。Version 7.0.2では曲率ベースの動的解剖学的点検出とメントン固定機能を追加しました。
 
 #### 制御点生成プロセス
 ```typescript
@@ -407,14 +407,37 @@ function calculatePointTransformation(
   const relX = (point.x - faceCenter.x) / faceBounds.width;
   const relY = (point.y - faceCenter.y) / faceBounds.height;
   
-  // 1. roundness: 丸み⇔角張り (-1.0〜1.0)
-  if (params.roundness !== 0 && region === 'lowerJaw') {
-    const roundnessEffect = params.roundness * 0.1;
-    dx += relX * roundnessEffect * faceBounds.width;
-    
-    // 顎先の特別処理（丸みの場合は少し上げる）
-    if (params.roundness > 0 && (index === 8 || index === 9)) {
-      dy -= faceBounds.height * params.roundness * 0.02;
+  // 1. faceShape: 丸み⇔角張り (-1.0〜1.0) [Version 7.0.2: roundnessから名称変更]
+  if (params.faceShape !== 0 && region === 'lowerJaw') {
+    if (params.faceShape > 0) {
+      // 丸い顔: 楕円形アプローチ（実際の顔アスペクト比使用）
+      const aspectRatio = faceBounds.height / faceBounds.width;
+      const angle = Math.atan2(relY, relX);
+      const radius = Math.sqrt(relX * relX + relY * relY);
+      
+      const ellipseX = Math.cos(angle) * radius * (1 + params.faceShape * 0.1);
+      const ellipseY = Math.sin(angle) * radius * aspectRatio * (1 + params.faceShape * 0.05);
+      
+      dx = ellipseX - relX * faceBounds.width;
+      dy = ellipseY - relY * faceBounds.height;
+      
+      // ガウシアン重み付けとメントン固定対応
+      const sigma = faceBounds.width * 0.2;
+      let weight = gaussianWeight(distToMenton, sigma);
+      
+      if (params.fixMenton) {
+        weight = 1 - weight; // メントン固定時は重み反転
+      }
+      
+      dx *= weight;
+      dy *= weight;
+    } else {
+      // 四角い顔: V軸投影アプローチ
+      const squareEffect = -params.faceShape;
+      const toGonion = isLeftSide ? toLeftGonion : toRightGonion;
+      
+      dx += toGonion.x * squareEffect * 0.15;
+      dy += toGonion.y * squareEffect * 0.15 * 0.7;
     }
   }
   
@@ -431,8 +454,8 @@ function calculatePointTransformation(
     dy += faceBounds.height * fullnessEffect * 0.02;
   }
   
-  // 4. chinHeight: 顎の長さ (0.8〜1.2)
-  if (params.chinHeight !== 1.0 && region === 'lowerJaw') {
+  // 4. chinHeight: 顎の長さ (0.8〜1.2) [メントン固定時は無効]
+  if (params.chinHeight !== 1.0 && region === 'lowerJaw' && !params.fixMenton) {
     const heightEffect = (params.chinHeight - 1.0);
     const lowerJawRatio = (index - 3) / 10; // 0.0〜1.0
     const centerRatio = 1 - Math.abs(lowerJawRatio - 0.5) * 2;
@@ -842,6 +865,115 @@ function safeNormalize(vector: { x: number; y: number }): { x: number; y: number
 1. 境界値テストケース
 2. パフォーマンスプロファイリング
 3. 視覚的デバッグツール（特徴点表示など）
+
+---
+
+### 3.6 🆕 解剖学的点検出アルゴリズム (Version 7.0.2)
+
+#### 曲率ベースの動的検出
+```typescript
+// src/features/image-warping/contourDeformation.ts
+function calculateCurvature(p1: Point, p2: Point, p3: Point): number {
+  // 2つのベクトルを計算
+  const v1 = { x: p2.x - p1.x, y: p2.y - p1.y };
+  const v2 = { x: p3.x - p2.x, y: p3.y - p2.y };
+  
+  // 外積による曲率計算
+  const crossProduct = v1.x * v2.y - v1.y * v2.x;
+  const len1 = Math.sqrt(v1.x * v1.x + v1.y * v1.y);
+  const len2 = Math.sqrt(v2.x * v2.x + v2.y * v2.y);
+  
+  if (len1 * len2 === 0) return 0;
+  return crossProduct / (len1 * len2);
+}
+
+function detectAnatomicalPoints(jawline: Point[]): AnatomicalPoints {
+  // メントン: 中央付近で最も下の点
+  const centerIndex = Math.floor(jawline.length / 2);
+  let mentonIndex = centerIndex;
+  let maxY = jawline[centerIndex].y;
+  
+  for (let i = centerIndex - 3; i <= centerIndex + 3; i++) {
+    if (i >= 0 && i < jawline.length && jawline[i].y > maxY) {
+      maxY = jawline[i].y;
+      mentonIndex = i;
+    }
+  }
+  
+  // ゴニオン: 曲率の局所最大値で検出
+  const curvatures: number[] = [];
+  for (let i = 1; i < jawline.length - 1; i++) {
+    const curvature = calculateCurvature(
+      jawline[i - 1], jawline[i], jawline[i + 1]
+    );
+    curvatures.push(Math.abs(curvature));
+  }
+  
+  // 左側ゴニオン（インデックス1-6の範囲）
+  let leftGonionIndex = 3;
+  let maxLeftCurvature = 0;
+  for (let i = 1; i <= 6 && i < curvatures.length; i++) {
+    if (curvatures[i - 1] > maxLeftCurvature) {
+      maxLeftCurvature = curvatures[i - 1];
+      leftGonionIndex = i;
+    }
+  }
+  
+  // 右側ゴニオン（インデックス10-15の範囲）
+  let rightGonionIndex = 13;
+  let maxRightCurvature = 0;
+  for (let i = 10; i <= 15 && i < curvatures.length + 1; i++) {
+    if (curvatures[i - 1] > maxRightCurvature) {
+      maxRightCurvature = curvatures[i - 1];
+      rightGonionIndex = i;
+    }
+  }
+  
+  return {
+    menton: jawline[mentonIndex],
+    leftGonion: jawline[leftGonionIndex],
+    rightGonion: jawline[rightGonionIndex]
+  };
+}
+```
+
+### 3.7 🆕 メントン固定アルゴリズム (Version 7.0.2)
+
+#### 固定と減衰処理
+```typescript
+if (params.fixMenton && mentonIndex >= 0) {
+  // メントンの位置を元に戻す
+  target[mentonIndex] = { ...original[mentonIndex] };
+  
+  // 隣接点の変形量を段階的に減衰
+  const decayRange = 2;
+  for (let i = 1; i <= decayRange; i++) {
+    const decay = 1 - (i / (decayRange + 1)); // 1 → 0.67 → 0.33
+    
+    // 左側
+    if (mentonIndex - i >= 0) {
+      const leftIdx = mentonIndex - i;
+      const dx = target[leftIdx].x - original[leftIdx].x;
+      const dy = target[leftIdx].y - original[leftIdx].y;
+      target[leftIdx] = {
+        x: original[leftIdx].x + dx * decay,
+        y: original[leftIdx].y + dy * decay
+      };
+    }
+    
+    // 右側
+    if (mentonIndex + i < target.length) {
+      const rightIdx = mentonIndex + i;
+      const dx = target[rightIdx].x - original[rightIdx].x;
+      const dy = target[rightIdx].y - original[rightIdx].y;
+      target[rightIdx] = {
+        x: original[rightIdx].x + dx * decay,
+        y: original[rightIdx].y + dy * decay
+      };
+    }
+  }
+}
+```
 
 ---
 
