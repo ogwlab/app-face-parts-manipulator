@@ -121,8 +121,14 @@ const loadSettingsFromBackup = (): SavedSettings | null => {
     let settings: SavedSettings = JSON.parse(backupJson);
     
     // バージョンチェックとマイグレーション
-    if (settings.version !== CURRENT_VERSION && settings.version === '1.0.0') {
-      settings = migrateSettings(settings);
+    if (settings.version !== CURRENT_VERSION) {
+      if (settings.version === '1.0.0') {
+        settings = migrateSettings(settings);
+      } else {
+        // 未知のバージョンは無視
+        console.warn('⚠️ 未知のバージョンです:', settings.version);
+        return null;
+      }
     }
     
     if (!isValidSettings(settings)) {

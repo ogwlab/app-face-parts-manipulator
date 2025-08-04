@@ -42,6 +42,7 @@ venv_*
 # Claude Code設定ファイル（機密情報含む）
 .claude/
 .claude/settings.local.json
+.serena/
 
 # デプロイ関連ファイル
 .htaccess

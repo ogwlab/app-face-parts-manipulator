@@ -41,8 +41,8 @@ export function generateContourControlPoints(
     
     // 顎の下部かどうかを判定（インデックス3〜13あたりが顎下部）
     const isLowerJaw = index >= 3 && index <= 13;
-    const isSideJaw = index >= 0 && index <= 4 || index >= 12 && index <= 16;
-    const isCheekArea = index >= 1 && index <= 3 || index >= 13 && index <= 15;
+    const isSideJaw = (index >= 0 && index <= 4) || (index >= 12 && index <= 16);
+    const isCheekArea = (index >= 1 && index <= 3) || (index >= 13 && index <= 15);
     
     // 解剖学的参照点からの距離を計算
     const distToMenton = distance(point, anatomicalPoints.menton);
@@ -169,18 +169,78 @@ interface AnatomicalPoints {
   rightGonion: Point;  // 右顎角（ゴニオン）
 }
 
-function detectAnatomicalPoints(jawline: Point[]): AnatomicalPoints {
-  // メントン: jawlineの中央付近で最も下にある点
-  const mentonIndex = 8; // 通常インデックス8が顎先
-  const menton = jawline[mentonIndex];
+/**
+ * 曲率を計算（3点を使用した離散曲率）
+ */
+function calculateCurvature(p1: Point, p2: Point, p3: Point): number {
+  // 2つのベクトルを計算
+  const v1 = { x: p2.x - p1.x, y: p2.y - p1.y };
+  const v2 = { x: p3.x - p2.x, y: p3.y - p2.y };
   
-  // ゴニオン: 顎角の検出（曲率が大きく変化する点）
-  // 簡易的にインデックスで指定（より精密には曲率計算が必要）
-  const leftGonionIndex = 3;
-  const rightGonionIndex = 13;
+  // 外積を計算（曲率の符号付き値）
+  const crossProduct = v1.x * v2.y - v1.y * v2.x;
+  
+  // ベクトルの長さ
+  const len1 = Math.sqrt(v1.x * v1.x + v1.y * v1.y);
+  const len2 = Math.sqrt(v2.x * v2.x + v2.y * v2.y);
+  
+  // 曲率を計算（長さで正規化）
+  if (len1 * len2 === 0) return 0;
+  return crossProduct / (len1 * len2);
+}
+
+function detectAnatomicalPoints(jawline: Point[]): AnatomicalPoints {
+  // 1. メントン: jawlineの中央付近で最も下（Y座標が最大）の点を検出
+  const centerIndex = Math.floor(jawline.length / 2);
+  const searchRange = 3; // 中央から±3の範囲で検索
+  
+  let mentonIndex = centerIndex;
+  let maxY = jawline[centerIndex].y;
+  
+  for (let i = centerIndex - searchRange; i <= centerIndex + searchRange; i++) {
+    if (i >= 0 && i < jawline.length && jawline[i].y > maxY) {
+      maxY = jawline[i].y;
+      mentonIndex = i;
+    }
+  }
+  
+  // 2. ゴニオン: 曲率の局所最大値を検出
+  const curvatures: number[] = [];
+  
+  // 各点の曲率を計算（最初と最後の点を除く）
+  for (let i = 1; i < jawline.length - 1; i++) {
+    const curvature = calculateCurvature(
+      jawline[i - 1],
+      jawline[i],
+      jawline[i + 1]
+    );
+    curvatures.push(Math.abs(curvature)); // 絶対値を使用
+  }
+  
+  // 左側のゴニオン（インデックス1〜6の範囲で最大曲率）
+  let leftGonionIndex = 3; // デフォルト値
+  let maxLeftCurvature = 0;
+  
+  for (let i = 1; i <= 6 && i < curvatures.length; i++) {
+    if (curvatures[i - 1] > maxLeftCurvature) {
+      maxLeftCurvature = curvatures[i - 1];
+      leftGonionIndex = i;
+    }
+  }
+  
+  // 右側のゴニオン（インデックス10〜15の範囲で最大曲率）
+  let rightGonionIndex = 13; // デフォルト値
+  let maxRightCurvature = 0;
+  
+  for (let i = 10; i <= 15 && i < curvatures.length + 1; i++) {
+    if (curvatures[i - 1] > maxRightCurvature) {
+      maxRightCurvature = curvatures[i - 1];
+      rightGonionIndex = i;
+    }
+  }
   
   return {
-    menton,
+    menton: jawline[mentonIndex],
     leftGonion: jawline[leftGonionIndex],
     rightGonion: jawline[rightGonionIndex]
   };
