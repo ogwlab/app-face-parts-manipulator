@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState, useCallback } from 'react';
+import React, { useRef, useEffect, useState, useCallback, memo } from 'react';
 import {
   Box,
   Typography,
@@ -15,8 +15,9 @@ import { useFaceDetection } from '../../hooks/useFaceDetection';
 import SaveButton from './SaveButton';
 import { UnifiedQualitySelector, type UnifiedQualityMode } from './UnifiedQualitySelector';
 import type { FaceLandmarks, ImageData } from '../../types/face';
+import { logger } from '../../utils/logger';
 
-const ImagePreview: React.FC = () => {
+const ImagePreview: React.FC = memo(() => {
   const { 
     originalImage, 
     processedImageUrl,
@@ -133,7 +134,7 @@ const ImagePreview: React.FC = () => {
 
   // originalImageが変更された時にimageLoadedをリセット
   useEffect(() => {
-    console.log('🖼️ originalImage changed:', originalImage ? 'あり' : 'なし');
+    logger.debug('🖼️ originalImage changed:', originalImage ? 'あり' : 'なし');
     setImageLoaded(false);
   }, [originalImage]);
 
@@ -512,6 +513,8 @@ const ImagePreview: React.FC = () => {
 
     </Box>
   );
-};
+});
+
+ImagePreview.displayName = 'ImagePreview';
 
 export default ImagePreview; 

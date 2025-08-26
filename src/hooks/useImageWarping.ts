@@ -1,5 +1,6 @@
 import { useEffect, useCallback, useRef } from 'react';
 import { useFaceStore } from '../stores/faceStore';
+import { logger } from '../utils/logger';
 import { canvasManager } from '../features/image-warping/canvasManager';
 import { applyAdaptiveTPSWarping, getAdaptiveOptionsFromQuality } from '../features/image-warping/adaptiveWarping';
 
@@ -29,7 +30,7 @@ export const useImageWarping = (quality: 'fast' | 'medium' | 'high' = 'high'): U
   // Canvas初期化
   const initializeCanvas = useCallback((canvasElement: HTMLCanvasElement, width?: number, height?: number) => {
     try {
-      console.log('🎨 Canvas初期化開始:', { 
+      logger.debug('🎨 Canvas初期化開始:', { 
         canvasElement: !!canvasElement, 
         width, 
         height,
@@ -39,7 +40,7 @@ export const useImageWarping = (quality: 'fast' | 'medium' | 'high' = 'high'): U
       
       canvasManager.initialize(canvasElement, width, height);
       
-      console.log('✅ Canvas初期化成功:', {
+      logger.debug('✅ Canvas初期化成功:', {
         canvas: !!canvasManager.canvas,
         size: width ? `${width}x${height}` : 'デフォルト',
         canvasWidth: canvasManager.canvas?.getWidth(),
@@ -48,7 +49,7 @@ export const useImageWarping = (quality: 'fast' | 'medium' | 'high' = 'high'): U
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Canvas初期化エラー';
       setError(errorMessage);
-      console.error('❌ Canvas初期化失敗:', error);
+      logger.error('❌ Canvas初期化失敗:', error);
     }
   }, [setError]);
 

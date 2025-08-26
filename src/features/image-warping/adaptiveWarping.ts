@@ -3,6 +3,7 @@ import { generateTPSControlPoints, type TPSControlPoint } from './tpsWarping';
 import { generateAnatomicalConstraints, applyAnatomicalConstraints } from './anatomicalConstraints';
 import { generateIndependentDeformation, applyIndependentDeformation } from './independentDeformation';
 import { performMeshBasedDeformation } from './forwardMapping/meshDeformation';
+import { logger } from '../../utils/logger';
 
 /**
  * 適応的サンプリングによる高性能顔ワーピング
@@ -240,7 +241,7 @@ function optimizeControlPoints(
   // 重要度による制御点の選択
   const sortedPoints = [...controlPoints].sort((a, b) => (b.weight || 1) - (a.weight || 1));
   
-  console.log(`🎯 制御点最適化: ${controlPoints.length} → ${options.maxControlPoints}`);
+  logger.debug(`🎯 制御点最適化: ${controlPoints.length} → ${options.maxControlPoints}`);
   return sortedPoints.slice(0, options.maxControlPoints);
 }
 
@@ -255,7 +256,7 @@ export function applyAdaptiveTPSWarping(
   canvasHeight: number,
   options: AdaptiveWarpingOptions = DEFAULT_ADAPTIVE_OPTIONS
 ): HTMLCanvasElement {
-  console.log('🎨 適応的TPS変形開始:', { 
+  logger.info('🎨 適応的TPS変形開始:', { 
     quality: options.quality, 
     mode: options.deformationMode,
     canvasWidth, 
@@ -263,7 +264,7 @@ export function applyAdaptiveTPSWarping(
   });
   
   // 🔍 仮説1検証: どのモードが選択されているかを明示
-  console.log('🔍 [仮説1検証] 変形モード判定:', {
+  logger.debug('🔍 [仮説1検証] 変形モード判定:', {
     deformationMode: options.deformationMode,
     isIndependent: options.deformationMode === 'independent',
     willUseIndependentSystem: options.deformationMode === 'independent'
@@ -273,7 +274,7 @@ export function applyAdaptiveTPSWarping(
 
   // メッシュベース変形モードの処理（Version 5.2.0）
   if (options.deformationMode === 'mesh') {
-    console.log('🔺 [Version 5.2.0] メッシュベース変形システムへ移行');
+    logger.info('🔺 [Version 5.2.0] メッシュベース変形システムへ移行');
     // renderModeをdebugOptionsに渡す
     const meshRenderMode = (options as any).meshRenderMode || 'hybrid';
     return performMeshBasedDeformation(
@@ -294,7 +295,7 @@ export function applyAdaptiveTPSWarping(
 
   // 独立変形モードの処理
   if (options.deformationMode === 'independent') {
-    console.log('🔧 独立変形システムへ移行');
+    logger.info('🔧 独立変形システムへ移行');
     return applyIndependentTPSWarping(
       sourceImageElement,
       landmarks,
@@ -306,7 +307,7 @@ export function applyAdaptiveTPSWarping(
   }
 
   // 従来のTPS変形処理（traditionalモード）
-  console.log('🔧 従来TPSシステムを使用');
+  logger.info('🔧 従来TPSシステムを使用');
   // Canvas準備
   const sourceCanvas = document.createElement('canvas');
   const targetCanvas = document.createElement('canvas');
@@ -382,7 +383,7 @@ export function applyAdaptiveTPSWarping(
   //   localRigidity: options.quality === 'fast' ? 0.9 : 0.8
   // };
   
-  console.log('🔄 適応的TPS変形実行中...');
+  logger.debug('🔄 適応的TPS変形実行中...');
   
   // 全ピクセル処理（適応的サンプリングを無効化して水平ノイズを防止）
   let processedPixels = 0;
@@ -477,7 +478,7 @@ export function applyAdaptiveTPSWarping(
     const progressInterval = options.quality === 'fast' ? 50 : 20;
     if (y % progressInterval === 0) {
       const progress = Math.round((y / canvasHeight) * 100);
-      console.log(`🔄 適応的変形進捗: ${progress}% (処理済み: ${processedPixels}/${totalPixels})`);
+      logger.debug(`🔄 適応的変形進捗: ${progress}% (処理済み: ${processedPixels}/${totalPixels}`);
     }
   }
   
@@ -488,7 +489,7 @@ export function applyAdaptiveTPSWarping(
   const processingTime = (endTime - startTime).toFixed(1);
   const processingRatio = (processedPixels / totalPixels * 100).toFixed(1);
   
-  console.log(`✅ 改良TPS変形完了: ${processingTime}ms, 処理率: ${processingRatio}%`);
+  logger.info(`✅ 改良TPS変形完了: ${processingTime}ms, 処理率: ${processingRatio}%`);
   
   return targetCanvas;
 }
@@ -546,10 +547,10 @@ function applyIndependentTPSWarping(
   // @ts-ignore - 将来の拡張で使用予定
   options: AdaptiveWarpingOptions
 ): HTMLCanvasElement {
-  console.log('🔧 独立変形システム開始');
+  logger.info('🔧 独立変形システム開始');
   
   // 🔍 仮説2検証: 顔パラメータの確認
-  console.log('🔍 [仮説2検証] 受信した顔パラメータ:', {
+  logger.debug('🔍 [仮説2検証] 受信した顔パラメータ:', {
     leftEye: faceParams.leftEye,
     rightEye: faceParams.rightEye,
     mouth: faceParams.mouth,

@@ -12,6 +12,7 @@ import { renderTriangleMeshBackward } from './backwardRenderer';
 import { renderTriangleMeshHybrid } from './hybridRenderer';
 import { generateContourControlPoints } from '../contourDeformation';
 import type { ContourParams } from '../../../types/face';
+import { logger } from '../../../utils/logger';
 
 /**
  * 特徴点ベース変形用の拡張されたメッシュ変形オプション
@@ -498,13 +499,13 @@ export function applyMeshDeformation(
   deformationResult: MeshDeformationResult,
   renderMode: 'forward' | 'backward' | 'hybrid' = 'hybrid'
 ): void {
-  console.log(`🎨 メッシュ変形適用開始 (${renderMode}モード)`);
+  logger.debug(`🎨 メッシュ変形適用開始 (${renderMode}モード)`);
   const startTime = performance.now();
   
   // Canvasをクリア
   const targetCtx = targetCanvas.getContext('2d');
   if (!targetCtx) {
-    console.error('Target canvas context取得エラー');
+    logger.error('Target canvas context取得エラー');
     return;
   }
   
@@ -519,7 +520,7 @@ export function applyMeshDeformation(
   // レンダリングモードに応じて処理を分岐
   switch (renderMode) {
     case 'backward':
-      console.log('🔄 バックワードマッピングモードで実行');
+      logger.debug('🔄 バックワードマッピングモードで実行');
       renderTriangleMeshBackward(
         sourceCanvas,
         targetCanvas,
@@ -528,7 +529,7 @@ export function applyMeshDeformation(
       break;
       
     case 'hybrid':
-      console.log('🔀 ハイブリッドモードで実行');
+      logger.debug('🔀 ハイブリッドモードで実行');
       renderTriangleMeshHybrid(
         sourceCanvas,
         targetCanvas,
@@ -538,7 +539,7 @@ export function applyMeshDeformation(
       
     case 'forward':
     default:
-      console.log('➡️ フォワードマッピングモードで実行');
+      logger.debug('➡️ フォワードマッピングモードで実行');
       renderTriangleMesh(
         sourceCanvas,
         targetCanvas,
@@ -548,7 +549,7 @@ export function applyMeshDeformation(
   }
   
   const endTime = performance.now();
-  console.log(`✅ メッシュ変形適用完了: ${(endTime - startTime).toFixed(1)}ms`);
+  logger.info(`✅ メッシュ変形適用完了: ${(endTime - startTime).toFixed(1)}ms`);
 }
 
 /**
