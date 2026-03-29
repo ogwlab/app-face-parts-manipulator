@@ -4,7 +4,7 @@ import react from '@vitejs/plugin-react'
 // https://vite.dev/config/
 export default defineConfig(() => ({
   plugins: [react()],
-  base: '/face-parts-manipulator/', // サーバー上のパス設定に合わせる
+  base: '/app-face-parts-manipulator/',
   server: {
     host: 'localhost',
     port: 5173,
