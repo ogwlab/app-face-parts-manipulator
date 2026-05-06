@@ -37,7 +37,7 @@ const StandardizationPanel: React.FC = () => {
   } = useStandardizationStore();
   
   // 簡略化されたデバッグログ
-  if (process.env.NODE_ENV === 'development') {
+  if (import.meta.env.DEV) {
     console.log('📋 標準化パネル:', { 
       enabled: standardizationEnabled, 
       ready: !!(faceDetection && originalImage),
@@ -47,7 +47,7 @@ const StandardizationPanel: React.FC = () => {
 
   // 標準化処理の実行
   const executeStandardization = useCallback(async () => {
-    if (process.env.NODE_ENV === 'development') {
+    if (import.meta.env.DEV) {
       console.log('🔄 標準化処理開始:', params);
     }
     
@@ -69,13 +69,10 @@ const StandardizationPanel: React.FC = () => {
         img.onerror = reject;
       });
 
-      // face-api.jsのランドマークを取得
-      const landmarks = faceDetection.landmarks as any;
-      
       // 特徴点ベース標準化実行
       const standardizationResult = await standardizeFaceImage(
         img,
-        landmarks,
+        faceDetection.landmarks,
         params
       );
       
@@ -87,7 +84,7 @@ const StandardizationPanel: React.FC = () => {
       // 🚀 新機能: faceStoreに標準化結果を自動保存
       setStandardizationResult(url, standardizationResult.transformedLandmarks);
       
-      if (process.env.NODE_ENV === 'development') {
+      if (import.meta.env.DEV) {
         console.log('✅ 標準化完了 & faceStore連携:', {
           size: `${standardizationResult.canvas.width}x${standardizationResult.canvas.height}`,
           transform: standardizationResult.appliedTransform,
@@ -101,7 +98,7 @@ const StandardizationPanel: React.FC = () => {
     } finally {
       setIsStandardizing(false);
     }
-  }, [faceDetection, originalImage, params, setResult, setStandardizedImageUrl, setIsStandardizing, setError]);
+  }, [faceDetection, originalImage, params, setResult, setStandardizedImageUrl, setStandardizationResult, setIsStandardizing, setError]);
 
   // パラメータ変更時の自動実行
   useEffect(() => {

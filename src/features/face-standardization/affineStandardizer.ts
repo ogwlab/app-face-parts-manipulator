@@ -307,7 +307,7 @@ const createScaleAroundPointMatrix = (sx: number, sy: number, center: Point): Af
   const T = createTranslationMatrix(center.x, center.y);
   
   // 組み合わせ: T @ S @ T^-1 (右から左に適用)
-  let result = multiplyMatrix(S, T_inv);
+  const result = multiplyMatrix(S, T_inv);
   return multiplyMatrix(T, result);
 };
 
@@ -324,7 +324,7 @@ const createRotationAroundPointMatrix = (angle: number, center: Point): AffineTr
   const T = createTranslationMatrix(center.x, center.y);
   
   // 組み合わせ: T @ R @ T^-1 (右から左に適用)
-  let result = multiplyMatrix(R, T_inv);
+  const result = multiplyMatrix(R, T_inv);
   return multiplyMatrix(T, result);
 };
 

@@ -341,7 +341,7 @@ export function applyAnatomicalConstraints(
 ): TPSControlPoint[] {
   console.log('🧬 解剖学的制約適用開始');
   
-  let adjustedPoints = [...controlPoints];
+  const adjustedPoints = [...controlPoints];
   
   for (let iteration = 0; iteration < maxIterations; iteration++) {
     const { totalViolation, violations } = calculateConstraintViolations(adjustedPoints, constraints);
@@ -383,7 +383,7 @@ function adjustConstraintViolation(
       
       // 制約の種類に応じた調整
       switch (constraint.type) {
-        case 'distance':
+        case 'distance': {
           // 距離制約違反の場合、中心に向かって調整
           const adjustment = {
             x: (cp.original.x - cp.target.x) * adjustmentFactor,
@@ -392,6 +392,7 @@ function adjustConstraintViolation(
           cp.target.x += adjustment.x;
           cp.target.y += adjustment.y;
           break;
+        }
           
         case 'symmetry':
           // 対称性制約違反の場合、Y座標を調整

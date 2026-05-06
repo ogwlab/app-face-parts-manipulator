@@ -132,8 +132,9 @@ function renderTriangleToImageData(
   targetImageData: ImageData,
   sourceTriangle: Triangle,
   targetTriangle: Triangle,
-  _transform: AffineTransform
+  transform: AffineTransform
 ): number {
+  void transform;
   const targetWidth = targetImageData.width;
   const targetHeight = targetImageData.height;
   let pixelCount = 0;

@@ -8,65 +8,12 @@ import {
 } from '@mui/material';
 import { useFaceStore } from '../../stores/faceStore';
 import { useFaceDetection } from '../../hooks/useFaceDetection';
-import type { ImageData } from '../../types/face';
+import { validateImageFile } from '../../utils/imageValidation';
 
 const ImageUpload: React.FC = () => {
   const { setOriginalImage, setError, isLoading, setLoading } = useFaceStore();
   const [dragActive, setDragActive] = useState(false);
   const { detectFace, initializeModels, isLoading: faceDetectionLoading, error: faceDetectionError, isLoadingModels } = useFaceDetection();
-
-  // ファイル検証の定数
-  const MAX_FILE_SIZE = 8 * 1024 * 1024; // 8MB
-  const MAX_RESOLUTION = 1920; // 1920px
-  const SUPPORTED_FORMATS = ['image/jpeg', 'image/png', 'image/jpg'];
-
-  const validateFile = useCallback((file: File): Promise<ImageData> => {
-    return new Promise((resolve, reject) => {
-      // ファイル形式チェック
-      if (!SUPPORTED_FORMATS.includes(file.type)) {
-        reject(new Error('サポートされていないファイル形式です。JPEGまたはPNGファイルを選択してください。'));
-        return;
-      }
-
-      // ファイルサイズチェック
-      if (file.size > MAX_FILE_SIZE) {
-        reject(new Error(`ファイルサイズが大きすぎます。${MAX_FILE_SIZE / 1024 / 1024}MB以下のファイルを選択してください。`));
-        return;
-      }
-
-      // 画像の解像度チェック
-      const img = new Image();
-      const tempUrl = URL.createObjectURL(file);
-      
-      img.onload = () => {
-        // 解像度チェック
-        if (img.width > MAX_RESOLUTION || img.height > MAX_RESOLUTION) {
-          URL.revokeObjectURL(tempUrl);
-          reject(new Error(`画像の解像度が大きすぎます。${MAX_RESOLUTION}px以下の画像を選択してください。`));
-          return;
-        }
-
-        // 新しいURLを作成して返す
-        const imageUrl = URL.createObjectURL(file);
-        resolve({
-          file,
-          url: imageUrl,
-          width: img.width,
-          height: img.height,
-        });
-        
-        // 一時URLをクリーンアップ
-        URL.revokeObjectURL(tempUrl);
-      };
-
-      img.onerror = () => {
-        URL.revokeObjectURL(tempUrl);
-        reject(new Error('画像ファイルの読み込みに失敗しました。'));
-      };
-
-      img.src = tempUrl;
-    });
-  }, [MAX_FILE_SIZE, MAX_RESOLUTION, SUPPORTED_FORMATS]);
 
   const handleFileSelect = useCallback(async (file: File) => {
     console.log('📸 画像ファイル選択:', file.name, file.type, file.size);
@@ -75,7 +22,7 @@ const ImageUpload: React.FC = () => {
 
     try {
       // 画像の検証とアップロード
-      const imageData = await validateFile(file);
+      const imageData = await validateImageFile(file);
       console.log('✅ 画像検証成功:', imageData.width, 'x', imageData.height);
       
       setOriginalImage(imageData, file.name);
@@ -117,7 +64,7 @@ const ImageUpload: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }, [setOriginalImage, setError, setLoading, detectFace, initializeModels, validateFile]);
+  }, [setOriginalImage, setError, setLoading, detectFace, initializeModels]);
 
   const handleDrag = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -249,4 +196,4 @@ const ImageUpload: React.FC = () => {
   );
 };
 
-export default ImageUpload; 
+export default ImageUpload;

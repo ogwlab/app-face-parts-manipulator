@@ -190,10 +190,12 @@ const estimateMemoryUsage = (canvas: HTMLCanvasElement): number => {
  * @returns 精度（0-100%）
  */
 const calculateAccuracy = (
-  _transformedLandmarks: FaceLandmarks,
-  _targetEyeDistanceRatio: number
+  transformedLandmarks: FaceLandmarks,
+  targetEyeDistanceRatio: number
 ): number => {
   try {
+    void transformedLandmarks;
+    void targetEyeDistanceRatio;
     // 比率ベースの場合は簡易的な精度評価
     // 実際の実装では画像サイズ情報が必要
     // このファイルは廃止予定のため固定値を返す

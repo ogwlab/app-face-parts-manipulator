@@ -14,8 +14,9 @@ import { useImageWarping } from '../../hooks/useImageWarping';
 import { useFaceDetection } from '../../hooks/useFaceDetection';
 import SaveButton from './SaveButton';
 import { UnifiedQualitySelector, type UnifiedQualityMode } from './UnifiedQualitySelector';
-import type { FaceLandmarks, ImageData } from '../../types/face';
+import type { FaceLandmarks } from '../../types/face';
 import { logger } from '../../utils/logger';
+import { validateImageFile } from '../../utils/imageValidation';
 
 const ImagePreview: React.FC = memo(() => {
   const { 
@@ -75,32 +76,7 @@ const ImagePreview: React.FC = memo(() => {
         setLoading(true);
         setError(null);
 
-        // ファイル検証
-        const MAX_FILE_SIZE = 8 * 1024 * 1024; // 8MB
-        const SUPPORTED_FORMATS = ['image/jpeg', 'image/png', 'image/jpg'];
-        
-        if (!SUPPORTED_FORMATS.includes(file.type)) {
-          throw new Error('サポートされていないファイル形式です。JPEGまたはPNGファイルを選択してください。');
-        }
-        
-        if (file.size > MAX_FILE_SIZE) {
-          throw new Error('ファイルサイズが大きすぎます。8MB以下のファイルを選択してください。');
-        }
-
-        // 画像データを作成
-        const imageData: ImageData = await new Promise((resolve, reject) => {
-          const img = new Image();
-          img.onload = () => {
-            resolve({
-              file,
-              url: URL.createObjectURL(file),
-              width: img.naturalWidth,
-              height: img.naturalHeight
-            });
-          };
-          img.onerror = () => reject(new Error('画像の読み込みに失敗しました。'));
-          img.src = URL.createObjectURL(file);
-        });
+        const imageData = await validateImageFile(file);
 
         setOriginalImage(imageData, file.name);
 
@@ -517,4 +493,4 @@ const ImagePreview: React.FC = memo(() => {
 
 ImagePreview.displayName = 'ImagePreview';
 
-export default ImagePreview; 
+export default ImagePreview;

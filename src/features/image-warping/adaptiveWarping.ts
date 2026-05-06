@@ -1,4 +1,4 @@
-import type { Point, FaceParams, FaceLandmarks } from '../../types/face';
+import type { FaceParams, FaceLandmarks } from '../../types/face';
 import { generateTPSControlPoints, type TPSControlPoint } from './tpsWarping';
 import { generateAnatomicalConstraints, applyAnatomicalConstraints } from './anatomicalConstraints';
 import { generateIndependentDeformation, applyIndependentDeformation } from './independentDeformation';
@@ -19,6 +19,7 @@ export interface AdaptiveWarpingOptions {
   enableConstraints: boolean;
   maxControlPoints: number;
   deformationMode: 'traditional' | 'independent' | 'mesh'; // メッシュモード追加
+  meshRenderMode?: 'forward' | 'hybrid' | 'backward';
   samplingDensity: {
     foreground: number; // 顔領域のサンプリング密度 (1.0 = 全ピクセル)
     background: number; // 背景領域のサンプリング密度
@@ -88,128 +89,6 @@ export function getAdaptiveOptionsFromQuality(quality: 'fast' | 'medium' | 'high
 }
 
 /**
- * 顔領域マスクを生成
- */
-// @ts-ignore - 未使用だがデバッグ用に保持
-function generateFaceMask(
-  landmarks: FaceLandmarks,
-  imageScale: { x: number; y: number },
-  canvasWidth: number,
-  canvasHeight: number
-): ImageData {
-  const canvas = document.createElement('canvas');
-  canvas.width = canvasWidth;
-  canvas.height = canvasHeight;
-  const ctx = canvas.getContext('2d');
-  
-  if (!ctx) {
-    throw new Error('Canvas context を取得できません');
-  }
-  
-  // 顔の輪郭を描画
-  ctx.fillStyle = 'white';
-  ctx.fillRect(0, 0, canvasWidth, canvasHeight);
-  
-  ctx.fillStyle = 'black';
-  ctx.beginPath();
-  
-  // 顔の外側輪郭（顎のライン）
-  landmarks.jawline.forEach((point, index) => {
-    const x = point.x * imageScale.x;
-    const y = point.y * imageScale.y;
-    if (index === 0) {
-      ctx.moveTo(x, y);
-    } else {
-      ctx.lineTo(x, y);
-    }
-  });
-  
-  // 額の部分（推定）
-  const jawCenter = landmarks.jawline[8];
-  const noseTop = landmarks.nose[0];
-  const foreheadY = noseTop.y - (jawCenter.y - noseTop.y) * 0.3;
-  
-  ctx.lineTo(landmarks.jawline[0].x * imageScale.x, foreheadY * imageScale.y);
-  ctx.lineTo(landmarks.jawline[16].x * imageScale.x, foreheadY * imageScale.y);
-  ctx.closePath();
-  ctx.fill();
-  
-  return ctx.getImageData(0, 0, canvasWidth, canvasHeight);
-}
-
-/**
- * 特徴点周辺の重要領域を特定
- */
-// @ts-ignore - 未使用だがデバッグ用に保持
-function identifyFeatureRegions(
-  landmarks: FaceLandmarks,
-  imageScale: { x: number; y: number }
-): Point[] {
-  const featureRegions: Point[] = [];
-  
-  // 重要な特徴点周辺を登録
-  const importantPoints = [
-    ...landmarks.leftEye,     // 左目
-    ...landmarks.rightEye,    // 右目
-    ...landmarks.mouth,       // 口
-    ...landmarks.nose         // 鼻
-  ];
-  
-  importantPoints.forEach(point => {
-    featureRegions.push({
-      x: point.x * imageScale.x,
-      y: point.y * imageScale.y
-    });
-  });
-  
-  return featureRegions;
-}
-
-/**
- * 適応的サンプリングマップを生成
- */
-// @ts-ignore - 未使用だがデバッグ用に保持
-function generateSamplingMap(
-  faceMask: ImageData,
-  featureRegions: Point[],
-  options: AdaptiveWarpingOptions,
-  canvasWidth: number,
-  canvasHeight: number
-): Float32Array {
-  const samplingMap = new Float32Array(canvasWidth * canvasHeight);
-  
-  for (let y = 0; y < canvasHeight; y++) {
-    for (let x = 0; x < canvasWidth; x++) {
-      const idx = y * canvasWidth + x;
-      const maskIdx = (y * canvasWidth + x) * 4;
-      
-      // 基本サンプリング密度（顔領域 vs 背景）
-      const isFaceRegion = faceMask.data[maskIdx] < 128; // 黒い部分が顔
-      let density = isFaceRegion ? options.samplingDensity.foreground : options.samplingDensity.background;
-      
-      // 特徴点周辺はサンプリング密度を上げる
-      const minFeatureDistance = Math.min(
-        ...featureRegions.map(region => {
-          const dx = x - region.x;
-          const dy = y - region.y;
-          return Math.sqrt(dx * dx + dy * dy);
-        })
-      );
-      
-      const featureRadius = 30; // 特徴点周辺の影響半径
-      if (minFeatureDistance < featureRadius) {
-        const featureWeight = 1 - (minFeatureDistance / featureRadius);
-        density = Math.max(density, options.samplingDensity.feature * featureWeight);
-      }
-      
-      samplingMap[idx] = density;
-    }
-  }
-  
-  return samplingMap;
-}
-
-/**
  * パーツ別影響半径を取得（首部変形防止）
  */
 function getPartInfluenceRadius(partType: string): number {
@@ -276,7 +155,7 @@ export function applyAdaptiveTPSWarping(
   if (options.deformationMode === 'mesh') {
     logger.info('🔺 [Version 5.2.0] メッシュベース変形システムへ移行');
     // renderModeをdebugOptionsに渡す
-    const meshRenderMode = (options as any).meshRenderMode || 'hybrid';
+    const meshRenderMode = options.meshRenderMode || 'hybrid';
     return performMeshBasedDeformation(
       sourceImageElement,
       landmarks,
@@ -544,9 +423,9 @@ function applyIndependentTPSWarping(
   faceParams: FaceParams,
   canvasWidth: number,
   canvasHeight: number,
-  // @ts-ignore - 将来の拡張で使用予定
   options: AdaptiveWarpingOptions
 ): HTMLCanvasElement {
+  void options;
   logger.info('🔧 独立変形システム開始');
   
   // 🔍 仮説2検証: 顔パラメータの確認

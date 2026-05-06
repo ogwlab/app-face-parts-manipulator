@@ -126,8 +126,7 @@ export const useImageWarping = (quality: 'fast' | 'medium' | 'high' = 'high'): U
       // renderModeをオプションに反映
       options.deformationMode = 'mesh'; // メッシュベースを使用
       if (options.deformationMode === 'mesh') {
-        // メッシュベースの場合、debugOptionsにrenderModeを設定
-        (options as any).meshRenderMode = renderMode;
+        options.meshRenderMode = renderMode;
       }
       
       const warpedCanvas = applyAdaptiveTPSWarping(

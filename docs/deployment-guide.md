@@ -65,6 +65,30 @@ dist/
 - **公開ディレクトリ**: `/var/www/html/`, `/public_html/`, `/www/` など
 - **SSHポート**: 通常は22番、カスタムの場合は指定されたポート
 
+### 2.3 現行本番環境（2026-05-06）
+
+現在の `ogwlab.org/face-parts-manipulator/` は、旧レンタルサーバーではなくVPS上のnginxで配信しています。
+
+| 項目 | 値 |
+|------|----|
+| 公開URL | `https://ogwlab.org/face-parts-manipulator/` |
+| SSH接続 | `ogwlab-vps`（`~/.ssh/config` のTailscale経由エイリアス） |
+| ユーザー | `root` |
+| 配置パス | `/var/www/html/face-parts-manipulator/` |
+| Webサーバー | nginx |
+| nginx設定 | `/etc/nginx/sites-available/wordpress` の `/face-parts-manipulator/` location |
+
+本番反映は以下で行います：
+
+```bash
+npm run build
+rsync -avz --progress --delete dist/ ogwlab-vps:/var/www/html/face-parts-manipulator/
+ssh ogwlab-vps 'nginx -t && systemctl reload nginx'
+curl -I https://ogwlab.org/face-parts-manipulator/
+```
+
+nginxでは `.htaccess` は適用されません。セキュリティヘッダーやSPA fallbackはnginxのlocation設定で管理してください。
+
 ---
 
 ## 3. rsyncを使用したデプロイ
@@ -159,12 +183,10 @@ AddType application/wasm .wasm
 
 # セキュリティヘッダー
 <IfModule mod_headers.c>
-    # CORS設定（モデルファイル用）
-    <FilesMatch "\.(json|wasm)$">
-        Header set Access-Control-Allow-Origin "*"
-        Header set Access-Control-Allow-Methods "GET, POST, OPTIONS"
-        Header set Access-Control-Allow-Headers "Content-Type"
-    </FilesMatch>
+    # 同一オリジン配信のため、モデルファイルに広いCORS許可は付けない
+    Header always unset Access-Control-Allow-Origin
+    Header always unset Access-Control-Allow-Methods
+    Header always unset Access-Control-Allow-Headers
     
     # セキュリティヘッダー
     Header always set X-Content-Type-Options "nosniff"
@@ -226,12 +248,32 @@ server {
     location /models/ {
         expires 1M;
         add_header Cache-Control "public";
-        add_header Access-Control-Allow-Origin "*";
     }
 
     # gzip圧縮
     gzip on;
     gzip_types text/css application/javascript application/json;
+}
+```
+
+`ogwlab.org` のように既存サイトのサブパスで公開する場合は、WordPressなどの汎用 `location /` より前に専用locationを置きます。
+
+```nginx
+location = /face-parts-manipulator {
+    return 301 /face-parts-manipulator/;
+}
+
+location /face-parts-manipulator/ {
+    alias /var/www/html/face-parts-manipulator/;
+    try_files $uri $uri/ /face-parts-manipulator/index.html;
+
+    add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
+    add_header X-Frame-Options "SAMEORIGIN" always;
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header X-XSS-Protection "1; mode=block" always;
+    add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+    add_header Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=(), usb=(), magnetometer=(), gyroscope=(), accelerometer=()" always;
+    add_header Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'; frame-ancestors 'self'; upgrade-insecure-requests" always;
 }
 ```
 
@@ -363,16 +405,16 @@ chmod +x simple-deploy.sh
 # .env.deploy を作成（サーバー情報を管理）
 cat > .env.deploy << 'EOF'
 # デプロイ設定
-DEPLOY_SERVER=your-server.com
-DEPLOY_USERNAME=your-username
-DEPLOY_PATH=/var/www/html/face-manipulator
+DEPLOY_SERVER=ogwlab-vps
+DEPLOY_USERNAME=root
+DEPLOY_PATH=/var/www/html/face-parts-manipulator
 DEPLOY_PORT=22
 DEPLOY_KEY_PATH=  # 空の場合はSSHエージェントまたはデフォルトキーを使用
 
 # アプリケーション設定
-APP_URL=https://your-server.com/face-manipulator
-APP_NAME="Face Parts Manipulator"
-BASE_PATH=/face-manipulator/
+APP_URL=https://ogwlab.org/face-parts-manipulator/
+APP_NAME="Face Parts Manipulator v7.0.1"
+BASE_PATH=/face-parts-manipulator/
 EOF
 
 # .gitignoreに追加（秘密情報を保護）
@@ -422,9 +464,10 @@ main() {
         exit 1
     fi
     
-    # rsyncコマンドの構築と実行
+    # rsyncコマンドの構築と実行（evalを使わず引数配列で実行）
     log_info "Deploying files to server..."
-    local rsync_cmd=""
+    local rsync_cmd=(rsync -avz --progress --delete)
+    local ssh_cmd=(ssh)
     
     # SSH鍵が指定されている場合の処理
     if [ -n "${DEPLOY_KEY_PATH}" ] && [ "${DEPLOY_KEY_PATH}" != "~/.ssh/id_rsa" ]; then
@@ -432,13 +475,15 @@ main() {
             log_error "SSH key file not found: ${DEPLOY_KEY_PATH}"
             exit 1
         fi
-        rsync_cmd="rsync -avz --progress --delete -e \"ssh -i ${DEPLOY_KEY_PATH} -p ${DEPLOY_PORT:-22}\" dist/ ${DEPLOY_USERNAME}@${DEPLOY_SERVER}:${DEPLOY_PATH}/"
-    else
-        rsync_cmd="rsync -avz --progress --delete -e \"ssh -p ${DEPLOY_PORT:-22}\" dist/ ${DEPLOY_USERNAME}@${DEPLOY_SERVER}:${DEPLOY_PATH}/"
+        ssh_cmd+=(-i "${DEPLOY_KEY_PATH}")
     fi
+
+    ssh_cmd+=(-p "${DEPLOY_PORT:-22}")
+    rsync_cmd+=(-e "$(printf '%q ' "${ssh_cmd[@]}")")
+    rsync_cmd+=(dist/ "${DEPLOY_USERNAME}@${DEPLOY_SERVER}:${DEPLOY_PATH}/")
     
     # rsync実行
-    if eval "${rsync_cmd}"; then
+    if "${rsync_cmd[@]}"; then
         log_success "Files deployed successfully"
     else
         log_error "Deployment failed"
@@ -502,22 +547,22 @@ log_error() {
 pre_deploy_check() {
     log_info "Pre-deployment checks..."
     
-    # SSH接続テスト（修正版：SSH鍵を実際に使用）
-    local ssh_cmd="ssh -o ConnectTimeout=10"
+    # SSH接続テスト（SSH鍵を実際に使用し、引数配列で実行）
+    local ssh_cmd=(ssh -o ConnectTimeout=10)
     
     if [ -n "${DEPLOY_KEY_PATH}" ] && [ "${DEPLOY_KEY_PATH}" != "~/.ssh/id_rsa" ]; then
         if [ ! -f "${DEPLOY_KEY_PATH}" ]; then
             log_error "SSH key file not found: ${DEPLOY_KEY_PATH}"
             exit 1
         fi
-        ssh_cmd="${ssh_cmd} -i ${DEPLOY_KEY_PATH}"
+        ssh_cmd+=(-i "${DEPLOY_KEY_PATH}")
     fi
     
     if [ -n "${DEPLOY_PORT}" ] && [ "${DEPLOY_PORT}" != "22" ]; then
-        ssh_cmd="${ssh_cmd} -p ${DEPLOY_PORT}"
+        ssh_cmd+=(-p "${DEPLOY_PORT}")
     fi
     
-    if ! ${ssh_cmd} ${DEPLOY_USERNAME}@${DEPLOY_SERVER} exit 2>/dev/null; then
+    if ! "${ssh_cmd[@]}" "${DEPLOY_USERNAME}@${DEPLOY_SERVER}" exit 2>/dev/null; then
         log_error "Cannot connect to server"
         exit 1
     fi
@@ -544,25 +589,25 @@ AddType application/json .json
 AddType application/javascript .js
 HTACCESS
     
-    # rsync実行（修正版：SSH鍵を実際に使用）
-    local rsync_opts="-avz --progress --delete"
-    local ssh_opts=""
+    # rsync実行（SSH鍵を使用し、evalを避ける）
+    local rsync_cmd=(rsync -avz --progress --delete)
+    local ssh_cmd=(ssh)
     
     if [ -n "${DEPLOY_KEY_PATH}" ] && [ "${DEPLOY_KEY_PATH}" != "~/.ssh/id_rsa" ]; then
-        ssh_opts="-i ${DEPLOY_KEY_PATH}"
+        ssh_cmd+=(-i "${DEPLOY_KEY_PATH}")
     fi
     
     if [ -n "${DEPLOY_PORT}" ] && [ "${DEPLOY_PORT}" != "22" ]; then
-        ssh_opts="${ssh_opts} -p ${DEPLOY_PORT}"
+        ssh_cmd+=(-p "${DEPLOY_PORT}")
     fi
     
-    if [ -n "${ssh_opts}" ]; then
-        rsync_opts="${rsync_opts} -e \"ssh ${ssh_opts}\""
+    if [ ${#ssh_cmd[@]} -gt 1 ]; then
+        rsync_cmd+=(-e "$(printf '%q ' "${ssh_cmd[@]}")")
     fi
     
-    local rsync_cmd="rsync ${rsync_opts} dist/ ${DEPLOY_USERNAME}@${DEPLOY_SERVER}:${DEPLOY_PATH}/"
+    rsync_cmd+=(dist/ "${DEPLOY_USERNAME}@${DEPLOY_SERVER}:${DEPLOY_PATH}/")
     
-    if eval "${rsync_cmd}"; then
+    if "${rsync_cmd[@]}"; then
         log_success "Files deployed successfully"
     else
         log_error "Deployment failed"
@@ -913,23 +958,29 @@ Host production-server
 #### 堅牢性強化（v1.2）
 - [ ] sed置換で`&`文字が適切にエスケープされている
 - [ ] SSH コマンド構築で空白が明示的に処理されている
-- [ ] CORS設定がセキュリティを考慮している（開発/本番分離）
+- [ ] CORS設定が同一オリジン前提の最小設定になっている
 - [ ] 圧縮設定にWASM、SVGが含まれている
 
 #### セキュリティ・パフォーマンス最適化（v1.3）
-- [ ] CSP設定で`'unsafe-eval'`のセキュリティリスクが文書化されている
-- [ ] 本番環境用の安全なCSP設定オプションが提供されている
+- [ ] 本番CSPから`'unsafe-eval'`が除去されている
+- [ ] `object-src 'none'` / `base-uri 'self'` / `form-action 'none'` が含まれている
 - [ ] WOFF/WOFF2の再圧縮が除外されている（CPU効率化）
 - [ ] 圧縮除外リストにフォント拡張子が含まれている
 - [ ] ドキュメントと実装の圧縮設定が一致している
-- [ ] face-api.js（TensorFlow.js）の`'unsafe-eval'`依存性が説明されている
+- [ ] face-api.jsの動作確認を厳格CSPのまま実施している
 
 ---
 
-最終更新日: 2025年1月5日  
-CodeRabbit対応バージョン: 1.3
+最終更新日: 2026年5月6日
+CodeRabbit対応バージョン: 1.4
 
 ## 変更履歴
+
+### v1.4 (2026-05-06)
+**セキュリティレビュー対応**
+- 本番CSPを厳格設定に固定し、`unsafe-eval` と広いCORS許可を除去
+- `rsync` 実行例を `eval` なしの引数配列方式へ更新
+- デプロイ前チェックを `npm audit --omit=dev` に統一
 
 ### v1.3 (2025-01-05)
 **CodeRabbit全指摘事項への最終対応**

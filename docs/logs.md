@@ -1,5 +1,47 @@
 # 開発ログ
 
+## Security Hardening + VPS Deployment (2026-05-06) - 依存更新 + デプロイ安全化
+
+### 主な修正
+
+#### 1. 依存関係の脆弱性対応
+- `fabric` を `7.3.1` に更新し、Fabric.js SVG export 由来の high finding を解消
+- `yaml` を `overrides` で `1.10.3` に固定し、`npm audit --omit=dev` を 0 vulnerabilities に復旧
+
+#### 2. 画像アップロード経路の統一
+- `src/utils/imageValidation.ts` を追加し、初回アップロードと「新しい画像を開く」経路で同じ検証を使用
+- JPEG/PNG、8MB上限、1920px上限を全アップロード経路で適用
+- 古い Object URL を `faceStore` 側で revoke し、繰り返し操作時のメモリ残留を抑制
+
+#### 3. 本番ログとLocalStorage安全性
+- Vite production build で `console` / `debugger` を drop
+- LocalStorage から復元する顔パラメータに範囲検証を追加し、手動改変・破損データを拒否
+
+#### 4. デプロイ安全化
+- デプロイガイドの `rsync` 実行例を `eval` なしの引数配列方式へ更新
+- `.htaccess` テンプレートを本番向けCSP固定へ変更し、`unsafe-eval` と広いCORS許可を除去
+- `.serena/` と `data/` のローカル状態ファイルを Git 管理から除外
+- 本番環境が旧XserverからVPSへ移行済みだったため、デプロイ先を `ogwlab-vps:/var/www/html/face-parts-manipulator/` に更新
+- VPS側nginxに `/face-parts-manipulator/` 専用locationを追加し、SPA fallbackとセキュリティヘッダーをnginxで管理
+
+### 検証
+- `npm audit --omit=dev`: 0 vulnerabilities
+- `npm run lint`: 成功
+- `npm run build`: 成功（bundle size warning は継続）
+- `dist/` 内の `.env` / key / DB ファイル混入チェック: 該当なし
+- `https://ogwlab.org/face-parts-manipulator/`: HTTP 200
+- 本番レスポンスヘッダー: CSP / HSTS / X-Frame-Options / X-Content-Type-Options / Permissions-Policy を確認
+- Playwrightで本番ページを読み込み、コンソール警告・エラー 0 件を確認
+
+### デプロイ状況
+- 本番同期完了
+- 公開URL: `https://ogwlab.org/face-parts-manipulator/`
+- 配置先: `ogwlab-vps:/var/www/html/face-parts-manipulator/`
+- nginx設定: `/etc/nginx/sites-available/wordpress`
+- nginx設定バックアップ: `/etc/nginx/sites-available/wordpress.bak-20260506180218`
+
+---
+
 ## Version 7.0.2 (2025-08-04) - 顔形状制御改善 + メントン固定機能
 
 ### 🎯 主な変更内容
@@ -94,6 +136,8 @@
 ---
 
 ## Version 7.0.0 Production Deployment (2025-07-11) - 顔標準化機能 完全公開
+
+> Note: この節は2025-07-11時点の旧Xserverデプロイ記録です。2026-05-06以降の現行本番環境はVPS/nginx配信で、最新の手順は本ファイル冒頭および `docs/deployment-guide.md` を参照してください。
 
 ### 🎯 デプロイ成功記録
 

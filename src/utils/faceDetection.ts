@@ -1,4 +1,5 @@
 import * as faceapi from '@vladmandic/face-api';
+import type { Point } from '../types/face';
 
 // モデルの読み込み状態を管理
 let modelsLoaded = false;
@@ -232,13 +233,14 @@ export const extractFaceParts = (
   console.log('Raw landmarks input:', landmarks);
   
   // face-api.jsのランドマークデータ構造を確認
-  let points;
+  type LandmarkLike = faceapi.FaceLandmarks68 & { _positions?: Point[] };
+  let points: Point[];
   if (landmarks.positions) {
     points = landmarks.positions;
   } else if (Array.isArray(landmarks)) {
     points = landmarks;
-  } else if ((landmarks as any)._positions) {
-    points = (landmarks as any)._positions;
+  } else if ((landmarks as LandmarkLike)._positions) {
+    points = (landmarks as LandmarkLike)._positions ?? [];
   } else {
     throw new Error('Unsupported landmarks format: ' + JSON.stringify(Object.keys(landmarks)));
   }
@@ -247,25 +249,25 @@ export const extractFaceParts = (
 
   return {
     // 左目: 特徴点 36-41 (6個)
-    leftEye: points.slice(36, 42).map((p: any) => ({ x: p.x, y: p.y })),
+    leftEye: points.slice(36, 42).map((p) => ({ x: p.x, y: p.y })),
     
     // 右目: 特徴点 42-47 (6個)
-    rightEye: points.slice(42, 48).map((p: any) => ({ x: p.x, y: p.y })),
+    rightEye: points.slice(42, 48).map((p) => ({ x: p.x, y: p.y })),
     
     // 口: 特徴点 48-67 (20個)
-    mouth: points.slice(48, 68).map((p: any) => ({ x: p.x, y: p.y })),
+    mouth: points.slice(48, 68).map((p) => ({ x: p.x, y: p.y })),
     
     // 鼻: 特徴点 27-35 (9個)
-    nose: points.slice(27, 36).map((p: any) => ({ x: p.x, y: p.y })),
+    nose: points.slice(27, 36).map((p) => ({ x: p.x, y: p.y })),
     
     // 顎ライン: 特徴点 0-16 (17個)
-    jawline: points.slice(0, 17).map((p: any) => ({ x: p.x, y: p.y })),
+    jawline: points.slice(0, 17).map((p) => ({ x: p.x, y: p.y })),
     
     // 左眉毛: 特徴点 17-21 (5個)
-    leftEyebrow: points.slice(17, 22).map((p: any) => ({ x: p.x, y: p.y })),
+    leftEyebrow: points.slice(17, 22).map((p) => ({ x: p.x, y: p.y })),
     
     // 右眉毛: 特徴点 22-26 (5個)
-    rightEyebrow: points.slice(22, 27).map((p: any) => ({ x: p.x, y: p.y }))
+    rightEyebrow: points.slice(22, 27).map((p) => ({ x: p.x, y: p.y }))
   };
 };
 

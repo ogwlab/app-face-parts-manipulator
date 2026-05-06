@@ -1,4 +1,5 @@
 import type { FaceParams } from '../types/face';
+import { PARAM_LIMITS } from '../types/face';
 
 // 保存される設定の型定義
 export interface SavedSettings {
@@ -13,6 +14,10 @@ export interface SavedSettings {
 const STORAGE_KEY = 'face-app-settings';
 const BACKUP_KEY = 'face-app-settings-backup';
 const CURRENT_VERSION = '1.1.0'; // Version bump for faceShape migration
+
+const isFiniteNumberInRange = (value: unknown, min: number, max: number): value is number => {
+  return typeof value === 'number' && Number.isFinite(value) && value >= min && value <= max;
+};
 
 /**
  * 設定をLocalStorageに保存
@@ -50,18 +55,20 @@ export const saveSettingsToStorage = (
 /**
  * 設定のマイグレーション（roundness → faceShape）
  */
-const migrateSettings = (settings: any): SavedSettings => {
+const migrateSettings = (settings: Record<string, unknown>): SavedSettings => {
   // contourパラメータのマイグレーション
-  if (settings.faceParams?.contour && 'roundness' in settings.faceParams.contour) {
+  const faceParams = settings.faceParams as Partial<FaceParams> | undefined;
+  if (faceParams?.contour && 'roundness' in faceParams.contour) {
     console.log('📦 設定をマイグレーション: roundness → faceShape');
-    settings.faceParams.contour.faceShape = settings.faceParams.contour.roundness;
-    delete settings.faceParams.contour.roundness;
+    const legacyContour = faceParams.contour as FaceParams['contour'] & { roundness?: number };
+    legacyContour.faceShape = legacyContour.roundness ?? legacyContour.faceShape;
+    delete legacyContour.roundness;
   }
   
   // バージョンを更新
   settings.version = CURRENT_VERSION;
   
-  return settings as SavedSettings;
+  return settings as unknown as SavedSettings;
 };
 
 /**
@@ -84,7 +91,7 @@ export const loadSettingsFromStorage = (): SavedSettings | null => {
       
       // 古いバージョンの設定をマイグレーション
       if (settings.version === '1.0.0') {
-        settings = migrateSettings(settings);
+        settings = migrateSettings(settings as unknown as Record<string, unknown>);
         // マイグレーション後の設定を保存
         saveSettingsToStorage(settings.faceParams, settings.qualityMode, settings.standardizationEnabled);
       } else {
@@ -123,7 +130,7 @@ const loadSettingsFromBackup = (): SavedSettings | null => {
     // バージョンチェックとマイグレーション
     if (settings.version !== CURRENT_VERSION) {
       if (settings.version === '1.0.0') {
-        settings = migrateSettings(settings);
+        settings = migrateSettings(settings as unknown as Record<string, unknown>);
       } else {
         // 未知のバージョンは無視
         console.warn('⚠️ 未知のバージョンです:', settings.version);
@@ -187,7 +194,7 @@ const isValidSettings = (settings: unknown): settings is SavedSettings => {
 
   // FaceParamsの構造チェック
   const faceParams = settingsObj.faceParams as Record<string, unknown>;
-  const requiredParts = ['leftEye', 'rightEye', 'mouth', 'nose'];
+  const requiredParts = ['leftEye', 'rightEye', 'mouth', 'nose', 'contour'];
   
   for (const part of requiredParts) {
     if (!faceParams[part] || typeof faceParams[part] !== 'object') {
@@ -200,7 +207,34 @@ const isValidSettings = (settings: unknown): settings is SavedSettings => {
     return false;
   }
 
-  return true;
+  const leftEye = faceParams.leftEye as Record<string, unknown>;
+  const rightEye = faceParams.rightEye as Record<string, unknown>;
+  const mouth = faceParams.mouth as Record<string, unknown>;
+  const nose = faceParams.nose as Record<string, unknown>;
+  const contour = faceParams.contour as Record<string, unknown>;
+
+  return (
+    isFiniteNumberInRange(leftEye.size, PARAM_LIMITS.eye.size.min, PARAM_LIMITS.eye.size.max) &&
+    isFiniteNumberInRange(leftEye.positionX, PARAM_LIMITS.eye.positionX.min, PARAM_LIMITS.eye.positionX.max) &&
+    isFiniteNumberInRange(leftEye.positionY, PARAM_LIMITS.eye.positionY.min, PARAM_LIMITS.eye.positionY.max) &&
+    isFiniteNumberInRange(rightEye.size, PARAM_LIMITS.eye.size.min, PARAM_LIMITS.eye.size.max) &&
+    isFiniteNumberInRange(rightEye.positionX, PARAM_LIMITS.eye.positionX.min, PARAM_LIMITS.eye.positionX.max) &&
+    isFiniteNumberInRange(rightEye.positionY, PARAM_LIMITS.eye.positionY.min, PARAM_LIMITS.eye.positionY.max) &&
+    isFiniteNumberInRange(mouth.width, PARAM_LIMITS.mouth.width.min, PARAM_LIMITS.mouth.width.max) &&
+    isFiniteNumberInRange(mouth.height, PARAM_LIMITS.mouth.height.min, PARAM_LIMITS.mouth.height.max) &&
+    isFiniteNumberInRange(mouth.positionX, PARAM_LIMITS.mouth.positionX.min, PARAM_LIMITS.mouth.positionX.max) &&
+    isFiniteNumberInRange(mouth.positionY, PARAM_LIMITS.mouth.positionY.min, PARAM_LIMITS.mouth.positionY.max) &&
+    isFiniteNumberInRange(nose.width, PARAM_LIMITS.nose.width.min, PARAM_LIMITS.nose.width.max) &&
+    isFiniteNumberInRange(nose.height, PARAM_LIMITS.nose.height.min, PARAM_LIMITS.nose.height.max) &&
+    isFiniteNumberInRange(nose.positionX, PARAM_LIMITS.nose.positionX.min, PARAM_LIMITS.nose.positionX.max) &&
+    isFiniteNumberInRange(nose.positionY, PARAM_LIMITS.nose.positionY.min, PARAM_LIMITS.nose.positionY.max) &&
+    isFiniteNumberInRange(contour.faceShape, PARAM_LIMITS.contour.faceShape.min, PARAM_LIMITS.contour.faceShape.max) &&
+    isFiniteNumberInRange(contour.jawWidth, PARAM_LIMITS.contour.jawWidth.min, PARAM_LIMITS.contour.jawWidth.max) &&
+    isFiniteNumberInRange(contour.cheekFullness, PARAM_LIMITS.contour.cheekFullness.min, PARAM_LIMITS.contour.cheekFullness.max) &&
+    isFiniteNumberInRange(contour.chinHeight, PARAM_LIMITS.contour.chinHeight.min, PARAM_LIMITS.contour.chinHeight.max) &&
+    isFiniteNumberInRange(contour.smoothness, PARAM_LIMITS.contour.smoothness.min, PARAM_LIMITS.contour.smoothness.max) &&
+    (typeof contour.fixMenton === 'boolean' || typeof contour.fixMenton === 'undefined')
+  );
 };
 
 /**

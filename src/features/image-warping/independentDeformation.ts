@@ -1,6 +1,6 @@
 import type { Point, FaceParams, FaceLandmarks, EyeParams, MouthParams, NoseParams } from '../../types/face';
 import type { TPSControlPoint } from './tpsWarping';
-import { segmentFaceParts, type PartSegmentationResult, type PartRegion } from './partSegmentation';
+import { segmentFaceParts, type PartBarrier, type PartSegmentationResult, type PartRegion } from './partSegmentation';
 
 /**
  * パーツ独立変形システム
@@ -429,9 +429,9 @@ function generateIndependentControlPoints(
  * 制御点が必要かどうかを判定
  */
 function shouldCreateControlPoints(
-  // @ts-ignore - Version 5.1.4では常にtrueを返すが、将来の参照のため引数を保持
   params: EyeParams | MouthParams | NoseParams
 ): boolean {
+  void params;
   // Version 5.1.4: 常に制御点を生成して基準状態を確立
   // これにより、変形なしでも正しい初期状態が保証される
   return true;
@@ -618,8 +618,6 @@ function calculatePartInfluences(
     }
 
     if (distanceToCenter < region.influenceRadius) {
-      // バリア効果を考慮
-      // @ts-ignore - デバッグ用に保持
       const barrierEffect = calculatePixelBarrierEffect(pixel, region, segmentation.barriers);
       
       if (barrierEffect > 0.1) { // 最小閾値
@@ -653,9 +651,9 @@ function calculatePartDeformation(
   pixel: Point,
   partControlPoints: IndependentControlPoint[],
   region: PartRegion,
-  // @ts-ignore - 将来のバリア効果で使用予定
   barrierEffect: number
 ): { offsetX: number; offsetY: number; strength: number } {
+  void barrierEffect;
   let totalWeight = 0;
   let weightedOffsetX = 0;
   let weightedOffsetY = 0;
@@ -725,7 +723,7 @@ function calculatePartDeformation(
 function calculatePixelBarrierEffect(
   pixel: Point,
   region: PartRegion,
-  barriers: any[]
+  barriers: PartBarrier[]
 ): number {
   let effect = 1.0;
 

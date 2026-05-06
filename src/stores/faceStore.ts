@@ -132,6 +132,11 @@ export const useFaceStore = create<FaceStore>((set, get) => ({
 
   // アクション
   setOriginalImage: (image, fileName) => {
+    const previousUrl = get().originalImage?.url;
+    if (previousUrl && previousUrl !== image?.url) {
+      URL.revokeObjectURL(previousUrl);
+    }
+
     set({ 
       originalImage: image,
       originalFileName: fileName || (image?.file.name) || null
@@ -229,6 +234,11 @@ export const useFaceStore = create<FaceStore>((set, get) => ({
   
   // 標準化関連アクション
   setStandardizationResult: (imageUrl, landmarks) => {
+    const previousUrl = get().standardizedImageUrl;
+    if (previousUrl && previousUrl !== imageUrl) {
+      URL.revokeObjectURL(previousUrl);
+    }
+
     set({
       isStandardized: true,
       standardizedImageUrl: imageUrl,
@@ -238,6 +248,11 @@ export const useFaceStore = create<FaceStore>((set, get) => ({
   },
   
   clearStandardization: () => {
+    const previousUrl = get().standardizedImageUrl;
+    if (previousUrl) {
+      URL.revokeObjectURL(previousUrl);
+    }
+
     set({
       isStandardized: false,
       standardizedImageUrl: null,
@@ -277,6 +292,14 @@ export const useFaceStore = create<FaceStore>((set, get) => ({
   },
   
   clearAll: () => {
+    const { originalImage, standardizedImageUrl } = get();
+    if (originalImage?.url) {
+      URL.revokeObjectURL(originalImage.url);
+    }
+    if (standardizedImageUrl) {
+      URL.revokeObjectURL(standardizedImageUrl);
+    }
+
     set({
       originalImage: null,
       originalFileName: null,
@@ -302,4 +325,4 @@ export const useFaceStore = create<FaceStore>((set, get) => ({
       currentBaseLandmarks: null,
     });
   },
-})); 
+}));

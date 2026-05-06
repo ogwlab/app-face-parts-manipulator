@@ -221,13 +221,13 @@ function expandBoundaryPoints(points: Point[], expansionRadius: number): Point[]
  * 除外ゾーンの生成（他パーツとの重複防止）
  */
 function generateExclusionZones(
-  // @ts-ignore - 将来の実装で使用予定
   partType: PartRegion['partType'],
-  // @ts-ignore - 将来の実装で使用予定
   center: Point,
-  // @ts-ignore - 将来の実装で使用予定
   influenceRadius: number
 ): Point[][] {
+  void partType;
+  void center;
+  void influenceRadius;
   // 現在は簡略化実装
   // 実際の実装では他パーツの位置を考慮した除外ゾーンを生成
   return [];
@@ -316,8 +316,7 @@ function generateInfluenceMask(
       let maxInfluence = 0;
 
       // 各パーツ領域からの影響を計算
-      // @ts-ignore - デバッグ用に保持
-      for (const [partId, region] of regions) {
+      for (const region of regions.values()) {
         const distance = Math.sqrt(
           Math.pow(pixel.x - region.center.x, 2) +
           Math.pow(pixel.y - region.center.y, 2)

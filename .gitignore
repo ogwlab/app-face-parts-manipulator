@@ -39,14 +39,17 @@ dist-ssr
 venv
 venv_*
 
+# ローカルDB/エージェント状態
+data/
+
 # Claude Code設定ファイル（機密情報含む）
 .claude/
 .claude/settings.local.json
 .serena/
 
-# デプロイ関連ファイル
+# デプロイ関連生成ファイル
 .htaccess
-deploy/
+deploy/.DS_Store
 
 # 開発履歴・内部ドキュメント
 docs/todo.md

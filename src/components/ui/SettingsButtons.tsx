@@ -158,7 +158,7 @@ const SettingsButtons: React.FC<SettingsButtonsProps> = ({
       </Box>
 
       {/* 設定状態の表示（開発モード時のみ） */}
-      {process.env.NODE_ENV === 'development' && settingsSummary.hasSettings && (
+      {import.meta.env.DEV && settingsSummary.hasSettings && (
         <Typography 
           variant="caption" 
           color="text.secondary" 

@@ -377,18 +377,18 @@ export function applySinglePartWarping(
   sourceImage: fabric.Image,
   landmarks: FaceLandmarks,
   partType: 'leftEye' | 'rightEye' | 'mouth' | 'nose',
-  params: any
+  params: FaceParams['leftEye'] | FaceParams['rightEye'] | FaceParams['mouth'] | FaceParams['nose']
 ): fabric.Image {
   try {
     switch (partType) {
       case 'leftEye':
-        return createEyeWarp(sourceImage, landmarks, params, true);
+        return createEyeWarp(sourceImage, landmarks, params as FaceParams['leftEye'], true);
       case 'rightEye':
-        return createEyeWarp(sourceImage, landmarks, params, false);
+        return createEyeWarp(sourceImage, landmarks, params as FaceParams['rightEye'], false);
       case 'mouth':
-        return createMouthWarp(sourceImage, landmarks, params);
+        return createMouthWarp(sourceImage, landmarks, params as FaceParams['mouth']);
       case 'nose':
-        return createNoseWarp(sourceImage, landmarks, params);
+        return createNoseWarp(sourceImage, landmarks, params as FaceParams['nose']);
       default:
         return sourceImage;
     }

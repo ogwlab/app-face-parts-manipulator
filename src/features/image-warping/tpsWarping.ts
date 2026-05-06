@@ -457,38 +457,6 @@ function calculateCenter(points: Point[]): Point {
 }
 
 /**
- * 安定化のための固定点を追加（現在未使用）
- */
-// @ts-ignore - 未使用だがデバッグ用に保持
-function addStabilizingPoints(
-  controlPoints: TPSControlPoint[],
-  imageScale: { x: number; y: number },
-  actualCanvasWidth?: number,
-  actualCanvasHeight?: number
-): void {
-  // 実際のCanvasサイズを使用（指定されていない場合は推定）
-  const canvasWidth = actualCanvasWidth || (800 * imageScale.x);
-  const canvasHeight = actualCanvasHeight || (600 * imageScale.y);
-  
-  // 画像の四隅と中央に固定点を追加
-  const stabilizingPoints = [
-    { x: 0, y: 0 },
-    { x: canvasWidth, y: 0 },
-    { x: canvasWidth, y: canvasHeight },
-    { x: 0, y: canvasHeight },
-    { x: canvasWidth / 2, y: canvasHeight / 2 }
-  ];
-
-  stabilizingPoints.forEach(point => {
-    controlPoints.push({
-      original: point,
-      target: point, // 固定点なので変形しない
-      weight: 0.1 // 低い重み
-    });
-  });
-}
-
-/**
  * パーツ別係数定義
  */
 const PART_MULTIPLIERS = {

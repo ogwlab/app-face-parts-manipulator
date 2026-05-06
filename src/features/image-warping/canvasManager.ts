@@ -102,8 +102,7 @@ export class FabricCanvasManager implements CanvasManager {
     if (!this.canvas) return;
 
     // Canvasサイズを更新
-    this.canvas.setWidth(width);
-    this.canvas.setHeight(height);
+    this.canvas.setDimensions({ width, height });
 
     // 既存の画像がある場合は、新しいサイズに合わせて調整
     if (this.currentImage) {
