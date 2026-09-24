@@ -1,6 +1,9 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
+// @types/node を入れずに Actions の環境変数だけ読むための宣言
+declare const process: { env: Record<string, string | undefined> }
+
 // https://vite.dev/config/
 export default defineConfig(({ mode }) => ({
   plugins: [react()],
