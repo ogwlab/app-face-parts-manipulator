@@ -4,7 +4,8 @@ import react from '@vitejs/plugin-react'
 // https://vite.dev/config/
 export default defineConfig(({ mode }) => ({
   plugins: [react()],
-  base: '/face-parts-manipulator/', // サーバー上のパス設定に合わせる
+  // GitHub Pages（Actions でのビルド）と Xserver（手作業デプロイ）で配置パスが異なる
+  base: process.env.GITHUB_ACTIONS ? '/app-face-parts-manipulator/' : '/face-parts-manipulator/',
   esbuild: {
     drop: mode === 'production' ? ['console', 'debugger'] : [],
   },
