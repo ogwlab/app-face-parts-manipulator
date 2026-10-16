@@ -1,6 +1,6 @@
 # AGENTS.md
 
-This file provides guidance to Codex (Codex.ai/code) when working with code in this repository.
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
 ## Project Overview
 
@@ -537,7 +537,7 @@ const newCenter = {
 #### 🔧 **RESOLVED: Security Permission Issue**
 **Implementation Date**: 2025-07-04
 **Issue**: CodeRabbit flagged overly broad `"Bash(grep:*)"` permission
-**Solution**: Removed unused `grep` permission from `.Codex/settings.local.json`
+**Solution**: Removed unused `grep` permission from `.claude/settings.local.json`
 **Result**: ✅ Security risk eliminated, no functional impact
 
 #### 🔧 **RESOLVED: CodeRabbit Robustness Improvements**
